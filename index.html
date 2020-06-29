@@ -221,7 +221,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/29/Angr╚δ├┼▒╩╝╟ú¿╥╗ú⌐/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/29/Angr入门笔记（一）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ZERO-A-ONE">
@@ -235,7 +235,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2020/06/29/Angr╚δ├┼▒╩╝╟ú¿╥╗ú⌐/" class="post-title-link" itemprop="url">Angr入门笔记（一）</a>
+            <a href="/2020/06/29/Angr入门笔记（一）/" class="post-title-link" itemprop="url">Angr入门笔记（一）</a>
           
         </h1>
 
@@ -250,7 +250,7 @@
                 
               
 
-              <time title="Erstellt: 2020-06-29 03:03:42 / Geändert am: 18:03:42" itemprop="dateCreated datePublished" datetime="2020-06-29T03:03:42-07:00">2020-06-29</time>
+              <time title="Erstellt: 2020-06-29 05:45:22 / Geändert am: 05:45:59" itemprop="dateCreated datePublished" datetime="2020-06-29T05:45:22-07:00">2020-06-29</time>
             </span>
           
             
@@ -269,7 +269,74 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>本文所使用Ubuntu环境皆为18.04 LTS 版本</p>
+<h2 id="安装篇"><a href="#安装篇" class="headerlink" title="安装篇"></a>安装篇</h2><p>建议首先修改Linux和Python镜像至国内镜像加速体验</p>
+<h3 id="Linux-Ubuntu国内镜像"><a href="#Linux-Ubuntu国内镜像" class="headerlink" title="Linux/Ubuntu国内镜像"></a>Linux/Ubuntu国内镜像</h3><ul>
+<li>首先打开Software&amp;Updates</li>
+<li>选择Download from</li>
+<li>选择Other…</li>
+<li>在国家列表中找到China</li>
+<li>推荐选择的镜像源为：<ul>
+<li>清华大学镜像站：<code>mirrors.tuna.tsinghua.edu.cn</code></li>
+<li>阿里云镜像站：<code>mirrors.aliyun.com</code></li>
+</ul>
+</li>
+<li>Choose Server</li>
+<li>选择Close后等待刷新镜像仓库</li>
+<li>在shell中执行<ul>
+<li><code>sudo apt update</code></li>
+<li><code>sudo apt upgrade</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="Python国内镜像加速"><a href="#Python国内镜像加速" class="headerlink" title="Python国内镜像加速"></a>Python国内镜像加速</h3><p>首先切回用户主目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br></pre></td></tr></table></figure>
+
+<p>然后创建<code>.pip</code>目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/.pip</span><br><span class="line">cd ~/.pip</span><br></pre></td></tr></table></figure>
+
+<p>这里推荐编辑器使用传说中的神器<code>vim</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install vim</span><br></pre></td></tr></table></figure>
+
+<p>在.pip目录下创建一个<code>pip.conf</code>文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim pip.conf</span><br></pre></td></tr></table></figure>
+
+<p>填入以下内容保存即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">index-url = https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">trusted-host = pypi.tuna.tsinghua.edu.cn</span><br><span class="line">disable-pip-version-check = true</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装Angr"><a href="#安装Angr" class="headerlink" title="安装Angr"></a>安装Angr</h3><p>这里主要参照官方手册文档的教学</p>
+<p>首先是安装必要的软件环境</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install python3-dev libffi-dev build-essential virtualenvwrapper</span><br></pre></td></tr></table></figure>
+
+<p>开始正式安装angr</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkvirtualenv --python=$(which python3) angr &amp;&amp; pip install angr</span><br></pre></td></tr></table></figure>
+
+<p>angr安装完毕</p>
+<p>angr官方推荐使用虚拟环境运行，每次需要调用具有angr环境时，只需要执行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkvirtualenv --python=$(which python3) angr</span><br></pre></td></tr></table></figure>
+
+<h3 id="Tips："><a href="#Tips：" class="headerlink" title="Tips："></a>Tips：</h3><h4 id="1）如果遇上-mkvirtualenv-command-not-found-问题"><a href="#1）如果遇上-mkvirtualenv-command-not-found-问题" class="headerlink" title="1）如果遇上 mkvirtualenv: command not found 问题"></a>1）如果遇上 mkvirtualenv: command not found 问题</h4><ul>
+<li>在终端命令行输入以下命令：<ul>
+<li><code>sudo pip install virtualenv</code></li>
+<li><code>sudo pip install virtualenvwrapper</code></li>
+</ul>
+</li>
+<li>没问题下一步<ul>
+<li><code>cd ~/</code></li>
+</ul>
+</li>
+<li>修改bashrc文件<ul>
+<li><code>vim .bashrc</code></li>
+<li>在文件末尾添加两行代码<ul>
+<li><code>export WORKON_HOME=~/.environments</code></li>
+<li><code>source /usr/local/bin/virtualenvwrapper.sh</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>保存退出即可</li>
+</ul>
+
         
       
     </div>
