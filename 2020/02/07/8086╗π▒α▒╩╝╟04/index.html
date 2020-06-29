@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="标志寄存器8086CPU的标志寄存器(flag)有16位，其中存储的信息通常被称为程序状态字(PSW)。flag和其它寄存器不一样，其它寄存器是用来存放数据的，都是整个寄存器具有一个含义。而flag寄存器是按位起作用的，也就是说，它的每一位都有专门的含义，记录特定的信息 flag的1、3、5、12、13、14、15位在8086CPU中没有使用，不具有任何含义。而0、2、4、6、7、8、9、10、1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="8086汇编笔记04">
+<meta property="og:url" content="http://yoursite.com/2020/02/07/8086╗π▒α▒╩╝╟04/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="标志寄存器8086CPU的标志寄存器(flag)有16位，其中存储的信息通常被称为程序状态字(PSW)。flag和其它寄存器不一样，其它寄存器是用来存放数据的，都是整个寄存器具有一个含义。而flag寄存器是按位起作用的，也就是说，它的每一位都有专门的含义，记录特定的信息 flag的1、3、5、12、13、14、15位在8086CPU中没有使用，不具有任何含义。而0、2、4、6、7、8、9、10、1">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-02-08T00:33:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="8086汇编笔记04">
+<meta name="twitter:description" content="标志寄存器8086CPU的标志寄存器(flag)有16位，其中存储的信息通常被称为程序状态字(PSW)。flag和其它寄存器不一样，其它寄存器是用来存放数据的，都是整个寄存器具有一个含义。而flag寄存器是按位起作用的，也就是说，它的每一位都有专门的含义，记录特定的信息 flag的1、3、5、12、13、14、15位在8086CPU中没有使用，不具有任何含义。而0、2、4、6、7、8、9、10、1">
+  <link rel="canonical" href="http://yoursite.com/2020/02/07/8086╗π▒α▒╩╝╟04/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>8086汇编笔记04 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/07/8086╗π▒α▒╩╝╟04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">8086汇编笔记04
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-07 00:33:23 / Geändert am: 16:33:38" itemprop="dateCreated datePublished" datetime="2020-02-07T00:33:23-08:00">2020-02-07</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="标志寄存器"><a href="#标志寄存器" class="headerlink" title="标志寄存器"></a>标志寄存器</h2><p>8086CPU的标志寄存器(flag)有16位，其中存储的信息通常被称为程序状态字(PSW)。flag和其它寄存器不一样，其它寄存器是用来存放数据的，都是整个寄存器具有一个含义。而flag寄存器是按位起作用的，也就是说，它的每一位都有专门的含义，记录特定的信息</p>
+<p>flag的1、3、5、12、13、14、15位在8086CPU中没有使用，不具有任何含义。而0、2、4、6、7、8、9、10、11位都具有特殊的含义</p>
+<table>
+<thead>
+<tr>
+<th align="center">0</th>
+<th align="center">CF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>2</strong></td>
+<td align="center"><strong>PF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td align="center"><strong>AF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>6</strong></td>
+<td align="center"><strong>ZF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>7</strong></td>
+<td align="center"><strong>SF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>8</strong></td>
+<td align="center"><strong>TF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>9</strong></td>
+<td align="center"><strong>IF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>10</strong></td>
+<td align="center"><strong>DF</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>11</strong></td>
+<td align="center"><strong>OF</strong></td>
+</tr>
+</tbody></table>
+<p>在8086CPU的指令集中，有的指令的执行是影响标志寄存器的，比如：add、sub、mul、div、inc、or、and等，它们大都是运算指令（进行逻辑或算术运算）</p>
+<p>有的指令的执行对标志寄存器没有影响，比如：mov、push、pop等，它们大都是传送指令</p>
+<p>我们在使用一条指令的时候，要注意这条指令的全部功能，其中包括，执行结果对标志寄存器的哪些标志位造成影响。有时候一条指令会对标志寄存器中的多个标志位产生影响</p>
+<h2 id="ZF标志"><a href="#ZF标志" class="headerlink" title="ZF标志"></a>ZF标志</h2><p>ZF是零标志位，它记录相关指令执行后：</p>
+<ul>
+<li>结果为0，ZF=1</li>
+<li>结果不为0，ZF=0</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov ax,1</span><br><span class="line">sub ax,1</span><br></pre></td></tr></table></figure>
+
+<p>指令执行后，结果为0，则ZF=1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov ax,2</span><br><span class="line">sub ax,1</span><br></pre></td></tr></table></figure>
+
+<p>指令执行后，结果为1，则ZF=0</p>
+<h2 id="PF标志"><a href="#PF标志" class="headerlink" title="PF标志"></a>PF标志</h2><p>PF是奇偶标志位，它记录指令执行后，结果的所有二进制位中1的个数：</p>
+<ul>
+<li>为偶数，PF=1</li>
+<li>为奇数，PF=0</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov al,1</span><br><span class="line">add al,10</span><br></pre></td></tr></table></figure>
+
+<p>执行后，结果为00001011B，其中有3（奇数）个1，则PF=0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov al,1</span><br><span class="line">or 	al,10</span><br></pre></td></tr></table></figure>
+
+<p>执行后，结果为00000011B，其中有2（偶数）个1，则PF=1</p>
+<h2 id="SF标志"><a href="#SF标志" class="headerlink" title="SF标志"></a>SF标志</h2><p>SF是符号标志位，它记录指令执行后：</p>
+<ul>
+<li>结果为负，SF=1</li>
+<li>结果为正，SF=0</li>
+</ul>
+<p>在我们将数据当作有符号数来运算的时候，可以通过它来得知结果的正负。但是，如果我们将数据当作无符号数来运算，SF的值则没有意义，虽然相关的指令影响了它的值</p>
+<p>CPU在执行add等指令时，是必然要影响到SF标志位的值，至于我们需不要这种影响，就取决于我们如何看待指令所进行的运算了</p>
+<h2 id="CF标志"><a href="#CF标志" class="headerlink" title="CF标志"></a>CF标志</h2><p>CF是进位标志位，一般情况下，在进行无符号数运算的时候，它记录了运算结果的最高有效位向更高位的进位值，或从更高位的借位值</p>
+<p>对于位数为N的无符号数来说，其对应的二进制信息的最高位，即第N-1位是最高有效位。而假想存在的第N位，就是相对于最高有效位的更高位。其实CPU在运算的时候，并不丢弃进位值，而是记录在CF位</p>
+<h2 id="OF标志"><a href="#OF标志" class="headerlink" title="OF标志"></a>OF标志</h2><p>OF是溢出标志位，记录是否产生了溢出，一定要注意CF和OF的区别：</p>
+<ul>
+<li>CF是对无符号数运算有意义的标志位，对于无符号数运算，CPU用CF位来记录是否产生了进位</li>
+<li>OF是对有符号数运算有意义的标志位，对于有符号数运算，CPU用OF位来记录是否产生了溢出</li>
+</ul>
+<h2 id="adc指令"><a href="#adc指令" class="headerlink" title="adc指令"></a>adc指令</h2><p>adc是带进位加法指令，它利用了CF位上记录的进位值</p>
+<p>格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adc 操作对象1，操作对象2</span><br></pre></td></tr></table></figure>
+
+<p>功能：</p>
+<p>操作对象1 = 操作对象1 + 操作对象2 + CF</p>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adc ax,bx</span><br></pre></td></tr></table></figure>
+
+<p>其实现的功能是：(ax)=(ax)+(bx)+CF</p>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov ax,2</span><br><span class="line">mov bx,1</span><br><span class="line">sub bx,ax</span><br><span class="line">adc ax,1</span><br></pre></td></tr></table></figure>
+
+<p>执行后，(ax)=4，相当于计算：（ax）+1+CF=2+1+1=4</p>
+<p>在执行adc指令的时候加上的CF的值的含义，由之前的指令决定的，也就是说关键在于所加上的CF值是被什么指令设置的，如果CF的值是被sub指令设置的，那么它的含义就是借位值；如果是被add指令设置的，那么它的含义就是进位值</p>
+<h2 id="sbb指令"><a href="#sbb指令" class="headerlink" title="sbb指令"></a>sbb指令</h2><p>sbb是带借位减法指令，它利用了CF位上记录的借位值</p>
+<p>格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sbb 操作对象1，操作对象2</span><br></pre></td></tr></table></figure>
+
+<p>功能：</p>
+<p>操作对象1 = 操作对象1 - 操作对象2 - CF</p>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sbb ax,bx</span><br></pre></td></tr></table></figure>
+
+<p>其实现的功能是：(ax)=(ax)-(bx)-CF</p>
+<h2 id="cmp指令"><a href="#cmp指令" class="headerlink" title="cmp指令"></a>cmp指令</h2><p>cmp是比较指令，功能相当于减法指令，只是不保存结果。cmp指令执行后，将对标志寄存器产生影响，其他相关指令通过识别这些被影响的标志寄存器来得知比较结果</p>
+<p>格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmp 操作对象1，操作对象2</span><br></pre></td></tr></table></figure>
+
+<p>功能：</p>
+<p>操作对象1 - 操作对象2 ，但并不保存结果，仅仅根据计算结果对标志寄存器进行设置</p>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmp ax,ax</span><br></pre></td></tr></table></figure>
+
+<p>做(ax)-(ax)的运算，结果为0，但并不在ax中保存，仅影响flag的相关各位，指令执行后：</p>
+<ul>
+<li>ZF=1</li>
+<li>PF=1</li>
+<li>SF=0</li>
+<li>CF=0</li>
+<li>OF=0</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov ax,8</span><br><span class="line">mov bx,3</span><br><span class="line">cmp ax,bx</span><br></pre></td></tr></table></figure>
+
+<p>指令执行后：</p>
+<ul>
+<li><p>(ax)=8</p>
+</li>
+<li><p>ZF=0</p>
+</li>
+<li><p>PF=1</p>
+</li>
+<li><p>SF=0</p>
+</li>
+<li><p>CF=0</p>
+</li>
+<li><p>OF=0</p>
+</li>
+</ul>
+<p>可以得到以下逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmp ax,bx</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果(ax)=(bx)，则(ax)-(bx)=0，所以：ZF=1</li>
+<li>如果(ax)!=(bx)，则(ax)-(bx)!=0，所以：ZF=0</li>
+<li>如果(ax)&lt;(bx)，则(ax)-(bx)将产生借位，所以：CF=1</li>
+<li>如果(ax)&gt;=(bx)，则(ax)-(bx)不必借位，所以：CF=0</li>
+<li>如果(ax)&gt;(bx)，则(ax)-(bx)不必借位且结果也不为0，所以：CF=0且ZF=0</li>
+<li>如果(ax)&lt;=(bx)，则(ax)-(bx)既可能产生借位且结果又可能为0，所以：CF=1且ZF=1</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmp ax,ax</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ZF=1，说明(ax)=(bx)</li>
+<li>ZF=0，说明(ax)!=(bx)</li>
+<li>CF=1，说明(ax)&lt;(bx)</li>
+<li>CF=0，说明(ax)&gt;=(bx)</li>
+<li>CF=0且ZF=0，说明(ax)&gt;(bx)</li>
+<li>CF=1或ZF=1，说明(ax)&lt;=(bx)</li>
+</ul>
+<h2 id="检测比较结果的条件转移指令"><a href="#检测比较结果的条件转移指令" class="headerlink" title="检测比较结果的条件转移指令"></a>检测比较结果的条件转移指令</h2><table>
+<thead>
+<tr>
+<th align="center">指令</th>
+<th align="center">含义</th>
+<th align="center">检测的相关标志位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">je</td>
+<td align="center">等于则转移</td>
+<td align="center">ZF=1</td>
+</tr>
+<tr>
+<td align="center">jne</td>
+<td align="center">不等于则转移</td>
+<td align="center">ZF=0</td>
+</tr>
+<tr>
+<td align="center">jb</td>
+<td align="center">低于则转移</td>
+<td align="center">CF=1</td>
+</tr>
+<tr>
+<td align="center">jnb</td>
+<td align="center">不低于则转移</td>
+<td align="center">CF=0</td>
+</tr>
+<tr>
+<td align="center">ja</td>
+<td align="center">高于则转移</td>
+<td align="center">CF=0,ZF=0</td>
+</tr>
+<tr>
+<td align="center">jna</td>
+<td align="center">不高于则转移</td>
+<td align="center">CF=1或ZF=1</td>
+</tr>
+</tbody></table>
+<p>这些指令都比较常用，它们所检测的标志位都是cmp指令进行无符号数比较时记录比较结果的标志位：</p>
+<ul>
+<li><p>j：表示jump</p>
+</li>
+<li><p>e：表示equal</p>
+</li>
+<li><p>ne：表示not equal</p>
+</li>
+<li><p>b：表示below</p>
+</li>
+<li><p>nb：表示not below</p>
+</li>
+<li><p>a：表示above</p>
+</li>
+<li><p>na：表示note above</p>
+</li>
+</ul>
+<h2 id="DF标志和串传送指令"><a href="#DF标志和串传送指令" class="headerlink" title="DF标志和串传送指令"></a>DF标志和串传送指令</h2><p>DF是方向标志位，在串处理指令中，控制每次操作后si，di的增减</p>
+<ul>
+<li>DF=0：每次操作后si，di递增</li>
+<li>DF=1：每次操作后si，di递减</li>
+</ul>
+<p>格式1：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movsb</span><br></pre></td></tr></table></figure>
+
+<p>将ds:si指向的内存单元中的字节送入es:di中，然后根据标志寄存器DF位的值，将si和di递增或递减</p>
+<p>功能：（以字节为单位传送）</p>
+<ul>
+<li>((es)<em>16+(di))=((ds)</em>16+(si))</li>
+<li>如果DF=0，则：<ul>
+<li>(si)=(si)+1</li>
+<li>(di)=(di)+1</li>
+</ul>
+</li>
+<li>如果DF=1，则：<ul>
+<li>(si)=(si)-1</li>
+<li>(di)=(di)-1</li>
+</ul>
+</li>
+</ul>
+<p>格式1：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movsw</span><br></pre></td></tr></table></figure>
+
+<p>将ds:si指向的内存单元中的字送入es:di中，然后根据标志寄存器DF位的值，将si和di递增2或递减2</p>
+<p>功能：（以字为单位传送）</p>
+<ul>
+<li>((es)<em>16+(di))=((ds)</em>16+(si))</li>
+<li>如果DF=0，则：<ul>
+<li>(si)=(si)+2</li>
+<li>(di)=(di)+2</li>
+</ul>
+</li>
+<li>如果DF=1，则：<ul>
+<li>(si)=(si)-2</li>
+<li>(di)=(di)-2</li>
+</ul>
+</li>
+</ul>
+<p>movsb和movsw进行的是串传送操作中的一个步骤，一般来说，movsb和movsw都和rep配合使用，格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rep movsb</span><br></pre></td></tr></table></figure>
+
+<p>rep的作用是根据cx的值，重复执行后面的串送指令。由于每执行一次movsb指令si和di都会递增或递减指向后一个单元或前个单元，则rep movsb就可以循环实现（cx）个字符的传送</p>
+<p>8086CPU提供以下两条指令对DF位进行设置：</p>
+<ul>
+<li>cld指令：将标志寄存器的DF置0</li>
+<li>std指令：将标志寄存器的DF置1</li>
+</ul>
+<h2 id="pushf和popf"><a href="#pushf和popf" class="headerlink" title="pushf和popf"></a>pushf和popf</h2><ul>
+<li>pushf：将标志寄存器的值压栈</li>
+<li>popf：从栈中弹出数据，送入标志寄存器中</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/06/8086╗π▒α▒╩╝╟03/" rel="next" title="8086汇编笔记03">
+                  <i class="fa fa-chevron-left"></i> 8086汇编笔记03
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/07/╝≥├≈╢╤╚δ├┼/" rel="prev" title="简明堆入门">
+                  简明堆入门 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#标志寄存器"><span class="nav-number">1.</span> <span class="nav-text">标志寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZF标志"><span class="nav-number">2.</span> <span class="nav-text">ZF标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PF标志"><span class="nav-number">3.</span> <span class="nav-text">PF标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SF标志"><span class="nav-number">4.</span> <span class="nav-text">SF标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CF标志"><span class="nav-number">5.</span> <span class="nav-text">CF标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OF标志"><span class="nav-number">6.</span> <span class="nav-text">OF标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#adc指令"><span class="nav-number">7.</span> <span class="nav-text">adc指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sbb指令"><span class="nav-number">8.</span> <span class="nav-text">sbb指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cmp指令"><span class="nav-number">9.</span> <span class="nav-text">cmp指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检测比较结果的条件转移指令"><span class="nav-number">10.</span> <span class="nav-text">检测比较结果的条件转移指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DF标志和串传送指令"><span class="nav-number">11.</span> <span class="nav-text">DF标志和串传送指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pushf和popf"><span class="nav-number">12.</span> <span class="nav-text">pushf和popf</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

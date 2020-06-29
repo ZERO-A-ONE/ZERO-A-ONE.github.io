@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="做了一下相关汇编指令的收集 整数运算指令集数据传输指令它们在存贮器和寄存器、寄存器和输入输出端口之间传送数据 通用数据传送指令   MOV 传送字或字节    MOVSX 先符号扩展,再传送   MOVZX 先零扩展,再传送   PUSH 把字压入堆栈   POP 把字弹出堆栈   PUSHA 把AX,CX,DX,BX,SP,BP,SI,DI依次压入堆栈   POPA 把DI,SI,BP,SP,B">
+<meta property="og:type" content="article">
+<meta property="og:title" content="X86和X87汇编指令大全">
+<meta property="og:url" content="http://yoursite.com/2019/09/09/X86║═X87╗π▒α╓╕┴ε┤≤╚½/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="做了一下相关汇编指令的收集 整数运算指令集数据传输指令它们在存贮器和寄存器、寄存器和输入输出端口之间传送数据 通用数据传送指令   MOV 传送字或字节    MOVSX 先符号扩展,再传送   MOVZX 先零扩展,再传送   PUSH 把字压入堆栈   POP 把字弹出堆栈   PUSHA 把AX,CX,DX,BX,SP,BP,SI,DI依次压入堆栈   POPA 把DI,SI,BP,SP,B">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-10T04:55:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="X86和X87汇编指令大全">
+<meta name="twitter:description" content="做了一下相关汇编指令的收集 整数运算指令集数据传输指令它们在存贮器和寄存器、寄存器和输入输出端口之间传送数据 通用数据传送指令   MOV 传送字或字节    MOVSX 先符号扩展,再传送   MOVZX 先零扩展,再传送   PUSH 把字压入堆栈   POP 把字弹出堆栈   PUSHA 把AX,CX,DX,BX,SP,BP,SI,DI依次压入堆栈   POPA 把DI,SI,BP,SP,B">
+  <link rel="canonical" href="http://yoursite.com/2019/09/09/X86║═X87╗π▒α╓╕┴ε┤≤╚½/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>X86和X87汇编指令大全 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/09/X86║═X87╗π▒α╓╕┴ε┤≤╚½/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">X86和X87汇编指令大全
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-09 06:55:06 / Geändert am: 21:55:28" itemprop="dateCreated datePublished" datetime="2019-09-09T06:55:06-07:00">2019-09-09</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>做了一下相关汇编指令的收集</p>
+<h2 id="整数运算指令集"><a href="#整数运算指令集" class="headerlink" title="整数运算指令集"></a>整数运算指令集</h2><h3 id="数据传输指令"><a href="#数据传输指令" class="headerlink" title="数据传输指令"></a>数据传输指令</h3><p>它们在存贮器和寄存器、寄存器和输入输出端口之间传送数据</p>
+<h3 id="通用数据传送指令"><a href="#通用数据传送指令" class="headerlink" title="通用数据传送指令"></a>通用数据传送指令</h3><table>
+<thead>
+<tr>
+<th align="center">MOV</th>
+<th align="center">传送字或字节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>MOVSX</strong></td>
+<td align="center"><strong>先符号扩展,再传送</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>MOVZX</strong></td>
+<td align="center"><strong>先零扩展,再传送</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>PUSH</strong></td>
+<td align="center"><strong>把字压入堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>POP</strong></td>
+<td align="center"><strong>把字弹出堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>PUSHA</strong></td>
+<td align="center"><strong>把AX,CX,DX,BX,SP,BP,SI,DI依次压入堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>POPA</strong></td>
+<td align="center"><strong>把DI,SI,BP,SP,BX,DX,CX,AX依次弹出堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>PUSHAD</strong></td>
+<td align="center"><strong>把EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI依次压入堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>POPAD</strong></td>
+<td align="center"><strong>把EDI,ESI,EBP,ESP,EBX,EDX,ECX,EAX依次弹出堆栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>BSWAP</strong></td>
+<td align="center"><strong>交换32位寄存器里字节的顺序</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>XCHG</strong></td>
+<td align="center"><strong>交换字或字节(至少有一个操作数为寄存器,段寄存器不可作为操作数)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CMPXCHG</strong></td>
+<td align="center"><strong>比较并交换操作数(第二个操作数必须为累加器AL/AX/EAX)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>XADD</strong></td>
+<td align="center"><strong>先交换再累加(结果在第一个操作数里)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>XLAT</strong></td>
+<td align="center"><strong>字节查表转换</strong></td>
+</tr>
+</tbody></table>
+<h3 id="输入输出端口传送指令"><a href="#输入输出端口传送指令" class="headerlink" title="输入输出端口传送指令"></a>输入输出端口传送指令</h3><p>输入输出端口由立即方式指定时，其范围是 <strong>0-255</strong>; 由寄存器 <strong>DX</strong> 指定时,其范围是：<strong>0-65535</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">IN</th>
+<th align="center">I/O端口输入</th>
+<th align="center">语法: IN   累加器,    {端口号│DX}</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>OUT</strong></td>
+<td align="center"><strong>I/O端口输出</strong></td>
+<td align="center"><strong>语法: OUT {端口号│DX},累加器</strong></td>
+</tr>
+</tbody></table>
+<h3 id="目的地址传送指令"><a href="#目的地址传送指令" class="headerlink" title="目的地址传送指令"></a>目的地址传送指令</h3><table>
+<thead>
+<tr>
+<th align="center">LEA</th>
+<th align="center">装入有效地址</th>
+<th align="center">LEA DX,string ;把偏移地址存到DX</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>LDS</strong></td>
+<td align="center"><strong>传送目标指针,把指针内容装入DS</strong></td>
+<td align="center"><strong>LDS SI,string;把段地址:偏移地址存到DS:SI</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LES</strong></td>
+<td align="center"><strong>传送目标指针,把指针内容装入ES</strong></td>
+<td align="center"><strong>LES DI,string;把段地址:偏移地址存到ES:DI</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LFS</strong></td>
+<td align="center"><strong>传送目标指针,把指针内容装入FS</strong></td>
+<td align="center"><strong>LFS DI,string;把段地址:偏移地址存到FS:DI</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LGS</strong></td>
+<td align="center"><strong>传送目标指针,把指针内容装入GS</strong></td>
+<td align="center"><strong>LGS DI,string;把段地址:偏移地址存到GS:DI</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LSS</strong></td>
+<td align="center"><strong>传送目标指针,把指针内容装入SS</strong></td>
+<td align="center"><strong>LSS DI,string;把段地址:偏移地址存到SS:DI</strong></td>
+</tr>
+</tbody></table>
+<h3 id="标志传送指令"><a href="#标志传送指令" class="headerlink" title="标志传送指令"></a>标志传送指令</h3><table>
+<thead>
+<tr>
+<th align="center">LAHF</th>
+<th align="center">标志寄存器传送,把标志装入AH</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>SAHF</strong></td>
+<td align="center"><strong>标志寄存器传送,把AH内容装入标志寄存器</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>PUSHF</strong></td>
+<td align="center"><strong>标志入栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>POPF</strong></td>
+<td align="center"><strong>标志出栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>PUSHD</strong></td>
+<td align="center"><strong>32位标志入栈</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>POPD</strong></td>
+<td align="center"><strong>32位标志出栈</strong></td>
+</tr>
+</tbody></table>
+<h3 id="算术运算指令"><a href="#算术运算指令" class="headerlink" title="算术运算指令"></a>算术运算指令</h3><table>
+<thead>
+<tr>
+<th align="center">ADD</th>
+<th align="center">加法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>ADC</strong></td>
+<td align="center"><strong>带进位加法</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>INC</strong></td>
+<td align="center"><strong>加 1</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>AAA</strong></td>
+<td align="center"><strong>加法的ASCII码调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>DAA</strong></td>
+<td align="center"><strong>加法的十进制调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SUB</strong></td>
+<td align="center"><strong>减法</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SBB</strong></td>
+<td align="center"><strong>带借位减法</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>DEC</strong></td>
+<td align="center"><strong>减 1</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>NEG</strong></td>
+<td align="center"><strong>求反(以    0 减之)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CMP</strong></td>
+<td align="center"><strong>比较(两操作数作减法,仅修改标志位,不回送结果)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>AAS</strong></td>
+<td align="center"><strong>减法的ASCII码调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>DAS</strong></td>
+<td align="center"><strong>减法的十进制调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>MUL</strong></td>
+<td align="center"><strong>无符号乘法,结果回送AH和AL(字节运算),或DX和AX(字运算)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>IMUL</strong></td>
+<td align="center"><strong>整数乘法,结果回送AH和AL(字节运算),或DX和AX(字运算)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>AAM</strong></td>
+<td align="center"><strong>乘法的ASCII码调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>DIV</strong></td>
+<td align="center"><strong>无符号除法,结果回送:商回送AL,余数回送AH, (字节运算);或 商回送AX,余数回送DX, (字运算)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>IDIV</strong></td>
+<td align="center"><strong>整数除法.结果回送:商回送AL,余数回送AH, (字节运算);或 商回送AX,余数回送DX, (字运算)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>AAD</strong></td>
+<td align="center"><strong>除法的ASCII码调整</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CBW</strong></td>
+<td align="center"><strong>字节转换为字(把AL中字节的符号扩展到AH中去)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CWD</strong></td>
+<td align="center"><strong>字转换为双字(把AX中的字的符号扩展到DX中去)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CWDE</strong></td>
+<td align="center"><strong>字转换为双字(把AX中的字符号扩展到EAX中去)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CDQ</strong></td>
+<td align="center"><strong>双字扩展(把EAX中的字的符号扩展到EDX中去)</strong></td>
+</tr>
+</tbody></table>
+<h3 id="逻辑运算指令"><a href="#逻辑运算指令" class="headerlink" title="逻辑运算指令"></a>逻辑运算指令</h3><p>以下八种移位指令,其移位次数可达255次,移位一次时, 可直接用操作码. 如 SHL AX,1.  移位&gt;1次时, 则由寄存器CL给出移位次数.  如 MOV CL,04   SHL AX,CL  </p>
+<table>
+<thead>
+<tr>
+<th align="center">AND</th>
+<th align="center">与运算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>OR</strong></td>
+<td align="center"><strong>或运算</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>XOR</strong></td>
+<td align="center"><strong>异或运算</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>NOT</strong></td>
+<td align="center"><strong>取反</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>TEST</strong></td>
+<td align="center"><strong>测试(两操作数作与运算,仅修改标志位,不回送结果)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SHL</strong></td>
+<td align="center"><strong>逻辑左移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SAL</strong></td>
+<td align="center"><strong>算术左移(=SHL)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SHR</strong></td>
+<td align="center"><strong>逻辑右移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SAR</strong></td>
+<td align="center"><strong>算术右移(=SHR)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ROL</strong></td>
+<td align="center"><strong>循环左移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ROR</strong></td>
+<td align="center"><strong>循环右移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>RCL</strong></td>
+<td align="center"><strong>通过进位的循环左移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>RCR</strong></td>
+<td align="center"><strong>通过进位的循环右移</strong></td>
+</tr>
+</tbody></table>
+<h3 id="串指令"><a href="#串指令" class="headerlink" title="串指令"></a>串指令</h3><blockquote>
+<p>DS:SI 源串段寄存器 :源串变址.<br>ES:DI 目标串段寄存器:目标串变址.<br>CX 重复次数计数器.<br>AL/AX 扫描值.<br>D标志   0表示重复操作中SI和DI应自动增量; 1表示应自动减量.<br> Z标志   用来控制扫描或比较操作的结束.  </p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">MOVS</th>
+<th align="center">串传送(MOVSB 传送字符；MOVSW 传送字；MOVSD 传送双字)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>CMPS</strong></td>
+<td align="center"><strong>串比较(CMPSB 比较字符;CMPSW 比较字)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SCAS</strong></td>
+<td align="center"><strong>串扫描(把AL或AX的内容与目标串作比较,比较结果反映在标志位)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LODS</strong></td>
+<td align="center"><strong>装入串(把源串中的元素(字或字节)逐一装入AL或AX中( LODSB传送字符;LODSW传送字  LODSD 传送双字)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STOS</strong></td>
+<td align="center"><strong>保存串(是LODS的逆过程)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>REP</strong></td>
+<td align="center"><strong>当CX/ECX&lt;&gt;0时重复</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>REPE/REPZ</strong></td>
+<td align="center"><strong>当ZF=1或比较结果相等,且CX/ECX&lt;&gt;0时重复</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>REPNE/REPNZ</strong></td>
+<td align="center"><strong>当ZF=0或比较结果不相等,且CX/ECX&lt;&gt;0时重复</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>REPC</strong></td>
+<td align="center"><strong>当CF=1且CX/ECX&lt;&gt;0时重复</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>REPNC</strong></td>
+<td align="center"><strong>当CF=0且CX/ECX&lt;&gt;0时重复</strong></td>
+</tr>
+</tbody></table>
+<h3 id="程序转移指令"><a href="#程序转移指令" class="headerlink" title="程序转移指令"></a>程序转移指令</h3><h4 id="无条件转移指令"><a href="#无条件转移指令" class="headerlink" title="无条件转移指令"></a>无条件转移指令</h4><p><strong>长转移</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">JMP</th>
+<th align="center">无条件转移指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>CALL</strong></td>
+<td align="center"><strong>过程调用</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>RET/RETF</strong></td>
+<td align="center"><strong>过程返回</strong></td>
+</tr>
+</tbody></table>
+<h4 id="条件转移指令"><a href="#条件转移指令" class="headerlink" title="条件转移指令"></a>条件转移指令</h4><p>*<em>短转移,-128到+127的距离内,当且仅当(SF XOR OF)=1时,OP1&lt;OP2 *</em></p>
+<table>
+<thead>
+<tr>
+<th align="center">JA/JNBE</th>
+<th align="center">不小于或不等于时转移</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>JAE/JNB</strong></td>
+<td align="center"><strong>大于或等于转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JB/JNAE</strong></td>
+<td align="center"><strong>小于转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JBE/JNA</strong></td>
+<td align="center"><strong>小于或等于转移</strong></td>
+</tr>
+</tbody></table>
+<p><strong>以上四条,测试无符号整数运算的结果(标志C和Z)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">JG/JNLE</th>
+<th align="center">大于转移</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>JGE/JNL</strong></td>
+<td align="center"><strong>大于或等于转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JL/JNGE</strong></td>
+<td align="center"><strong>小于转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JLE/JNG</strong></td>
+<td align="center"><strong>小于或等于转移</strong></td>
+</tr>
+</tbody></table>
+<p><strong>以上四条,测试带符号整数运算的结果(标志S,O和Z)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">JE/JZ</th>
+<th align="center">等于转移</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>JNE/JNZ</strong></td>
+<td align="center"><strong>不等于时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JC</strong></td>
+<td align="center"><strong>有进位时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JNC</strong></td>
+<td align="center"><strong>无进位时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JNO</strong></td>
+<td align="center"><strong>不溢出时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JNP/JPO</strong></td>
+<td align="center"><strong>奇偶性为奇数时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JNS</strong></td>
+<td align="center"><strong>符号位为 “0” 时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JO</strong></td>
+<td align="center"><strong>溢出转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JP/JPE</strong></td>
+<td align="center"><strong>奇偶性为偶数时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JS</strong></td>
+<td align="center"><strong>符号位为 “1” 时转移</strong></td>
+</tr>
+</tbody></table>
+<h4 id="循环控制指令"><a href="#循环控制指令" class="headerlink" title="循环控制指令"></a>循环控制指令</h4><p><strong>短转移</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">LOOP</th>
+<th align="center">CX不为零时循环</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>LOOPE/LOOPZ</strong></td>
+<td align="center"><strong>CX不为零且标志Z=1时循环</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LOOPNE/LOOPNZ</strong></td>
+<td align="center"><strong>CX不为零且标志Z=0时循环</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JCXZ</strong></td>
+<td align="center"><strong>CX为零时转移</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>JECXZ</strong></td>
+<td align="center"><strong>ECX为零时转移</strong></td>
+</tr>
+</tbody></table>
+<h4 id="中断指令"><a href="#中断指令" class="headerlink" title="中断指令"></a>中断指令</h4><table>
+<thead>
+<tr>
+<th align="center">INT</th>
+<th align="center">中断指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>INTO</strong></td>
+<td align="center"><strong>溢出中断</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>IRET</strong></td>
+<td align="center"><strong>中断返回</strong></td>
+</tr>
+</tbody></table>
+<h4 id="处理器控制指令"><a href="#处理器控制指令" class="headerlink" title="处理器控制指令"></a>处理器控制指令</h4><table>
+<thead>
+<tr>
+<th align="center">HLT</th>
+<th align="center">处理器暂停,  直到出现中断或复位信号才继续</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>WAIT</strong></td>
+<td align="center"><strong>当芯片引线TEST为高电平时使CPU进入等待状态</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ESC</strong></td>
+<td align="center"><strong>转换到外处理器</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LOCK</strong></td>
+<td align="center"><strong>封锁总线</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>NOP</strong></td>
+<td align="center"><strong>空操作</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STC</strong></td>
+<td align="center"><strong>置进位标志位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CLC</strong></td>
+<td align="center"><strong>清进位标志位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CMC</strong></td>
+<td align="center"><strong>进位标志取反</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STD</strong></td>
+<td align="center"><strong>置方向标志位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CLD</strong></td>
+<td align="center"><strong>清方向标志位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STI</strong></td>
+<td align="center"><strong>置中断允许位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CLI</strong></td>
+<td align="center"><strong>清中断允许位</strong></td>
+</tr>
+</tbody></table>
+<h3 id="伪指令"><a href="#伪指令" class="headerlink" title="伪指令"></a>伪指令</h3><table>
+<thead>
+<tr>
+<th align="center">DW</th>
+<th align="center">定义字(2字节)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>PROC</strong></td>
+<td align="center"><strong>定义过程</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ENDP</strong></td>
+<td align="center"><strong>过程结束</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>SEGMENT</strong></td>
+<td align="center"><strong>定义段</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ASSUME</strong></td>
+<td align="center"><strong>建立段寄存器寻址</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ENDS</strong></td>
+<td align="center"><strong>段结束</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>END</strong></td>
+<td align="center"><strong>程序结束</strong></td>
+</tr>
+</tbody></table>
+<h3 id="处理机控制指令：标志处理指令"><a href="#处理机控制指令：标志处理指令" class="headerlink" title="处理机控制指令：标志处理指令"></a>处理机控制指令：标志处理指令</h3><table>
+<thead>
+<tr>
+<th align="center">CLC</th>
+<th align="center">进位位置0指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>CMC</strong></td>
+<td align="center"><strong>进位位求反指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STC</strong></td>
+<td align="center"><strong>进位位置为1指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CLD</strong></td>
+<td align="center"><strong>方向标志置1指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STD</strong></td>
+<td align="center"><strong>方向标志位置1指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>CLI</strong></td>
+<td align="center"><strong>中断标志置0指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>STI</strong></td>
+<td align="center"><strong>中断标志置1指令</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>NOP</strong></td>
+<td align="center"><strong>无操作</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>HLT</strong></td>
+<td align="center"><strong>停机</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>WAIT</strong></td>
+<td align="center"><strong>等待</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>ESC</strong></td>
+<td align="center"><strong>换码</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>LOCK</strong></td>
+<td align="center"><strong>封锁</strong></td>
+</tr>
+</tbody></table>
+<h2 id="浮点运算指令集"><a href="#浮点运算指令集" class="headerlink" title="浮点运算指令集"></a>浮点运算指令集</h2><h3 id="控制指令"><a href="#控制指令" class="headerlink" title="控制指令"></a>控制指令</h3><p>带9B的控制指令前缀F变为FN时浮点不检查，机器码去掉9B</p>
+<table>
+<thead>
+<tr>
+<th align="center">FINIT</th>
+<th align="center">初始化浮点部件</th>
+<th align="center">机器码  9B DB E3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>FCLEX</strong></td>
+<td align="center"><strong>清除异常</strong></td>
+<td align="center"><strong>机器码  9B DB E2</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FDISI</strong></td>
+<td align="center"><strong>浮点检查禁止中断</strong></td>
+<td align="center"><strong>机器码  9B DB E1</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FENI</strong></td>
+<td align="center"><strong>浮点检查禁止中断二</strong></td>
+<td align="center"><strong>机器码  9B DB E0</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>WAIT</strong></td>
+<td align="center"><strong>同步CPU和FPU</strong></td>
+<td align="center"><strong>机器码  9B</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FWAIT</strong></td>
+<td align="center"><strong>同步CPU和FPU</strong></td>
+<td align="center"><strong>机器码  D9 D0</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FNOP</strong></td>
+<td align="center"><strong>无操作</strong></td>
+<td align="center"><strong>机器码  DA E9</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FXCH</strong></td>
+<td align="center"><strong>交换ST(0)和ST(1)</strong></td>
+<td align="center"><strong>机器码  D9 C9</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FXCH ST(i)</strong></td>
+<td align="center"><strong>交换ST(0)和ST(i)</strong></td>
+<td align="center"><strong>机器码  D9 C1iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTSW ax</strong></td>
+<td align="center"><strong>状态字到ax</strong></td>
+<td align="center"><strong>机器码  9B DF E0</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTSW   word ptr mem</strong></td>
+<td align="center"><strong>状态字到mem</strong></td>
+<td align="center"><strong>机器码  9B DD mm111mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDCW   word ptr mem</strong></td>
+<td align="center"><strong>mem到状态字</strong></td>
+<td align="center"><strong>机器码  D9 mm101mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTCW   word ptr mem</strong></td>
+<td align="center"><strong>控制字到mem</strong></td>
+<td align="center"><strong>机器码  9B D9 mm111mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDENV  word ptr mem</strong></td>
+<td align="center"><strong>mem到全环境</strong></td>
+<td align="center"><strong>机器码  D9 mm100mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTENV  word ptr mem</strong></td>
+<td align="center"><strong>全环境到mem</strong></td>
+<td align="center"><strong>机器码  9B D9 mm110mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FRSTOR  word ptr mem</strong></td>
+<td align="center"><strong>mem到FPU状态</strong></td>
+<td align="center"><strong>机器码  DD mm100mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSAVE   word ptr mem</strong></td>
+<td align="center"><strong>FPU状态到mem</strong></td>
+<td align="center"><strong>机器码  9B DD mm110mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FFREE ST(i)</strong></td>
+<td align="center"><strong>标志ST(i)未使用</strong></td>
+<td align="center"><strong>机器码  DD C0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FDECSTP</strong></td>
+<td align="center"><strong>减少栈指针1-&gt;0 2-&gt;1</strong></td>
+<td align="center"><strong>机器码  D9 F6</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FINCSTP</strong></td>
+<td align="center"><strong>增加栈指针0-&gt;1 1-&gt;2</strong></td>
+<td align="center"><strong>机器码  D9 F7</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSETPM</strong></td>
+<td align="center"><strong>浮点设置保护</strong></td>
+<td align="center"><strong>机器码  DB E4</strong></td>
+</tr>
+</tbody></table>
+<h3 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h3><table>
+<thead>
+<tr>
+<th align="center">FLDZ</th>
+<th align="center">将0.0装入ST(0)</th>
+<th align="center">机器码  D9 EE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>FLD1</strong></td>
+<td align="center"><strong>将1.0装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 E8</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDPI</strong></td>
+<td align="center"><strong>将π装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 EB</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDL2T</strong></td>
+<td align="center"><strong>将ln10/ln2装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 E9</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDL2E</strong></td>
+<td align="center"><strong>将1/ln2装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 EA</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDLG2</strong></td>
+<td align="center"><strong>将ln2/ln10装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 EC</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLDLN2</strong></td>
+<td align="center"><strong>将ln2装入ST(0)</strong></td>
+<td align="center"><strong>机器码  D9 ED</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLD    real4 ptr mem</strong></td>
+<td align="center"><strong>装入mem的单精度浮点数</strong></td>
+<td align="center"><strong>机器码  D9 mm000mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLD    real8 ptr mem</strong></td>
+<td align="center"><strong>装入mem的双精度浮点数</strong></td>
+<td align="center"><strong>机器码  DD mm000mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FLD   real10 ptr mem</strong></td>
+<td align="center"><strong>装入mem的十字节浮点数</strong></td>
+<td align="center"><strong>机器码  DB mm101mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FILD    word ptr mem</strong></td>
+<td align="center"><strong>装入mem的二字节整数</strong></td>
+<td align="center"><strong>机器码  DF mm000mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FILD   dword ptr mem</strong></td>
+<td align="center"><strong>装入mem的四字节整数</strong></td>
+<td align="center"><strong>机器码  DB mm000mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FILD   qword ptr mem</strong></td>
+<td align="center"><strong>装入mem的八字节整数</strong></td>
+<td align="center"><strong>机器码  DF mm101mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FBLD   tbyte ptr mem</strong></td>
+<td align="center"><strong>装入mem的十字节BCD数</strong></td>
+<td align="center"><strong>机器码  DF mm100mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FST    real4 ptr mem</strong></td>
+<td align="center"><strong>保存单精度浮点数到mem</strong></td>
+<td align="center"><strong>机器码  D9 mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FST    real8 ptr mem</strong></td>
+<td align="center"><strong>保存双精度浮点数到mem</strong></td>
+<td align="center"><strong>机器码  DD mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FIST    word ptr mem</strong></td>
+<td align="center"><strong>保存二字节整数到mem</strong></td>
+<td align="center"><strong>机器码  DF mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FIST   dword ptr mem</strong></td>
+<td align="center"><strong>保存四字节整数到mem</strong></td>
+<td align="center"><strong>机器码  DB mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTP   real4 ptr mem</strong></td>
+<td align="center"><strong>保存单精度浮点数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  D9 mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTP   real8 ptr mem</strong></td>
+<td align="center"><strong>保存双精度浮点数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DD mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FSTP  real10 ptr mem</strong></td>
+<td align="center"><strong>保存十字节浮点数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DB mm111mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FISTP   word ptr mem</strong></td>
+<td align="center"><strong>保存二字节整数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DF mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FISTP  dword ptr mem</strong></td>
+<td align="center"><strong>保存四字节整数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DB mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FISTP  qword ptr mem</strong></td>
+<td align="center"><strong>保存八字节整数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DF mm111mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FBSTP  tbyte ptr mem</strong></td>
+<td align="center"><strong>保存十字节BCD数到mem并出栈</strong></td>
+<td align="center"><strong>机器码  DF mm110mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVB</strong></td>
+<td align="center"><strong>ST(0),ST(i) &lt;时传送</strong></td>
+<td align="center"><strong>机器码  DA C0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVBE</strong></td>
+<td align="center"><strong>ST(0),ST(i) &lt;=时传送</strong></td>
+<td align="center"><strong>机器码  DA D0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVE</strong></td>
+<td align="center"><strong>ST(0),ST(i) =时传送</strong></td>
+<td align="center"><strong>机器码  DA C1iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVNB</strong></td>
+<td align="center"><strong>ST(0),ST(i) &gt;=时传送</strong></td>
+<td align="center"><strong>机器码  DB C0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVNBE</strong></td>
+<td align="center"><strong>ST(0),ST(i) &gt;时传送</strong></td>
+<td align="center"><strong>机器码  DB D0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVNE</strong></td>
+<td align="center"><strong>ST(0),ST(i) !=时传送</strong></td>
+<td align="center"><strong>机器码  DB C1iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVNU</strong></td>
+<td align="center"><strong>ST(0),ST(i) 有序时传送</strong></td>
+<td align="center"><strong>机器码  DB D1iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCMOVU</strong></td>
+<td align="center"><strong>ST(0),ST(i) 无序时传送</strong></td>
+<td align="center"><strong>机器码  DA D1iii</strong></td>
+</tr>
+</tbody></table>
+<h3 id="比较指令"><a href="#比较指令" class="headerlink" title="比较指令"></a>比较指令</h3><table>
+<thead>
+<tr>
+<th align="center">FCOM</th>
+<th align="center">ST(0)-ST(1)</th>
+<th align="center">机器码  D8 D1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>FCOMI</strong></td>
+<td align="center"><strong>ST(0),ST(i)  ST(0)-ST(1)</strong></td>
+<td align="center"><strong>机器码  DB F0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCOMIP</strong></td>
+<td align="center"><strong>ST(0),ST(i)  ST(0)-ST(1)并出栈</strong></td>
+<td align="center"><strong>机器码  DF F0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCOM   real4 ptr mem</strong></td>
+<td align="center"><strong>ST(0)-实数mem</strong></td>
+<td align="center"><strong>机器码  D8 mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FCOM   real8 ptr mem</strong></td>
+<td align="center"><strong>ST(0)-实数mem</strong></td>
+<td align="center"><strong>机器码  DC mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FICOM   word ptr mem</strong></td>
+<td align="center"><strong>ST(0)-整数mem</strong></td>
+<td align="center"><strong>机器码  DE mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FICOM  dword ptr mem</strong></td>
+<td align="center"><strong>ST(0)-整数mem</strong></td>
+<td align="center"><strong>机器码  DA mm010mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FICOMP  word ptr mem</strong></td>
+<td align="center"><strong>ST(0)-整数mem并出栈</strong></td>
+<td align="center"><strong>机器码  DE mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FICOMP dword ptr mem</strong></td>
+<td align="center"><strong>ST(0)-整数mem并出栈</strong></td>
+<td align="center"><strong>机器码  DA mm011mmm</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FTST</strong></td>
+<td align="center"><strong>ST(0)-0</strong></td>
+<td align="center"><strong>机器码  D9 E4</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FUCOM  ST(i)</strong></td>
+<td align="center"><strong>ST(0)-ST(i)</strong></td>
+<td align="center"><strong>机器码  DD E0iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FUCOMP ST(i)</strong></td>
+<td align="center"><strong>ST(0)-ST(i)并出栈</strong></td>
+<td align="center"><strong>机器码  DD E1iii</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FUCOMPP</strong></td>
+<td align="center"><strong>ST(0)-ST(1)并二次出栈</strong></td>
+<td align="center"><strong>机器码  DA E9</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>FXAM</strong></td>
+<td align="center"><strong>ST(0)规格类型</strong></td>
+<td align="center"><strong>机器码  D9 E5</strong></td>
+</tr>
+</tbody></table>
+<h3 id="运算指令"><a href="#运算指令" class="headerlink" title="运算指令"></a>运算指令</h3><table>
+<thead>
+<tr>
+<th>FADD</th>
+<th>把目的操作数 (直接接在指令后的变量或堆栈缓存器) 与来源操作数 (接在目的操作数后的变量或堆栈缓存器)  相加，并将结果存入目的操作数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>FADDP</strong></td>
+<td><strong>这个指令是使目的操作数加上 ST  缓存器，并弹出 ST 缓存器，而目的操作数必须是堆栈缓存器的其中之一，最后不管目的操作数为何，经弹出一次后，目的操作数会变成上一个堆栈缓存器了</strong></td>
+</tr>
+<tr>
+<td><strong>FIADD</strong></td>
+<td><strong>FIADD 是把 ST   加上来源操作数，然后再存入 ST 缓存器，来源操作数必须是字组整数或短整数形态的变数</strong></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/09/╧╓┤·├▄┬δ╤º╓«╢α▒φ╝╙├▄/" rel="next" title="现代密码学之多表加密">
+                  <i class="fa fa-chevron-left"></i> 现代密码学之多表加密
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/10/╗ñ═°▒¡2019-MISC-baby-forensic/" rel="prev" title="护网杯2019-MISC-baby_forensic">
+                  护网杯2019-MISC-baby_forensic <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#整数运算指令集"><span class="nav-number">1.</span> <span class="nav-text">整数运算指令集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据传输指令"><span class="nav-number">1.1.</span> <span class="nav-text">数据传输指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通用数据传送指令"><span class="nav-number">1.2.</span> <span class="nav-text">通用数据传送指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入输出端口传送指令"><span class="nav-number">1.3.</span> <span class="nav-text">输入输出端口传送指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目的地址传送指令"><span class="nav-number">1.4.</span> <span class="nav-text">目的地址传送指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标志传送指令"><span class="nav-number">1.5.</span> <span class="nav-text">标志传送指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算术运算指令"><span class="nav-number">1.6.</span> <span class="nav-text">算术运算指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逻辑运算指令"><span class="nav-number">1.7.</span> <span class="nav-text">逻辑运算指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#串指令"><span class="nav-number">1.8.</span> <span class="nav-text">串指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#程序转移指令"><span class="nav-number">1.9.</span> <span class="nav-text">程序转移指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#无条件转移指令"><span class="nav-number">1.9.1.</span> <span class="nav-text">无条件转移指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件转移指令"><span class="nav-number">1.9.2.</span> <span class="nav-text">条件转移指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#循环控制指令"><span class="nav-number">1.9.3.</span> <span class="nav-text">循环控制指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#中断指令"><span class="nav-number">1.9.4.</span> <span class="nav-text">中断指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#处理器控制指令"><span class="nav-number">1.9.5.</span> <span class="nav-text">处理器控制指令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#伪指令"><span class="nav-number">1.10.</span> <span class="nav-text">伪指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理机控制指令：标志处理指令"><span class="nav-number">1.11.</span> <span class="nav-text">处理机控制指令：标志处理指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浮点运算指令集"><span class="nav-number">2.</span> <span class="nav-text">浮点运算指令集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#控制指令"><span class="nav-number">2.1.</span> <span class="nav-text">控制指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据传送指令"><span class="nav-number">2.2.</span> <span class="nav-text">数据传送指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#比较指令"><span class="nav-number">2.3.</span> <span class="nav-text">比较指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算指令"><span class="nav-number">2.4.</span> <span class="nav-text">运算指令</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

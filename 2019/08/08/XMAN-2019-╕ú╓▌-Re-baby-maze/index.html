@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="天舒的师傅真的讲的不错，逻辑结构清晰，循序渐进，题目难易适中现在感觉其实逆向工程是很多东西的基础，比如要PWN一道题目，也需要清晰地认识到程序的流程，不只是PWN，现在Web也需要很多的逆向工程的知识。然后其实逆向工程和杂项和密码学结合还是挺深的，或者说逆向工程考的就是基本功，对编程能力和计算机原理的认识，所以我觉得逆向工程十分好玩 相关资料均可在GitHub上下载：https://github.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XMAN-2019-福州-Re-baby_maze">
+<meta property="og:url" content="http://yoursite.com/2019/08/08/XMAN-2019-╕ú╓▌-Re-baby-maze/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="天舒的师傅真的讲的不错，逻辑结构清晰，循序渐进，题目难易适中现在感觉其实逆向工程是很多东西的基础，比如要PWN一道题目，也需要清晰地认识到程序的流程，不只是PWN，现在Web也需要很多的逆向工程的知识。然后其实逆向工程和杂项和密码学结合还是挺深的，或者说逆向工程考的就是基本功，对编程能力和计算机原理的认识，所以我觉得逆向工程十分好玩 相关资料均可在GitHub上下载：https://github.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-09T07:17:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XMAN-2019-福州-Re-baby_maze">
+<meta name="twitter:description" content="天舒的师傅真的讲的不错，逻辑结构清晰，循序渐进，题目难易适中现在感觉其实逆向工程是很多东西的基础，比如要PWN一道题目，也需要清晰地认识到程序的流程，不只是PWN，现在Web也需要很多的逆向工程的知识。然后其实逆向工程和杂项和密码学结合还是挺深的，或者说逆向工程考的就是基本功，对编程能力和计算机原理的认识，所以我觉得逆向工程十分好玩 相关资料均可在GitHub上下载：https://github.">
+  <link rel="canonical" href="http://yoursite.com/2019/08/08/XMAN-2019-╕ú╓▌-Re-baby-maze/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>XMAN-2019-福州-Re-baby_maze | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/08/XMAN-2019-╕ú╓▌-Re-baby-maze/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">XMAN-2019-福州-Re-baby_maze
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-08-08 09:16:45" itemprop="dateCreated datePublished" datetime="2019-08-08T09:16:45-07:00">2019-08-08</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-08-09 00:17:04" itemprop="dateModified" datetime="2019-08-09T00:17:04-07:00">2019-08-09</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>天舒的师傅真的讲的不错，逻辑结构清晰，循序渐进，题目难易适中现在感觉其实逆向工程是很多东西的基础，比如要PWN一道题目，也需要清晰地认识到程序的流程，不只是PWN，现在Web也需要很多的逆向工程的知识。然后其实逆向工程和杂项和密码学结合还是挺深的，或者说逆向工程考的就是基本功，对编程能力和计算机原理的认识，所以我觉得逆向工程十分好玩</p>
+<p>相关资料均可在GitHub上下载：<a href="https://github.com/suyucheng-lz/XMAN-2019-FZU" target="_blank" rel="noopener">https://github.com/suyucheng-lz/XMAN-2019-FZU</a></p>
+<h2 id="baby-maze"><a href="#baby-maze" class="headerlink" title="baby_maze"></a>baby_maze</h2><p>这题是一道和很基础的<strong>迷宫</strong>类型题目</p>
+<p>迷宫问题有以下特点: </p>
+<ul>
+<li>在内存中布置一张 “地图”</li>
+<li>将用户输入限制在少数几个字符范围内. </li>
+<li>一般只有一个迷宫入口和一个迷宫出口</li>
+</ul>
+<p>布置的地图可以由可显字符 (比如<code>#</code>和<code>*</code>)组合而成 (这非常明显,  查看字符串基本就知道这是个迷宫题了.), 也可以单纯用不可显的十六进制值进行表示. 可以将地图直接组成一条非常长的字符串,  或是一行一行分开布置. 如果是一行一行分开布置的话, 因为迷宫一般都会比较大, 所以用于按行(注意, 布置并非按顺序布置,  每行都对应一个具体的行号, 你需要确定行号才能还原迷宫地图) 布置迷宫的函数会明显重复多次. </p>
+<p>而被限制的字符通常会是一些方便记忆的组合 (不是也没办法), 比如<code>w/s/a/d</code>, <code>h/j/k/l</code>, <code>l/r/u/d</code>这样的类似组合. 当然各个键具体的操作需要经过分析判断 (像那种只用一条字符串表示迷宫的, 就可以用<code>t</code>键表示向右移动<code>12</code>个字符这样). 对于二维的地图, 一般作者都会设置一个<code>X坐标</code>和一个<code>Y坐标</code>用于保存当前位置. 我们也可以根据这个特点来入手分析.</p>
+<p>一般情况下, 迷宫是只有 1 个入口和 1 个出口, 像入口在最左上角<code>(0, 0)</code>位置, 而出口在最右下角<code>(max_X, max_Y)</code>处. 但也有可能是出口在迷宫的正中心, 用一个<code>Y</code>字符表示等等. 解答迷宫题的条件也是需要根据具体情况判断的.  </p>
+<p>当然迷宫的走法可能不止 1 条, 也有情况是有多条走法, 但是要求某一个走法比如说代价最小. 那么这就可以变相为一个算法问题. </p>
+<p>我们首先打开这个程序可以看一下IDA Pro自动生成的反汇编代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> *v4; <span class="comment">// [esp+1Ch] [ebp-4h]</span></span><br><span class="line"></span><br><span class="line">  sub_401B60();</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"input:"</span>);</span><br><span class="line">  v4 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">0x400</span>u);</span><br><span class="line">  <span class="keyword">if</span> ( !v4 )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  <span class="built_in">scanf</span>(<span class="string">"%s"</span>, v4);</span><br><span class="line">  <span class="keyword">if</span> ( sub_401350(v4) &amp;&amp; sub_40145A() )</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Correct!\nFlag is your input"</span>);</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"wrong"</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一开始我们毫无头绪，只是知道大概是需要分析<code>sub_401350</code>和<code>sub_40145A</code>两个函数</p>
+<p>我们先来分析<code>sub_401350</code>这个函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">sub_401350</span><span class="params">(<span class="keyword">char</span> *a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [esp+1Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">strlen</span>(a1) != <span class="number">32</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">strncmp</span>(a1, <span class="string">"flag&#123;"</span>, <span class="number">5u</span>) || a1[<span class="number">31</span>] != <span class="number">125</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">25</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">switch</span> ( a1[i + <span class="number">5</span>] )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">97</span>:</span><br><span class="line">        dword_405060[i] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">100</span>:</span><br><span class="line">        dword_405060[i] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">119</span>:</span><br><span class="line">        dword_405060[i] = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">115</span>:</span><br><span class="line">        dword_405060[i] = <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们不难分析出<code>a1</code>其实即为我们输入的<code>flag</code>，且<code>flag</code>的长度为<code>32</code>，然后一个<code>for</code>循环里面的<code>switch</code>语句，相当于我们输入的<code>flag</code>转换数据并存在<code>dword_405060</code>这个数组里面</p>
+<p>然后我们看看<code>switch</code>函数的几个值，<code>97</code>，<code>100</code>，<code>119</code>，<code>115</code>是不是很像<code>ASCII</code>编码，我们把它通过<code>IDA</code>转换为<code>char</code>类型，然后重命名一些函数名称就成了下面的样子</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">sub_401350</span><span class="params">(<span class="keyword">char</span> *flag)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [esp+1Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">strlen</span>(flag) != <span class="number">32</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">strncmp</span>(flag, <span class="string">"flag&#123;"</span>, <span class="number">5</span>) || flag[<span class="number">31</span>] != <span class="number">125</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">25</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">switch</span> ( flag[i + <span class="number">5</span>] )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'a'</span>:</span><br><span class="line">        save[i] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'d'</span>:</span><br><span class="line">        save[i] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'w'</span>:</span><br><span class="line">        save[i] = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'s'</span>:</span><br><span class="line">        save[i] = <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就直观很多了，等于说我们的<code>flag</code>仅限于<code>a</code>, <code>d</code>, <code>w</code>, <code>s</code>这四个字母，这就很像一道迷宫题的样子，我们继续分析<code>sub_40145A</code>这个函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> <span class="keyword">int</span> <span class="title">sub_40145A</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [esp+4h] [ebp-Ch]</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> v2; <span class="comment">// [esp+8h] [ebp-8h]</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> v3; <span class="comment">// [esp+Ch] [ebp-4h]</span></span><br><span class="line"></span><br><span class="line">  v3 = <span class="number">4</span>;</span><br><span class="line">  v2 = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">25</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    v3 += dword_402068[save[i]];</span><br><span class="line">    v2 += dword_402078[save[i]];</span><br><span class="line">    <span class="keyword">if</span> ( v3 &gt; <span class="number">9</span> || v3 &lt; <span class="number">0</span> || v2 &gt; <span class="number">9</span> || v2 &lt; <span class="number">0</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( byte_402000[<span class="number">10</span> * v3 + v2] == <span class="number">35</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( byte_402000[<span class="number">10</span> * v3 + v2] == <span class="number">43</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们先分析一下<code>dword_402068</code>和<code>dword_402078</code>这两个数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">.data:<span class="number">00402068</span> ; <span class="keyword">int</span> dword_402068[]</span><br><span class="line">.data:<span class="number">00402068</span> dword_402068    dd <span class="number">0</span>                    ; DATA XREF: sub_40145A+<span class="number">2</span>A↑r</span><br><span class="line">.data:<span class="number">0040206</span>C                 align <span class="number">10</span>h</span><br><span class="line">.data:<span class="number">00402070</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402071</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402072</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402073</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402074</span>                 db    <span class="number">1</span></span><br><span class="line">.data:<span class="number">00402075</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402076</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402077</span>                 db    <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>这里有个坑，其他数据都是以<code>db</code>类型保存，而第一个为<code>dd</code>格式，</p>
+<p><code>db</code>定义字节类型变量，一个字节数据占<code>1</code>个字节单元，读完一个，偏移量加<code>1</code></p>
+<p><code>dw</code>定义字类型变量，一个字数据占<code>2</code>个字节单元，读完一个，偏移量加<code>2</code></p>
+<p><code>dd</code>定义双字类型变量，一个双字数据占<code>4</code>个字节单元，读完一个，偏移量加<code>4</code></p>
+<p>在<code>IDA</code>里面我们可以通过<code>D</code>键更改数据的类型，可以变为这样</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">data:<span class="number">00402068</span> ; <span class="keyword">int</span> byte_402068[]</span><br><span class="line">.data:<span class="number">00402068</span> byte_402068     db <span class="number">0</span>                    ; DATA XREF: sub_40145A+<span class="number">2</span>A↑r</span><br><span class="line">.data:<span class="number">00402069</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206</span>A                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206B</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206</span>C                 db <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206</span>D                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206</span>E                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040206F</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402070</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402071</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402072</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402073</span>                 db <span class="number">0F</span>Fh</span><br><span class="line">.data:<span class="number">00402074</span>                 db    <span class="number">1</span></span><br><span class="line">.data:<span class="number">00402075</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402076</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402077</span>                 db    <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>不难看出其实保存的数据就是十六进制下的<code>0</code>，<code>0</code>，<code>-1</code>，<code>1</code>，之前的align就是为了对齐内存数据，从内存数据也可以看出</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">00402060</span>  <span class="number">2</span>E <span class="number">2</span>E <span class="number">23</span> <span class="number">23</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span></span><br><span class="line"><span class="number">00402070</span>  FF FF FF FF <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  FF FF FF FF <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span></span><br></pre></td></tr></table></figure>
+
+<p><code>dword_402068</code>的内存地址位<code>0x00402068</code>到<code>0x00402077</code>，即为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> FF FF FF FF <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span></span><br></pre></td></tr></table></figure>
+
+<p>现在我们来关注<code>dword_402078</code>这个数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">data:<span class="number">00402078</span> dword_402078    dd <span class="number">0F</span>FFFFFFFh           ; DATA XREF: sub_40145A+<span class="number">3</span>E↑r</span><br><span class="line">.data:<span class="number">0040207</span>C                 db    <span class="number">1</span></span><br><span class="line">.data:<span class="number">0040207</span>D                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040207</span>E                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040207F</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402080</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402081</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402082</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402083</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402084</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402085</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402086</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402087</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402088</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402089</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208</span>A                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208B</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208</span>C                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208</span>D                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208</span>E                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040208F</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402090</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402091</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402092</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402093</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402094</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402095</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402096</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402097</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402098</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">00402099</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209</span>A                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209B</span>                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209</span>C                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209</span>D                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209</span>E                 db    <span class="number">0</span></span><br><span class="line">.data:<span class="number">0040209F</span>                 db    <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>在<code>IDA</code>里面我们可以选中需要导出数据的内存区域，然后按<code>shift+E</code>的快捷键就可以选择各种导出格式方便导出，我们直接选择导出为数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> ida_chars[] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, </span><br><span class="line">  <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, </span><br><span class="line">  <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, </span><br><span class="line">  <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这两个数组也就是改变<code>v3</code>和<code>v2</code>的值，也不太能方便的得知程序的真实意图，我们再看看<code>byte_402000</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.data:<span class="number">00402000</span> byte_402000     db <span class="number">23</span>h                  ; DATA XREF: sub_40145A+<span class="number">7</span>A↑r</span><br><span class="line">.data:<span class="number">00402000</span>                                         ; sub_40145A+<span class="number">9F</span>↑r</span><br><span class="line">.data:00402001                 db '#....######.##.###.##.##.###....##.###..####......####.#.##.####.'</span><br><span class="line">.data:00402001                 db '..##....#########.###+#####.....##',0</span><br><span class="line">.data:<span class="number">00402065</span>                 align <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>这就是迷宫的地图啊，然后这里有个坑，其实第一个<code>23h</code>也是地图的一部分，也就是<code>#</code>，我们不难得出地图的字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#....######.##.###.##.##.###....##.###..####......####.#.##.####...##....#########.###+#####.....##</span><br></pre></td></tr></table></figure>
+
+<p>所以这是个怎么样的二维地图呢，我们回到函数看到这些代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( v3 &gt; <span class="number">9</span> || v3 &lt; <span class="number">0</span> || v2 &gt; <span class="number">9</span> || v2 &lt; <span class="number">0</span> )</span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="keyword">if</span> ( byte_402000[<span class="number">10</span> * v3 + v2] == <span class="number">35</span> )</span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="keyword">if</span> ( byte_402000[<span class="number">10</span> * v3 + v2] == <span class="number">43</span> )</span><br><span class="line">     <span class="keyword">return</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>[10 * v3 + v2]</code>就是一个模拟二维数组的方式，根据<code>v3 &gt; 9 || v3 &lt; 0 || v2 &gt; 9 || v2 &lt; 0</code>也可以得出这是一个按照<code>10 x 10</code> 排列的地图</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">##....####</span><br><span class="line">##.##.###.</span><br><span class="line">##.##.###.</span><br><span class="line">...##.###.</span><br><span class="line">.####.....</span><br><span class="line">.####.#.##</span><br><span class="line">.####...##</span><br><span class="line">....######</span><br><span class="line">###.###+##</span><br><span class="line">###.....##</span><br></pre></td></tr></table></figure>
+
+<p><code>v3</code>就是行数，<code>v2</code>就是列数,<code>v3</code>和<code>v2</code>的初始值就是起点，然后根据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( byte_402000[<span class="number">10</span> * v3 + v2] == <span class="number">43</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>不难得出终点就是<code>+</code>，起点就是二维数组的<code>[4,5]</code>，也就是第五行第六列，我们用其他符号标出起点</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">##....####</span><br><span class="line">##.##.###.</span><br><span class="line">##.##.###.</span><br><span class="line">...##.###.</span><br><span class="line">.####<span class="number">0.</span>...</span><br><span class="line">.####.#.##</span><br><span class="line">.####...##</span><br><span class="line">....######</span><br><span class="line">###.###+##</span><br><span class="line">###.....##</span><br></pre></td></tr></table></figure>
+
+<p>则函数的修复代码应该为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> <span class="keyword">int</span> <span class="title">sub_40145A</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [esp+4h] [ebp-Ch]</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> line; <span class="comment">// [esp+8h] [ebp-8h]</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> row; <span class="comment">// [esp+Ch] [ebp-4h]</span></span><br><span class="line"></span><br><span class="line">  row = <span class="number">4</span>;</span><br><span class="line">  line = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">25</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    row += s1[save[i]];</span><br><span class="line">    line += s2[save[i]];</span><br><span class="line">    <span class="keyword">if</span> ( row &gt; <span class="number">9</span> || row &lt; <span class="number">0</span> || line &gt; <span class="number">9</span> || line &lt; <span class="number">0</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( <span class="built_in">map</span>[<span class="number">10</span> * row + line] == <span class="number">35</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( <span class="built_in">map</span>[<span class="number">10</span> * row + line] == <span class="number">43</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不难得出<code>flag</code>，即为以<code>a</code>, <code>w</code>, <code>s</code>, <code>d</code>为方向键走出迷宫的路径</p>
+<p><code>flag{wwwwaaaasssaassssdddssddddw}</code></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/08/XMAN-2019-╕ú╓▌-Re-reverse2-final/" rel="next" title="XMAN-2019-福州-Re-reverse2_final">
+                  <i class="fa fa-chevron-left"></i> XMAN-2019-福州-Re-reverse2_final
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/09/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╧┬ú⌐/" rel="prev" title="XMAN-2019-福州-PWN-stackoverflow（下）">
+                  XMAN-2019-福州-PWN-stackoverflow（下） <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-maze"><span class="nav-number">1.</span> <span class="nav-text">baby_maze</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

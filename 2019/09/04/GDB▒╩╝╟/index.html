@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="查看内存vmmap查看程序地址布局 1234567891011121314151617181920pwndbg&amp;gt; vmmapLEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA    0x55af2b74c000     0x55af2b74d000 r-xp     1000 0      /mnt/hgfs/shared/xman/first">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GDB笔记">
+<meta property="og:url" content="http://yoursite.com/2019/09/04/GDB▒╩╝╟/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="查看内存vmmap查看程序地址布局 1234567891011121314151617181920pwndbg&amp;gt; vmmapLEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA    0x55af2b74c000     0x55af2b74d000 r-xp     1000 0      /mnt/hgfs/shared/xman/first">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-05T05:06:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GDB笔记">
+<meta name="twitter:description" content="查看内存vmmap查看程序地址布局 1234567891011121314151617181920pwndbg&amp;gt; vmmapLEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA    0x55af2b74c000     0x55af2b74d000 r-xp     1000 0      /mnt/hgfs/shared/xman/first">
+  <link rel="canonical" href="http://yoursite.com/2019/09/04/GDB▒╩╝╟/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>GDB笔记 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/04/GDB▒╩╝╟/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">GDB笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-04 07:05:55 / Geändert am: 22:06:22" itemprop="dateCreated datePublished" datetime="2019-09-04T07:05:55-07:00">2019-09-04</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="查看内存"><a href="#查看内存" class="headerlink" title="查看内存"></a>查看内存</h2><h3 id="vmmap"><a href="#vmmap" class="headerlink" title="vmmap"></a>vmmap</h3><p>查看程序地址布局</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; vmmap</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span><br><span class="line">    <span class="number">0x55af2b74c000</span>     <span class="number">0x55af2b74d000</span> r-xp     <span class="number">1000</span> <span class="number">0</span>      /mnt/hgfs/shared/xman/first/pwn/dicegame/dice_game</span><br><span class="line">    <span class="number">0x55af2b94d000</span>     <span class="number">0x55af2b94e000</span> r--p     <span class="number">1000</span> <span class="number">1000</span>   /mnt/hgfs/shared/xman/first/pwn/dicegame/dice_game</span><br><span class="line">    <span class="number">0x55af2b94e000</span>     <span class="number">0x55af2b94f000</span> rw-p     <span class="number">1000</span> <span class="number">2000</span>   /mnt/hgfs/shared/xman/first/pwn/dicegame/dice_game</span><br><span class="line">    <span class="number">0x55af2bfe7000</span>     <span class="number">0x55af2c008000</span> rw-p    <span class="number">21000</span> <span class="number">0</span>      [heap]</span><br><span class="line">    <span class="number">0x7eff0e064000</span>     <span class="number">0x7eff0e224000</span> r-xp   <span class="number">1</span>c0000 <span class="number">0</span>      /lib/x86_64-linux-gnu/libc<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e224000</span>     <span class="number">0x7eff0e424000</span> ---p   <span class="number">200000</span> <span class="number">1</span>c0000 /lib/x86_64-linux-gnu/libc<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e424000</span>     <span class="number">0x7eff0e428000</span> r--p     <span class="number">4000</span> <span class="number">1</span>c0000 /lib/x86_64-linux-gnu/libc<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e428000</span>     <span class="number">0x7eff0e42a000</span> rw-p     <span class="number">2000</span> <span class="number">1</span>c4000 /lib/x86_64-linux-gnu/libc<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e42a000</span>     <span class="number">0x7eff0e42e000</span> rw-p     <span class="number">4000</span> <span class="number">0</span>      </span><br><span class="line">    <span class="number">0x7eff0e42e000</span>     <span class="number">0x7eff0e454000</span> r-xp    <span class="number">26000</span> <span class="number">0</span>      /lib/x86_64-linux-gnu/ld<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e635000</span>     <span class="number">0x7eff0e638000</span> rw-p     <span class="number">3000</span> <span class="number">0</span>      </span><br><span class="line">    <span class="number">0x7eff0e653000</span>     <span class="number">0x7eff0e654000</span> r--p     <span class="number">1000</span> <span class="number">25000</span>  /lib/x86_64-linux-gnu/ld<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e654000</span>     <span class="number">0x7eff0e655000</span> rw-p     <span class="number">1000</span> <span class="number">26000</span>  /lib/x86_64-linux-gnu/ld<span class="number">-2.23</span>.so</span><br><span class="line">    <span class="number">0x7eff0e655000</span>     <span class="number">0x7eff0e656000</span> rw-p     <span class="number">1000</span> <span class="number">0</span>      </span><br><span class="line">    <span class="number">0x7fffcce94000</span>     <span class="number">0x7fffcceb5000</span> rw-p    <span class="number">21000</span> <span class="number">0</span>      [<span class="built_in">stack</span>]</span><br><span class="line">    <span class="number">0x7fffccef0000</span>     <span class="number">0x7fffccef3000</span> r--p     <span class="number">3000</span> <span class="number">0</span>      [vvar]</span><br><span class="line">    <span class="number">0x7fffccef3000</span>     <span class="number">0x7fffccef5000</span> r-xp     <span class="number">2000</span> <span class="number">0</span>      [vdso]</span><br><span class="line"><span class="number">0xffffffffff600000</span> <span class="number">0xffffffffff601000</span> r-xp     <span class="number">1000</span> <span class="number">0</span>      [vsyscall]</span><br></pre></td></tr></table></figure>
+
+<h3 id="telescope"><a href="#telescope" class="headerlink" title="telescope"></a>telescope</h3><p>telescope [addr]  [count]</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; telescope </span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp  <span class="number">0x7fffcceb26e8</span> —▸ <span class="number">0x55af2b74cbfc</span> ◂— mov    qword ptr [rbp - <span class="number">0x18</span>], rax</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│ rsi  <span class="number">0x7fffcceb26f0</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│      <span class="number">0x7fffcceb2720</span> —▸ <span class="number">0x55af2b74ccd0</span> ◂— push   r15</span><br><span class="line"></span><br><span class="line">pwndbg&gt; telescope <span class="number">0x7fffcceb26e8</span> <span class="number">30</span></span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp  <span class="number">0x7fffcceb26e8</span> —▸ <span class="number">0x55af2b74cbfc</span> ◂— mov    qword ptr [rbp - <span class="number">0x18</span>], rax</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│ rsi  <span class="number">0x7fffcceb26f0</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│      <span class="number">0x7fffcceb2720</span> —▸ <span class="number">0x55af2b74ccd0</span> ◂— push   r15</span><br><span class="line"><span class="number">08</span>:<span class="number">0040</span>│      <span class="number">0x7fffcceb2728</span> —▸ <span class="number">0x55af2b74c8f0</span> ◂— xor    ebp, ebp</span><br><span class="line"><span class="number">09</span>:<span class="number">0048</span>│      <span class="number">0x7fffcceb2730</span> ◂— <span class="number">0x5d6df5a3</span></span><br><span class="line"><span class="number">0</span>a:<span class="number">0050</span>│      <span class="number">0x7fffcceb2738</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">0b</span>:<span class="number">0058</span>│ rbp  <span class="number">0x7fffcceb2740</span> —▸ <span class="number">0x55af2b74ccd0</span> ◂— push   r15</span><br><span class="line"><span class="number">0</span>c:<span class="number">0060</span>│      <span class="number">0x7fffcceb2748</span> —▸ <span class="number">0x7eff0e084830</span> (__libc_start_main+<span class="number">240</span>) ◂— mov    edi, eax</span><br><span class="line"><span class="number">0</span>d:<span class="number">0068</span>│      <span class="number">0x7fffcceb2750</span> ◂— <span class="number">0x1</span></span><br><span class="line">0e:0070│      0x7fffcceb2758 —▸ 0x7fffcceb2828 —▸ 0x7fffcceb4208 ◂— 'dice_game'</span><br><span class="line"><span class="number">0f</span>:<span class="number">0078</span>│      <span class="number">0x7fffcceb2760</span> ◂— <span class="number">0x10e653ca0</span></span><br><span class="line"><span class="number">10</span>:<span class="number">0080</span>│      <span class="number">0x7fffcceb2768</span> —▸ <span class="number">0x55af2b74cb99</span> ◂— push   rbp</span><br><span class="line"><span class="number">11</span>:<span class="number">0088</span>│      <span class="number">0x7fffcceb2770</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">12</span>:<span class="number">0090</span>│      <span class="number">0x7fffcceb2778</span> ◂— <span class="number">0x8904a58936d20a67</span></span><br><span class="line"><span class="number">13</span>:<span class="number">0098</span>│      <span class="number">0x7fffcceb2780</span> —▸ <span class="number">0x55af2b74c8f0</span> ◂— xor    ebp, ebp</span><br><span class="line"><span class="number">14</span>:<span class="number">00</span>a0│      <span class="number">0x7fffcceb2788</span> —▸ <span class="number">0x7fffcceb2820</span> ◂— <span class="number">0x1</span></span><br><span class="line"><span class="number">15</span>:<span class="number">00</span>a8│      <span class="number">0x7fffcceb2790</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line"><span class="number">17</span>:<span class="number">00b</span>8│      <span class="number">0x7fffcceb27a0</span> ◂— <span class="number">0xdda56ab6e1d20a67</span></span><br><span class="line"><span class="number">18</span>:<span class="number">00</span>c0│      <span class="number">0x7fffcceb27a8</span> ◂— <span class="number">0xdfa4ef7020a20a67</span></span><br><span class="line"><span class="number">19</span>:<span class="number">00</span>c8│      <span class="number">0x7fffcceb27b0</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line">1c:00e0│      0x7fffcceb27c8 —▸ 0x7fffcceb2838 —▸ 0x7fffcceb4212 ◂— 0x505f4150515f5451 ('QT_QPA_P')</span><br><span class="line"><span class="number">1</span>d:<span class="number">00e8</span>│      <span class="number">0x7fffcceb27d0</span> —▸ <span class="number">0x7eff0e655168</span> —▸ <span class="number">0x55af2b74c000</span> ◂— jg     <span class="number">0x55af2b74c047</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">pwndbg&gt; telescope <span class="number">0x7fffcceb26e8</span> </span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp  <span class="number">0x7fffcceb26e8</span> —▸ <span class="number">0x55af2b74cbfc</span> ◂— mov    qword ptr [rbp - <span class="number">0x18</span>], rax</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│ rsi  <span class="number">0x7fffcceb26f0</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│      <span class="number">0x7fffcceb2720</span> —▸ <span class="number">0x55af2b74ccd0</span> ◂— push   r15</span><br></pre></td></tr></table></figure>
+
+<h3 id="x"><a href="#x" class="headerlink" title="x"></a>x</h3><p>格式：x/&lt;n/f/u&gt;  <addr></addr></p>
+<p>n:是正整数，表示需要显示的内存单元的个数，即从当前地址向后显示n个内存单元的内容，一个内存单元的大小由第三个参数u定义。</p>
+<p>f:表示addr指向的内存内容的输出格式，s对应输出字符串，此处需特别注意输出整型数据的格式：</p>
+<p>x 按十六进制格式显示变量。</p>
+<p>d 按十进制格式显示变量。</p>
+<p>u 按十六进制格式显示无符号整型。</p>
+<p>o 按八进制格式显示变量。</p>
+<p>t 按二进制格式显示变量。</p>
+<p>a 按十六进制格式显示变量。</p>
+<p>c 按字符格式显示变量。</p>
+<p>f 按浮点数格式显示变量。</p>
+<p>u:就是指以多少个字节作为一个内存单元-unit,默认为4。当然u还可以用被一些字符表示，如b=1 byte, h=2 bytes,w=4 bytes,g=8 bytes</p>
+<p>示例:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">10</span>wx <span class="number">0x7fffcceb26e8</span></span><br><span class="line"><span class="number">0x7fffcceb26e8</span>:	<span class="number">0x2b74cbfc</span>	<span class="number">0x000055af</span>	<span class="number">0x00000000</span>	<span class="number">0x00000000</span></span><br><span class="line"><span class="number">0x7fffcceb26f8</span>:	<span class="number">0x00000000</span>	<span class="number">0x00000000</span>	<span class="number">0x00000000</span>	<span class="number">0x00000000</span></span><br><span class="line"><span class="number">0x7fffcceb2708</span>:	<span class="number">0x00000000</span>	<span class="number">0x00000000</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10</span>gx <span class="number">0x7fffcceb26e8</span></span><br><span class="line"><span class="number">0x7fffcceb26e8</span>:	<span class="number">0x000055af2b74cbfc</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffcceb26f8</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffcceb2708</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffcceb2718</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x000055af2b74ccd0</span></span><br><span class="line"><span class="number">0x7fffcceb2728</span>:	<span class="number">0x000055af2b74c8f0</span>	<span class="number">0x000000005d6df5a3</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10b</span>x <span class="number">0x7fffcceb26e8</span></span><br><span class="line"><span class="number">0x7fffcceb26e8</span>:	<span class="number">0xfc</span>	<span class="number">0xcb</span>	<span class="number">0x74</span>	<span class="number">0x2b</span>	<span class="number">0xaf</span>	<span class="number">0x55</span>	<span class="number">0x00</span>	<span class="number">0x00</span></span><br><span class="line"><span class="number">0x7fffcceb26f0</span>:	<span class="number">0x00</span>	<span class="number">0x00</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10</span>hx <span class="number">0x7fffcceb26e8</span></span><br><span class="line"><span class="number">0x7fffcceb26e8</span>:	<span class="number">0xcbfc</span>	<span class="number">0x2b74</span>	<span class="number">0x55af</span>	<span class="number">0x0000</span>	<span class="number">0x0000</span>	<span class="number">0x0000</span>	<span class="number">0x0000</span>	<span class="number">0x0000</span></span><br><span class="line"><span class="number">0x7fffcceb26f8</span>:	<span class="number">0x0000</span>	<span class="number">0x0000</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10b</span> <span class="number">0x7fffcceb26e8</span></span><br><span class="line"><span class="number">0x7fffcceb26e8</span>:	<span class="number">0xfc</span>	<span class="number">0xcb</span>	<span class="number">0x74</span>	<span class="number">0x2b</span>	<span class="number">0xaf</span>	<span class="number">0x55</span>	<span class="number">0x00</span>	<span class="number">0x00</span></span><br><span class="line"><span class="number">0x7fffcceb26f0</span>:	<span class="number">0x00</span>	<span class="number">0x00</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10</span>c <span class="number">0x7fffcceb26e8</span></span><br><span class="line">0x7fffcceb26e8:	-4 '\374'	-53 '\313'	116 't'	43 '+'	-81 '\257'	85 'U'	0 '\000'	0 '\000'</span><br><span class="line">0x7fffcceb26f0:	0 '\000'	0 '\000'</span><br></pre></td></tr></table></figure>
+
+<h3 id="heap"><a href="#heap" class="headerlink" title="heap"></a>heap</h3><p>显示堆的情况</p>
+<h3 id="bins"><a href="#bins" class="headerlink" title="bins"></a>bins</h3><p>显示堆的分配情况</p>
+<h3 id="stack"><a href="#stack" class="headerlink" title="stack"></a>stack</h3><p>stack [count]<br>显示栈的情况</p>
+<h2 id="下断点"><a href="#下断点" class="headerlink" title="下断点"></a>下断点</h2><h3 id="b"><a href="#b" class="headerlink" title="b"></a>b</h3><p>直接输入b会把断点下在当前rip或者eip的位置</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">RIP  <span class="number">0x7ffff7b04260</span> (__read_nocancel+<span class="number">7</span>) ◂— cmp    rax, <span class="number">-0xfff</span></span><br><span class="line">───────────────────────────────────────────────────────[ DISASM ]────────────────────────────────────────────────────────</span><br><span class="line"> ► <span class="number">0x7ffff7b04260</span> &lt;__read_nocancel+<span class="number">7</span>&gt;     cmp    rax, <span class="number">-0xfff</span></span><br><span class="line">   <span class="number">0x7ffff7b04266</span> &lt;__read_nocancel+<span class="number">13</span>&gt;    jae    read+<span class="number">73</span> &lt;<span class="number">0x7ffff7b04299</span>&gt;</span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x7ffff7b04299</span> &lt;read+<span class="number">73</span>&gt;               mov    rcx, qword ptr [rip + <span class="number">0x2ccbd8</span>]</span><br><span class="line">   <span class="number">0x7ffff7b042a0</span> &lt;read+<span class="number">80</span>&gt;               neg    eax</span><br><span class="line">   <span class="number">0x7ffff7b042a2</span> &lt;read+<span class="number">82</span>&gt;               mov    dword ptr fs:[rcx], eax</span><br><span class="line">   <span class="number">0x7ffff7b042a5</span> &lt;read+<span class="number">85</span>&gt;               <span class="keyword">or</span>     rax, <span class="number">0xffffffffffffffff</span></span><br><span class="line">   <span class="number">0x7ffff7b042a9</span> &lt;read+<span class="number">89</span>&gt;               ret    </span><br><span class="line"> </span><br><span class="line">   <span class="number">0x7ffff7b042aa</span>                         nop    word ptr [rax + rax]</span><br><span class="line">   <span class="number">0x7ffff7b042b0</span> &lt;write&gt;                 cmp    dword ptr [rip + <span class="number">0x2d2489</span>], <span class="number">0</span> &lt;<span class="number">0x7ffff7dd6740</span>&gt;</span><br><span class="line">   <span class="number">0x7ffff7b042b7</span> &lt;write+<span class="number">7</span>&gt;               jne    write+<span class="number">25</span> &lt;<span class="number">0x7ffff7b042c9</span>&gt;</span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x7ffff7b042c9</span> &lt;write+<span class="number">25</span>&gt;              sub    rsp, <span class="number">8</span></span><br><span class="line">────────────────────────────────────────────────────────[ STACK ]────────────────────────────────────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp  <span class="number">0x7fffffffdce8</span> —▸ <span class="number">0x555555554bfc</span> ◂— mov    qword ptr [rbp - <span class="number">0x18</span>], rax</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│ rsi  <span class="number">0x7fffffffdcf0</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│      <span class="number">0x7fffffffdd20</span> —▸ <span class="number">0x555555554cd0</span> ◂— push   r15</span><br><span class="line">──────────────────────────────────────────────────────[ BACKTRACE ]──────────────────────────────────────────────────────</span><br><span class="line"> ► f <span class="number">0</span>     <span class="number">7f</span>fff7b04260 __read_nocancel+<span class="number">7</span></span><br><span class="line">   f <span class="number">1</span>     <span class="number">555555554b</span>fc</span><br><span class="line">   f <span class="number">2</span>     <span class="number">7f</span>fff7a2d830 __libc_start_main+<span class="number">240</span></span><br><span class="line">Program received signal SIGINT</span><br><span class="line">pwndbg&gt; b</span><br><span class="line">Breakpoint <span class="number">1</span> at <span class="number">0x7ffff7b04260</span>: file ../sysdeps/unix/syscall-<span class="keyword">template</span>.S, line <span class="number">84.</span></span><br></pre></td></tr></table></figure>
+
+<p>b  *addr</p>
+<p>下断点在addr处</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; b *<span class="number">0x7ffff7b042a9</span></span><br><span class="line">Breakpoint <span class="number">4</span> at <span class="number">0x7ffff7b042a9</span>: file ../sysdeps/unix/syscall-<span class="keyword">template</span>.S, line <span class="number">86.</span></span><br></pre></td></tr></table></figure>
+
+<p>b *reg</p>
+<p>根据寄存器的值下断点</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; b *$r12</span><br><span class="line">Breakpoint <span class="number">5</span> at <span class="number">0x5555555548f0</span></span><br></pre></td></tr></table></figure>
+
+<p>下完断点后 c（continue）命令，程序会在你下的断点处断下来，但是前提是你要保证程序会执行到那里</p>
+<h3 id="rwatch"><a href="#rwatch" class="headerlink" title="rwatch"></a>rwatch</h3><p>内存访问断点</p>
+<p>rwatch *addr</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; rwatch *<span class="number">0x7ffff7dd18e0</span></span><br><span class="line">Hardware read watchpoint <span class="number">6</span>: *<span class="number">0x7ffff7dd18e0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="dump-内存"><a href="#dump-内存" class="headerlink" title="dump 内存"></a>dump 内存</h2><p>dump memory filename start_addr stop_addr</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; ls</span><br><span class="line">dice_game  dice_game.i64  dicegame.zip	<span class="built_in">exp</span>.py	libc.so<span class="number">.6</span>  t  t.c</span><br><span class="line"></span><br><span class="line">pwndbg&gt; dump memory dump.dmp <span class="number">0x7fffffffd4c8</span> <span class="number">0x7fffffffd4d0</span></span><br><span class="line"></span><br><span class="line">pwndbg&gt; ls</span><br><span class="line">dice_game  dice_game.i64  dicegame.zip	dump.dmp  <span class="built_in">exp</span>.py  libc.so<span class="number">.6</span>  t	t.c</span><br><span class="line"></span><br><span class="line"><span class="comment">//dump.dmp就是我们dump下来的内存</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="ROP"><a href="#ROP" class="headerlink" title="ROP"></a>ROP</h1><h2 id="神奇的一个gadget"><a href="#神奇的一个gadget" class="headerlink" title="神奇的一个gadget"></a>神奇的一个gadget</h2><p>__do_global_dtors_aux函数里的</p>
+<h1 id="adc-rbp-48h-edx"><a href="#adc-rbp-48h-edx" class="headerlink" title="adc     [rbp+48h], edx"></a>adc     [rbp+48h], edx</h1><p>edx和rbp都可控</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/02/Backdoorctf-2015-forgot/" rel="next" title="Backdoorctf-2015-forgot">
+                  <i class="fa fa-chevron-left"></i> Backdoorctf-2015-forgot
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/05/4th-QCTF-2018-stack2/" rel="prev" title="4th-QCTF-2018-stack2">
+                  4th-QCTF-2018-stack2 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看内存"><span class="nav-number">1.</span> <span class="nav-text">查看内存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vmmap"><span class="nav-number">1.1.</span> <span class="nav-text">vmmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#telescope"><span class="nav-number">1.2.</span> <span class="nav-text">telescope</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x"><span class="nav-number">1.3.</span> <span class="nav-text">x</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#heap"><span class="nav-number">1.4.</span> <span class="nav-text">heap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bins"><span class="nav-number">1.5.</span> <span class="nav-text">bins</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stack"><span class="nav-number">1.6.</span> <span class="nav-text">stack</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下断点"><span class="nav-number">2.</span> <span class="nav-text">下断点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#b"><span class="nav-number">2.1.</span> <span class="nav-text">b</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rwatch"><span class="nav-number">2.2.</span> <span class="nav-text">rwatch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dump-内存"><span class="nav-number">3.</span> <span class="nav-text">dump 内存</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ROP"><span class="nav-number"></span> <span class="nav-text">ROP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#神奇的一个gadget"><span class="nav-number">1.</span> <span class="nav-text">神奇的一个gadget</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#adc-rbp-48h-edx"><span class="nav-number"></span> <span class="nav-text">adc     [rbp+48h], edx</span></a></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

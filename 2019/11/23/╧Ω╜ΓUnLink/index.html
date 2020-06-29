@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="解析首先我们先说一下为什么会合并 chunk，这是为了避免 heap 中有太多零零碎碎的内存块，合并之后可以用来应对更大的内存块请求。合并的主要顺序为  先考虑物理低地址空闲块 后考虑物理高地址空闲块  且 只有不是 fast bin 的情况下才会触发 unlink ，本人感觉CTF Wiki上很多东西讲的不是很清楚，故自己写了 首先又是这张经典的图  这张图，至少那时候我看得很迷糊，主要是unl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="详解UnLink">
+<meta property="og:url" content="http://yoursite.com/2019/11/23/╧Ω╜ΓUnLink/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="解析首先我们先说一下为什么会合并 chunk，这是为了避免 heap 中有太多零零碎碎的内存块，合并之后可以用来应对更大的内存块请求。合并的主要顺序为  先考虑物理低地址空闲块 后考虑物理高地址空闲块  且 只有不是 fast bin 的情况下才会触发 unlink ，本人感觉CTF Wiki上很多东西讲的不是很清楚，故自己写了 首先又是这张经典的图  这张图，至少那时候我看得很迷糊，主要是unl">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/unlink_smallbin_intro.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/old_unlink_vul.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/QQ%E5%9B%BE%E7%89%8720191121011336.png">
+<meta property="og:updated_time" content="2019-11-24T01:01:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="详解UnLink">
+<meta name="twitter:description" content="解析首先我们先说一下为什么会合并 chunk，这是为了避免 heap 中有太多零零碎碎的内存块，合并之后可以用来应对更大的内存块请求。合并的主要顺序为  先考虑物理低地址空闲块 后考虑物理高地址空闲块  且 只有不是 fast bin 的情况下才会触发 unlink ，本人感觉CTF Wiki上很多东西讲的不是很清楚，故自己写了 首先又是这张经典的图  这张图，至少那时候我看得很迷糊，主要是unl">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/unlink_smallbin_intro.png">
+  <link rel="canonical" href="http://yoursite.com/2019/11/23/╧Ω╜ΓUnLink/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>详解UnLink | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/23/╧Ω╜ΓUnLink/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">详解UnLink
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-11-23 01:01:25 / Geändert am: 17:01:38" itemprop="dateCreated datePublished" datetime="2019-11-23T01:01:25-08:00">2019-11-23</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先我们先说一下为什么会合并 chunk，这是为了避免 heap 中有太多零零碎碎的内存块，合并之后可以用来应对更大的内存块请求。合并的主要顺序为</p>
+<ul>
+<li>先考虑物理低地址空闲块</li>
+<li>后考虑物理高地址空闲块</li>
+</ul>
+<p>且 只有不是 fast bin 的情况下才会触发 unlink ，本人感觉CTF Wiki上很多东西讲的不是很清楚，故自己写了</p>
+<p>首先又是这张经典的图</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/unlink_smallbin_intro.png" alt></p>
+<p>这张图，至少那时候我看得很迷糊，主要是unlink的时候到底那个是P，哪个是BK，哪个是FD，物理内存上到底又是什么样子的，就很迷糊，所以我觉得好好研究研究</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/old_unlink_vul.png" alt></p>
+<p>又是这经典的图作为例子，还是很迷糊，于是我决定换个形式描述这张图，首先是一个<strong>chunk</strong>在内存中的真实布局</p>
+<table>
+<thead>
+<tr>
+<th align="center">Low Address</th>
+<th align="center">Prev_size</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center"><strong>Size</strong></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>fd</strong></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>bk</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>High Address</strong></td>
+<td align="center"><strong>Content</strong></td>
+</tr>
+</tbody></table>
+<p>所以上面那张图在内存中的布局应该是</p>
+<table>
+<thead>
+<tr>
+<th align="center">Low Address</th>
+<th align="center">Prev_size</th>
+<th align="center"><strong>Q</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center"><strong>Size=0x81</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>User Content</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>Prev_Size</strong></td>
+<td align="center"><strong>NextChunk</strong></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>Size=0x80</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>fd</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>bk</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>Unuser Data</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>Prev_size</strong></td>
+<td align="center"><strong>NextChunk of NextChunk</strong></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>Size=0x80</strong></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>High Address</strong></td>
+<td align="center"><strong>User Content</strong></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<p> 其中 <strong>Q</strong> 处于使用状态、<strong>Nextchunk</strong> 处于释放状态 , 当我们 <strong>free(Q)</strong>  </p>
+<ul>
+<li><strong>glibc</strong> 判断这个块是 <strong>small chunk</strong></li>
+<li>先考虑物理低地址空闲块，判断前向合并，发现前一个 <strong>chunk</strong> 处于使用状态，不需要前向合并</li>
+<li>后考虑物理高地址空闲块，判断后向合并，发现后一个 <strong>chunk</strong> 处于空闲状态，需要合并</li>
+<li>继而对 <strong>Nextchunk</strong> 采取 <strong>unlink</strong> 操作</li>
+</ul>
+<p>则此时，<strong>P</strong>即为<strong>Nextchunk</strong>，<strong>FD</strong>是<strong>Q</strong>，<strong>BF</strong>是<strong>Nextchunk of Nextchunk</strong></p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E8%AF%A6%E8%A7%A3UnLink/QQ%E5%9B%BE%E7%89%8720191121011336.png" alt></p>
+<p>此时横向内存布局也是Low Address ——&gt; High Address</p>
+<table>
+<thead>
+<tr>
+<th align="center">Q（FD）</th>
+<th align="center">Nextchunk（P）</th>
+<th align="center">Nextchunk of Nextchunk（BK）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>Low Address</strong></td>
+<td align="center"></td>
+<td align="center">High Address</td>
+</tr>
+</tbody></table>
+<p>那么 unlink 具体执行的效果是什么样子呢？我们可以来分析一下</p>
+<ul>
+<li><strong>FD=P-&gt;fd</strong>  = <strong>Nextchunk address - 12</strong><ul>
+<li><strong>FD = Q</strong></li>
+</ul>
+</li>
+<li><strong>BK=P-&gt;bk</strong> <ul>
+<li><strong>BK = Nextchunk of Nextchunk</strong></li>
+</ul>
+</li>
+<li><strong>FD-&gt;bk = BK</strong> <ul>
+<li><strong>Q-&gt;bk = Nextchunk of Nextchunk</strong></li>
+</ul>
+</li>
+<li><strong>BK-&gt;fd = FD</strong><ul>
+<li><strong>Nextchunk of Nextchunk-&gt;fd = Q</strong></li>
+</ul>
+</li>
+</ul>
+<p>注意到倘若我们能修改<strong>Nextchunk</strong>的<strong>fd</strong>和<strong>bk</strong>，将<strong>fd</strong>和<strong>bk</strong>指向虚构的<strong>chunk</strong>地址，那么就有可能实现任意地址读写，那么假设我们把<strong>Nextchunk</strong>的<strong>fd</strong>设定为<strong>target addr -12 **,</strong>bk<strong>设定为</strong>expect value**，那么接下来</p>
+<ul>
+<li><strong>FD=P-&gt;fd = target addr -12</strong></li>
+<li><strong>BK=P-&gt;bk = expect value</strong></li>
+<li><strong>FD-&gt;bk = BK，即 *(target addr-12+12)=BK=expect value</strong></li>
+<li><strong>BK-&gt;fd = FD，即 *(expect value +8) = FD = target addr-12</strong></li>
+</ul>
+<p>我们就可以使<strong>target addr</strong> = <strong>expect value</strong>, 看起来我们似乎可以通过 unlink 直接实现任意地址读写的目的，但是我们还是需要确保 expect value +8 地址具有可写的权限</p>
+<p>比如说我们将 target addr 设置为某个 got 表项，那么当程序调用对应的 libc 函数时，就会直接执行我们设置的值（expect value）处的代码。例如我们将free修改为system，当程序执行free的时候就会执行system</p>
+<p><strong>需要注意的是，expect value+8 处的值被破坏了，需要想办法绕过</strong> </p>
+<p>我们刚才考虑的是没有检查的情况，但是一旦加上检查，就没有这么简单了。我们看一下对 fd 和 bk 的检查 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fd bk</span></span><br><span class="line"><span class="keyword">if</span> (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, <span class="number">0</span>))                      \</span><br><span class="line">  malloc_printerr (check_action, <span class="string">"corrupted double-linked list"</span>, P, AV);  \</span><br></pre></td></tr></table></figure>
+
+<p>如果按照我们之前说所的那样修改fd和bk此时</p>
+<ul>
+<li>FD-&gt;bk = target addr - 12 + 12=target_addr</li>
+<li>BK-&gt;fd = expect value + 8 = target addr-12</li>
+</ul>
+<p>就无法通过检查</p>
+<p>首先我们通过覆盖，将 nextchunk 的 FD 指针指向了 fakeFD，将 nextchunk 的 BK 指针指向了 fakeBK 。那么为了通过验证，我们需要</p>
+<ul>
+<li><code>fakeFD -&gt; bk == P</code>  &lt;=&gt;  <code>*(fakeFD + 12) == P</code></li>
+<li><code>fakeBK -&gt; fd == P</code>  &lt;=&gt;  <code>*(fakeBK + 8) == P</code></li>
+</ul>
+<p>当满足上述两式时，可以进入 Unlink 的环节，进行如下操作：</p>
+<ul>
+<li><code>fakeFD -&gt; bk = fakeBK</code>  &lt;=&gt;  <code>*(fakeFD + 12) = fakeBK</code></li>
+<li><code>fakeBK -&gt; fd = fakeFD</code>  &lt;=&gt;  <code>*(fakeBK + 8) = fakeFD</code></li>
+</ul>
+<p>如果让 fakeFD + 12 和 fakeBK + 8 指向同一个指向 P 的指针，那么：</p>
+<ul>
+<li><code>*P = P - 8</code></li>
+<li><code>*P = P - 12</code></li>
+</ul>
+<p>即通过此方式，P 的指针指向了比自己低 12 的地址处。此方法虽然不可以实现任意地址写，但是可以修改指向 chunk 的指针，这样的修改是可以达到一定的效果的。</p>
+<p>需要注意的是，这里我们并没有违背下面的约束，因为 P 在 Unlink 前是指向正确的 chunk 的指针。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 由于P已经在双向链表中，所以有两个地方记录其大小，所以检查一下其大小是否一致。</span><br><span class="line">if (__builtin_expect (chunksize(P) != prev_size (next_chunk(P)), 0))      \</span><br><span class="line">  malloc_printerr (&quot;corrupted size vs. prev_size&quot;);               \</span><br></pre></td></tr></table></figure>
+
+<p><strong>此外，其实如果我们设置 next chunk 的 fd 和 bk 均为 nextchunk 的地址也是可以绕过上面的检测的。但是这样的话，并不能达到修改指针内容的效果</strong></p>
+<h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><ol>
+<li>UAF ，可修改 free 状态下 smallbin 或是 unsorted bin 的 fd 和 bk 指针</li>
+<li>已知位置存在一个指针指向可进行 UAF 的 chunk</li>
+</ol>
+<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>使得已指向 UAF chunk 的指针 ptr 变为 ptr - 0x18</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>设指向可 UAF chunk 的指针的地址为 ptr</p>
+<ol>
+<li>修改 fd 为 ptr - 0x18</li>
+<li>修改 bk 为 ptr - 0x10</li>
+<li>触发 unlink</li>
+</ol>
+<p>ptr 处的指针会变为 ptr - 0x18</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/21/2019╕▀╨ú╘╦╬¼╚ⁿWriteUp/" rel="next" title="2019高校运维赛WriteUp">
+                  <i class="fa fa-chevron-left"></i> 2019高校运维赛WriteUp
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/12/02/GDB╫╘╢»╗»╜┼▒╛▒α╨┤▒╩╝╟╥╗/" rel="prev" title="GDB自动化脚本编写笔记一">
+                  GDB自动化脚本编写笔记一 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解析"><span class="nav-number">1.</span> <span class="nav-text">解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用思路"><span class="nav-number">2.</span> <span class="nav-text">利用思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#条件"><span class="nav-number">2.1.</span> <span class="nav-text">条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#效果"><span class="nav-number">2.2.</span> <span class="nav-text">效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#思路"><span class="nav-number">2.3.</span> <span class="nav-text">思路</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

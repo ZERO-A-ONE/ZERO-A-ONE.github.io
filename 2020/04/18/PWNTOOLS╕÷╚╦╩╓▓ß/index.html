@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="项目主页：http://pwntools.com/ 项目地址：https://github.com/Gallopsled/pwntools 安装12345678＃更新包sudo apt-get update＃安装必要的组件sudo apt-get install -y python2.7 python -pip python-dev git libssl-dev libffi-dev build-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PWNTOOLS个人手册">
+<meta property="og:url" content="http://yoursite.com/2020/04/18/PWNTOOLS╕÷╚╦╩╓▓ß/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="项目主页：http://pwntools.com/ 项目地址：https://github.com/Gallopsled/pwntools 安装12345678＃更新包sudo apt-get update＃安装必要的组件sudo apt-get install -y python2.7 python -pip python-dev git libssl-dev libffi-dev build-">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-04-18T23:48:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PWNTOOLS个人手册">
+<meta name="twitter:description" content="项目主页：http://pwntools.com/ 项目地址：https://github.com/Gallopsled/pwntools 安装12345678＃更新包sudo apt-get update＃安装必要的组件sudo apt-get install -y python2.7 python -pip python-dev git libssl-dev libffi-dev build-">
+  <link rel="canonical" href="http://yoursite.com/2020/04/18/PWNTOOLS╕÷╚╦╩╓▓ß/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>PWNTOOLS个人手册 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/18/PWNTOOLS╕÷╚╦╩╓▓ß/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">PWNTOOLS个人手册
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-04-18 01:48:38 / Geändert am: 16:48:56" itemprop="dateCreated datePublished" datetime="2020-04-18T01:48:38-07:00">2020-04-18</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>项目主页：<a href="http://pwntools.com/" target="_blank" rel="noopener">http://pwntools.com/</a></p>
+<p>项目地址：<a href="https://github.com/Gallopsled/pwntools" target="_blank" rel="noopener">https://github.com/Gallopsled/pwntools</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">＃更新包</span><br><span class="line">sudo apt-get update</span><br><span class="line">＃安装必要的组件</span><br><span class="line">sudo apt-get install -y python2.7 python -pip python-dev git libssl-dev libffi-dev build-essential</span><br><span class="line">＃升级Python的包管理器</span><br><span class="line">pip install --upgrade pip</span><br><span class="line">＃安装pwntools </span><br><span class="line">sudo pip install --upgrade pwntools</span><br></pre></td></tr></table></figure>
+
+<h2 id="模块列表"><a href="#模块列表" class="headerlink" title="模块列表"></a>模块列表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- pwnlib.adb — Android Debug Bridge</span><br><span class="line">- pwnlib.asm — Assembler functions</span><br><span class="line">- pwnlib.encoders — Encoding Shellcode</span><br><span class="line">- pwnlib.elf — ELF Executables and Libraries</span><br><span class="line">- pwnlib.exception — Pwnlib exceptions</span><br><span class="line">- pwnlib.flag — CTF Flag Management</span><br><span class="line">- pwnlib.fmtstr — Format string bug exploitation tools</span><br><span class="line">- pwnlib.gdb — Working with GDB</span><br><span class="line">- pwnlib.log — Logging stuff</span><br><span class="line">- pwnlib.protocols — Wire Protocols</span><br><span class="line">- pwnlib.rop — Return Oriented Programming</span><br><span class="line">- pwnlib.runner — Running Shellcode</span><br><span class="line">- pwnlib.shellcraft — Shellcode generation</span><br><span class="line">- pwnlib.shellcraft.&lt;architecture&gt;</span><br><span class="line">- pwnlib.term — Terminal handling</span><br><span class="line">- pwnlib.timeout — Timeout handling</span><br><span class="line">- pwnlib.tubes — Talking to the World!</span><br><span class="line">- pwnlib.tubes.&lt;process|serialtube|SSH&gt;</span><br><span class="line">- pwnlib.update — Updating Pwntools</span><br><span class="line">- pwnlib.useragents — A database of useragent strings</span><br><span class="line">- pwnlib.util.cyclic — Generation of unique sequences</span><br><span class="line">- pwnlib.util.fiddling — Utilities bit fiddling</span><br><span class="line">- pwnlib.util.net — Networking interfaces</span><br><span class="line">- pwnlib.util.packing — Packing and unpacking of strings</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br></pre></td></tr></table></figure>
+
+<h2 id="模块介绍"><a href="#模块介绍" class="headerlink" title="模块介绍"></a>模块介绍</h2><p><strong>常用模块如下：</strong></p>
+<ul>
+<li>asm : 汇编与反汇编，支持x86/x64/arm/mips/powerpc等基本上所有的主流平台</li>
+<li>dynelf : 用于远程符号泄漏，需要提供leak方法</li>
+<li>elf : 对elf文件进行操作</li>
+<li>gdb : 配合gdb进行调试</li>
+<li>memleak : 用于内存泄漏</li>
+<li>shellcraft : shellcode的生成器</li>
+<li>tubes : 包括tubes.sock, tubes.process, tubes.ssh, tubes.serialtube，分别适用于不同场景的PIPE</li>
+<li>utils : 一些实用的小功能，例如CRC计算，cyclic pattern等</li>
+</ul>
+<h3 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">本地 ：sh = porcess(&quot;./level0&quot;)</span><br><span class="line">远程：sh = remote(&quot;127.0.0.1&quot;,10001)</span><br><span class="line">关闭连接：sh.close()</span><br></pre></td></tr></table></figure>
+
+<p>pwn库中最常用的部分之一是，它允许您轻松地连接到Web服务并执行操作。pwntools的<a href="https://docs.pwntools.com/en/stable/intro.html" target="_blank" rel="noopener">入门文档</a>中包含的一个示例是连接到overthewire的 bandit CTF实验室。Overthewire是一款在线信息安全CTF通关网站，你可以在线Hacking,并为任何刚接触Linux / CLI 等的初级人员提供了手把手教学。<br>我们可以利用pwn库创建到主机的SSH连接，并对其运行任意命令。每个bandit级别的目标是找到进入下一级别的密码。例如：利用pwntools，您可以开发一个脚本来将SSH连接到目标主机，并运行一系列自动信息收集探针，以确定如何以最佳方式对其进行攻击。<br>一个不错的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Connect to the target</span><br><span class="line">shell = ssh(&apos;bandit0&apos;, &apos;bandit.labs.overthewire.org&apos;, password=&apos;bandit0&apos;, port=2220)</span><br><span class="line"># Create an initial process</span><br><span class="line">sh = shell.run(&apos;sh&apos;)</span><br><span class="line"># Send the process arguments</span><br><span class="line">sh.sendline(&apos;ls -la&apos;)</span><br><span class="line"># Receive output from the executed command</span><br><span class="line">sh.recvline(timeout=5)</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"># Obtain the first flag (password for bandit1)</span><br><span class="line">sh.sendline(&apos;cat readme&apos;)</span><br><span class="line"># Print the flag</span><br><span class="line">sh.recvline(timeout=5)</span><br></pre></td></tr></table></figure>
+
+<h3 id="IO模块"><a href="#IO模块" class="headerlink" title="IO模块"></a>IO模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sh.send(data)  发送数据</span><br><span class="line">sh.sendline(data)  发送一行数据，相当于在数据后面加\n</span><br><span class="line">sh.recv(numb = 2048, timeout = dufault)  接受数据，numb指定接收的字节，timeout指定超时</span><br><span class="line">sh.recvline(keepends=True)  接受一行数据，keepends为是否保留行尾的\n</span><br><span class="line">sh.recvuntil(&quot;Hello,World\n&quot;,drop=fasle)  接受数据直到我们设置的标志出现</span><br><span class="line">sh.recvall()  一直接收直到EOF</span><br><span class="line">sh.recvrepeat(timeout = default)  持续接受直到EOF或timeout</span><br><span class="line">sh.interactive()  直接进行交互，相当于回到shell的模式，在取得shell之后使用</span><br></pre></td></tr></table></figure>
+
+<h3 id="汇编和反汇编"><a href="#汇编和反汇编" class="headerlink" title="汇编和反汇编"></a>汇编和反汇编</h3><p>汇编：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; asm(&apos;nop&apos;)</span><br><span class="line">&apos;\x90&apos;</span><br><span class="line">&gt;&gt;&gt; asm(&apos;nop&apos;, arch=&apos;arm&apos;)</span><br><span class="line">&apos;\x00\xf0 \xe3&apos;</span><br></pre></td></tr></table></figure>
+
+<p>可以使用context来指定cpu类型以及操作系统。context是pwntools用来设置环境的功能。在很多时候，由于二进制文件的情况不同，我们可能需要进行一些环境设置才能够正常运行exp，比如有一些需要进行汇编，但是32的汇编和64的汇编不同，如果不设置context会导致一些问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; context.arch      = &apos;i386&apos;</span><br><span class="line">&gt;&gt;&gt; context.os        = &apos;linux&apos;</span><br><span class="line">&gt;&gt;&gt; context.endian    = &apos;little&apos;</span><br><span class="line">&gt;&gt;&gt; context.word_size = 32</span><br></pre></td></tr></table></figure>
+
+<p>一般来说我们设置context只需要简单的一句话:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context(os=&apos;linux&apos;, arch=&apos;amd64&apos;, log_level=&apos;debug&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>使用disasm进行反汇编</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; print disasm(&apos;6a0258cd80ebf9&apos;.decode(&apos;hex&apos;))</span><br><span class="line">   0:   6a 02                   push   0x2</span><br><span class="line">   2:   58                      pop    eax</span><br><span class="line">   3:   cd 80                   int    0x80</span><br><span class="line">   5:   eb f9                   jmp    0x0</span><br></pre></td></tr></table></figure>
+
+<p>注意，asm需要binutils中的as工具辅助，如果是不同于本机平台的其他平台的汇编，例如在我的x86机器上进行mips的汇编就会出现as工具未找到的情况，这时候需要安装其他平台的cross-binutils</p>
+<h3 id="shellcode生成器"><a href="#shellcode生成器" class="headerlink" title="shellcode生成器"></a>shellcode生成器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; print shellcraft.i386.nop().strip(&apos;\n&apos;)</span><br><span class="line">    nop</span><br><span class="line">&gt;&gt;&gt; print shellcraft.i386.linux.sh()</span><br><span class="line">    /* push &apos;/bin///sh\x00&apos; */</span><br><span class="line">    push 0x68</span><br><span class="line">    push 0x732f2f2f</span><br><span class="line">    push 0x6e69622f</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>结合asm可以可以得到最终的pyaload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context(os=&apos;linux&apos;,arch=&apos;amd64&apos;)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line">shellcode = asm(shellcraft.amd64.linux.sh())</span><br></pre></td></tr></table></figure>
+
+<p>除了直接执行sh之外，还可以进行其它的一些常用操作例如提权、反向连接等等</p>
+<h4 id="ELF文件操作"><a href="#ELF文件操作" class="headerlink" title="ELF文件操作"></a>ELF文件操作</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; e = ELF(&apos;/bin/cat&apos;)</span><br><span class="line">&gt;&gt;&gt; print hex(e.address)  # 文件装载的基地址</span><br><span class="line">0x400000</span><br><span class="line">&gt;&gt;&gt; print hex(e.symbols[&apos;write&apos;]) # 函数地址</span><br><span class="line">0x401680</span><br><span class="line">&gt;&gt;&gt; print hex(e.got[&apos;write&apos;]) # GOT表的地址</span><br><span class="line">0x60b070</span><br><span class="line">&gt;&gt;&gt; print hex(e.plt[&apos;write&apos;]) # PLT的地址</span><br><span class="line">0x401680</span><br><span class="line">&gt;&gt;&gt; print hex(e.search(&apos;/bin/sh&apos;).next())# 字符串/bin/sh的地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="整数pack与数据unpack"><a href="#整数pack与数据unpack" class="headerlink" title="整数pack与数据unpack"></a>整数pack与数据unpack</h3><p>pack：p32，p64<br>unpack：u32，u64</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">elf = ELF(&apos;./level0&apos;)</span><br><span class="line">sys_addr = elf.symbols[&apos;system&apos;]</span><br><span class="line">payload = &apos;a&apos; * (0x80 + 0x8) + p64(sys_addr)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>还可以调整大端序和小端序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Create some variable with an address</span><br><span class="line">addr = 0xabcdef12</span><br><span class="line"># 32-bit: Big Endian</span><br><span class="line">p32(addr, endian=&quot;big&quot;</span><br><span class="line"># 32-bit: Little Endian</span><br><span class="line">p32(addr, endian=&quot;big&quot;</span><br><span class="line"># 32-bit: Default is Little Endian</span><br><span class="line">p32(addr)</span><br><span class="line"># 64-bit: Big Endian</span><br><span class="line">p64(addr, endian=&quot;big&quot;)</span><br><span class="line"># 64-bit: Little Endian</span><br><span class="line">p64(addr, endian=&quot;small&quot;)</span><br><span class="line"># 64-bit: Default is Little Endian</span><br><span class="line">p64(addr)</span><br></pre></td></tr></table></figure>
+
+<h3 id="ROP链生成器"><a href="#ROP链生成器" class="headerlink" title="ROP链生成器"></a>ROP链生成器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">elf = ELF(&apos;ropasaurusrex&apos;)</span><br><span class="line">rop = ROP(elf)</span><br><span class="line">rop.read(0, elf.bss(0x80))</span><br><span class="line">rop.dump()</span><br><span class="line"># [&apos;0x0000:        0x80482fc (read)&apos;,</span><br><span class="line">#  &apos;0x0004:       0xdeadbeef&apos;,</span><br><span class="line">#  &apos;0x0008:              0x0&apos;,</span><br><span class="line">#  &apos;0x000c:        0x80496a8&apos;]</span><br><span class="line">str(rop)</span><br><span class="line"># &apos;\xfc\x82\x04\x08\xef\xbe\xad\xde\x00\x00\x00\x00\xa8\x96\x04\x08&apos;</span><br></pre></td></tr></table></figure>
+
+<p>使用ROP(elf)来产生一个rop的对象，这时rop链还是空的，需要在其中添加函数。</p>
+<p>因为ROP对象实现了<strong>getattr</strong>的功能，可以直接通过func call的形式来添加函数，rop.read(0, elf.bss(0x80))实际相当于rop.call(‘read’, (0, elf.bss(0x80)))。<br> 通过多次添加函数调用，最后使用str将整个rop chain dump出来就可以了。</p>
+<ul>
+<li>call(resolvable, arguments=()) : 添加一个调用，resolvable可以是一个符号，也可以是一个int型地址，注意后面的参数必须是元组否则会报错，即使只有一个参数也要写成元组的形式(在后面加上一个逗号)</li>
+<li>chain() : 返回当前的字节序列，即payload</li>
+<li>dump() : 直观地展示出当前的rop chain</li>
+<li>raw() : 在rop chain中加上一个整数或字符串</li>
+<li>search(move=0, regs=None, order=’size’) : 按特定条件搜索gadget</li>
+<li>unresolve(value) : 给出一个地址，反解析出符号</li>
+</ul>
+<h3 id="数据输出"><a href="#数据输出" class="headerlink" title="数据输出"></a>数据输出</h3><p>如果需要输出一些信息,最好使用pwntools自带的,因为和pwntools本来的格式吻合,看起来也比较舒服,用法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">some_str = &quot;hello, world&quot;</span><br><span class="line">log.info(some_str)</span><br></pre></td></tr></table></figure>
+
+<p>其中的info代表是log等级，也可以使用其他log等级</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/04/12/┤╙└φ╜ΓELF╡╜╩╓╨┤Readelf╜Γ╬÷╞≈ú¿╥╗ú⌐/" rel="next" title="从理解ELF到手写Readelf解析器（一）">
+                  <i class="fa fa-chevron-left"></i> 从理解ELF到手写Readelf解析器（一）
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/04/21/Linux╚├╓╒╢╦╫▀┤·└φ╡─╝╕╓╓╖╜╖¿/" rel="prev" title="Linux让终端走代理的几种方法">
+                  Linux让终端走代理的几种方法 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模块列表"><span class="nav-number">2.</span> <span class="nav-text">模块列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模块介绍"><span class="nav-number">4.</span> <span class="nav-text">模块介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#链接"><span class="nav-number">4.1.</span> <span class="nav-text">链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO模块"><span class="nav-number">4.2.</span> <span class="nav-text">IO模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#汇编和反汇编"><span class="nav-number">4.3.</span> <span class="nav-text">汇编和反汇编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shellcode生成器"><span class="nav-number">4.4.</span> <span class="nav-text">shellcode生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ELF文件操作"><span class="nav-number">4.4.1.</span> <span class="nav-text">ELF文件操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#整数pack与数据unpack"><span class="nav-number">4.5.</span> <span class="nav-text">整数pack与数据unpack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROP链生成器"><span class="nav-number">4.6.</span> <span class="nav-text">ROP链生成器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据输出"><span class="nav-number">4.7.</span> <span class="nav-text">数据输出</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

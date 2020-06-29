@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="入门逆向没啥好说的 12345678910111213141516171819mov     byte ptr [esp+2Fh], &apos;f&apos;mov     byte ptr [esp+2Eh], &apos;l&apos;mov     byte ptr [esp+2Dh], &apos;a&apos;mov     byte ptr [esp+2Ch], &apos;g&apos;mov     byte ptr [esp+2Bh], &apos;&amp;#123;&apos;m">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BugKu_Re(1)">
+<meta property="og:url" content="http://yoursite.com/2019/10/07/BugKu-Re-1/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="入门逆向没啥好说的 12345678910111213141516171819mov     byte ptr [esp+2Fh], &apos;f&apos;mov     byte ptr [esp+2Eh], &apos;l&apos;mov     byte ptr [esp+2Dh], &apos;a&apos;mov     byte ptr [esp+2Ch], &apos;g&apos;mov     byte ptr [esp+2Bh], &apos;&amp;#123;&apos;m">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://i.loli.net/2019/03/20/5c92561c36680.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadadbc74e63.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadb2004a6b6.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadb2004c374.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadb33e04764.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadb3f5df43e.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadc40677139.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadc494aef1e.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd09e36dc6.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd1383063a.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd1a7a01b0.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd332ec48c.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd3f6dfb97.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd86d23ea4.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadd8f83b3c1.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadeb314bca4.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadebc91d750.png">
+<meta property="og:image" content="https://i.loli.net/2019/04/10/5cadee07e601d.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/Bugku/Re/index.png">
+<meta property="og:image" content="https://img-blog.csdn.net/20171228160459980">
+<meta property="og:image" content="https://img-blog.csdn.net/20171228160500294">
+<meta property="og:image" content="https://img-blog.csdn.net/20171228160501460">
+<meta property="og:image" content="https://img-blog.csdn.net/20171228160502178">
+<meta property="og:image" content="https://img-blog.csdn.net/20171228160503183">
+<meta property="og:updated_time" content="2019-10-08T00:27:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BugKu_Re(1)">
+<meta name="twitter:description" content="入门逆向没啥好说的 12345678910111213141516171819mov     byte ptr [esp+2Fh], &apos;f&apos;mov     byte ptr [esp+2Eh], &apos;l&apos;mov     byte ptr [esp+2Dh], &apos;a&apos;mov     byte ptr [esp+2Ch], &apos;g&apos;mov     byte ptr [esp+2Bh], &apos;&amp;#123;&apos;m">
+<meta name="twitter:image" content="https://i.loli.net/2019/03/20/5c92561c36680.png">
+  <link rel="canonical" href="http://yoursite.com/2019/10/07/BugKu-Re-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>BugKu_Re(1) | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/07/BugKu-Re-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">BugKu_Re(1)
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-07 02:26:59 / Geändert am: 17:27:30" itemprop="dateCreated datePublished" datetime="2019-10-07T02:26:59-07:00">2019-10-07</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="入门逆向"><a href="#入门逆向" class="headerlink" title="入门逆向"></a>入门逆向</h2><p>没啥好说的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">mov     byte ptr [esp+<span class="number">2F</span>h], <span class="string">'f'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">2</span>Eh], <span class="string">'l'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">2</span>Dh], <span class="string">'a'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">2</span>Ch], <span class="string">'g'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">2B</span>h], <span class="string">'&#123;'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">2</span>Ah], <span class="string">'R'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">29</span>h], <span class="string">'e'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">28</span>h], <span class="string">'_'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">27</span>h], <span class="string">'1'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">26</span>h], <span class="string">'s'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">25</span>h], <span class="string">'_'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">24</span>h], <span class="string">'S'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">23</span>h], <span class="string">'0'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">22</span>h], <span class="string">'_'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">21</span>h], <span class="string">'C'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">20</span>h], <span class="string">'0'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">1F</span>h], <span class="string">'O'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">1</span>Eh], <span class="string">'L'</span></span><br><span class="line">mov     byte ptr [esp+<span class="number">1</span>Dh], <span class="string">'&#125;'</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flag{Re_1s_S0_C0OL}</strong></p>
+<h2 id="Easy-vb"><a href="#Easy-vb" class="headerlink" title="Easy_vb"></a>Easy_vb</h2><p>没啥好说的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">00401</span>A48 dword_401A48    dd <span class="number">33</span>AD4EE1h, <span class="number">11</span>CF6699h, <span class="number">0</span>AA000CB7h, <span class="number">93</span>D36000h, <span class="number">2</span>Eh</span><br><span class="line">.text:<span class="number">00401</span>A48                                         ; DATA XREF: .text:<span class="number">00402398</span>↓o</span><br><span class="line">.text:<span class="number">00401</span>A48                                         ; .text:<span class="number">0040241</span>E↓o ...</span><br><span class="line">.text:<span class="number">00401</span>A5C aMctfN3tRev1sE4:                        ; DATA XREF: .text:<span class="number">004023</span>A9↓o</span><br><span class="line">.text:00401A5C                 text "UTF-16LE", 'MCTF&#123;_N3t_Rev_1s_E4ay_&#125;',0</span><br><span class="line">.text:<span class="number">00401</span>A8C                 dd <span class="number">14</span>h</span><br><span class="line">.text:<span class="number">00401</span>A90 aTryAgain:                              ; DATA XREF: .text:<span class="number">00402473</span>↓o</span><br></pre></td></tr></table></figure>
+
+<p><strong>flag{<em>N3t_Rev_1s_E4ay</em>}</strong></p>
+<h2 id="Easy-re"><a href="#Easy-re" class="headerlink" title="Easy_re"></a>Easy_re</h2><p>没啥好说的，OD载入easy_vb.exe，右键中文字符串智能搜索,发现疑似flag字符串</p>
+<p><img src="https://i.loli.net/2019/03/20/5c92561c36680.png" alt="od.png"></p>
+<p><strong>DUTCTF{We1c0met0DUTCTF}</strong></p>
+<h2 id="游戏过关"><a href="#游戏过关" class="headerlink" title="游戏过关"></a>游戏过关</h2><h4 id="修改Path法"><a href="#修改Path法" class="headerlink" title="修改Path法"></a>修改Path法</h4><p>搜索关键字符串<strong>“flag”</strong>直接找到<strong>main</strong>函数，我们找到了一个<strong>jnz</strong>和<strong>call</strong>的地方，因为不是<strong>flag</strong>的直接比较，所以想法是跳转至成功函数输出<strong>flag</strong>，总之就是寻找各种跳转函数，最后跳到<strong>0x0045F66C</strong>这个调用<strong>sub_45E940</strong>函数的地址即可</p>
+<h4 id="直接逻辑法"><a href="#直接逻辑法" class="headerlink" title="直接逻辑法"></a>直接逻辑法</h4><p>搜索关键字符串<strong>“flag</strong>”直接找到<strong>main</strong>函数，然后修改常见函数名得到主函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [esp+DCh] [ebp-20h]</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [esp+F4h] [ebp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B110);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B158);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B1A0);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B1E8);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B230);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B278);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B2C0);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;unk_50B308);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"二                                                     |\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"|              by 0x61                                 |\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"|                                                      |\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"|------------------------------------------------------|\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(</span><br><span class="line">    <span class="string">"Play a game\n"</span></span><br><span class="line">    <span class="string">"The n is the serial number of the lamp,and m is the state of the lamp\n"</span></span><br><span class="line">    <span class="string">"If m of the Nth lamp is 1,it's on ,if not it's off\n"</span></span><br><span class="line">    <span class="string">"At first all the lights were closed\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"Now you can input n to change its state\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(</span><br><span class="line">    <span class="string">"But you should pay attention to one thing,if you change the state of the Nth lamp,the state of (N-1)th and (N+1)th w"</span></span><br><span class="line">    <span class="string">"ill be changed too\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"When all lamps are on,flag will appear\n"</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"Now,input n \n"</span>);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"input n,n(1-8)\n"</span>);</span><br><span class="line">      getchar();</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"n="</span>);</span><br><span class="line">      <span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;v1);</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">      <span class="keyword">if</span> ( v1 &gt;= <span class="number">0</span> &amp;&amp; v1 &lt;= <span class="number">8</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"sorry,n error,try again\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v1 )</span><br><span class="line">    &#123;</span><br><span class="line">      sub_4576D6(v1 - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; <span class="number">8</span>; ++i )</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">if</span> ( (<span class="keyword">unsigned</span> <span class="keyword">int</span>)i &gt;= <span class="number">9</span> )</span><br><span class="line">          j____report_rangecheckfailure();</span><br><span class="line">        byte_532E28[i] = <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    j__system(<span class="string">"CLS"</span>);</span><br><span class="line">    sub_458054();</span><br><span class="line">    <span class="keyword">if</span> ( byte_532E28[<span class="number">0</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">1</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">2</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">3</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">4</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">5</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">6</span>] == <span class="number">1</span></span><br><span class="line">      &amp;&amp; byte_532E28[<span class="number">7</span>] == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      sub_457AB4();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时也找到了调用函数<strong>sub_45E940</strong>，存在两个数组，先两个数组按位异或，再与0x13异或，直接提取出数据然后写脚本跑即可</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; <span class="number">56</span>; ++i )</span><br><span class="line"> &#123;</span><br><span class="line">   *(&amp;v2 + i) ^= *(&amp;v59 + i);</span><br><span class="line">   *(&amp;v2 + i) ^= <span class="number">0x13</span>u;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ss4 = [<span class="number">0x12</span>,<span class="number">0x40</span>,<span class="number">0x62</span>,<span class="number">0x5</span>,<span class="number">0x2</span>,<span class="number">0x4</span>,<span class="number">0x6</span>,<span class="number">0x3</span>,<span class="number">0x6</span>,<span class="number">0x30</span>,<span class="number">0x31</span>,<span class="number">0x41</span>,<span class="number">0x20</span>,<span class="number">0x0C</span>,<span class="number">0x30</span>,<span class="number">0x41</span>,<span class="number">0x1F</span>,<span class="number">0x4E</span>,<span class="number">0x3E</span>,<span class="number">0x20</span>,<span class="number">0x31</span>,<span class="number">0x20</span>,<span class="number">0x1</span>,<span class="number">0x39</span>,<span class="number">0x60</span>,<span class="number">0x3</span>,<span class="number">0x15</span>,<span class="number">0x9</span>,<span class="number">0x4</span>,<span class="number">0x3E</span>,<span class="number">0x3</span>,<span class="number">0x5</span>,<span class="number">0x4</span>,<span class="number">0x1</span>,<span class="number">0x2</span>,<span class="number">0x3</span>,<span class="number">0x2C</span>,<span class="number">0x41</span>,<span class="number">0x4E</span>,<span class="number">0x20</span>,<span class="number">0x10</span>,<span class="number">0x61</span>,<span class="number">0x36</span>,<span class="number">0x10</span>,<span class="number">0x2C</span>,<span class="number">0x34</span>,<span class="number">0x20</span>,<span class="number">0x40</span>,<span class="number">0x59</span>,<span class="number">0x2D</span>,<span class="number">0x20</span>,<span class="number">0x41</span>,<span class="number">0x0F</span>,<span class="number">0x22</span>,<span class="number">0x12</span>,<span class="number">0x10</span>,<span class="number">0x0</span>]</span><br><span class="line">ss8 = [<span class="number">0x7B</span>,<span class="number">0x20</span>,<span class="number">0x12</span>,<span class="number">0x62</span>,<span class="number">0x77</span>,<span class="number">0x6C</span>,<span class="number">0x41</span>,<span class="number">0x29</span>,<span class="number">0x7C</span>,<span class="number">0x50</span>,<span class="number">0x7D</span>,<span class="number">0x26</span>,<span class="number">0x7C</span>,<span class="number">0x6F</span>,<span class="number">0x4A</span>,<span class="number">0x31</span>,<span class="number">0x53</span>,<span class="number">0x6C</span>,<span class="number">0x5E</span>,<span class="number">0x6C</span>,<span class="number">0x54</span>,<span class="number">0x6</span>,<span class="number">0x60</span>,<span class="number">0x53</span>,<span class="number">0x2C</span>,<span class="number">0x79</span>,<span class="number">0x68</span>,<span class="number">0x6E</span>,<span class="number">0x20</span>,<span class="number">0x5F</span>,<span class="number">0x75</span>,<span class="number">0x65</span>,<span class="number">0x63</span>,<span class="number">0x7B</span>,<span class="number">0x7F</span>,<span class="number">0x77</span>,<span class="number">0x60</span>,<span class="number">0x30</span>,<span class="number">0x6B</span>,<span class="number">0x47</span>,<span class="number">0x5C</span>,<span class="number">0x1D</span>,<span class="number">0x51</span>,<span class="number">0x6B</span>,<span class="number">0x5A</span>,<span class="number">0x55</span>,<span class="number">0x40</span>,<span class="number">0x0C</span>,<span class="number">0x2B</span>,<span class="number">0x4C</span>,<span class="number">0x56</span>,<span class="number">0x0D</span>,<span class="number">0x72</span>,<span class="number">0x1</span>,<span class="number">0x75</span>,<span class="number">0x7E</span>,<span class="number">0x0</span>]</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">0x38</span>):</span><br><span class="line">    flag += chr(ss4[i]^ss8[i]^<span class="number">0x13</span>)</span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+
+<p>得到flag：<strong>zsctf{T9is_tOpic_1s_v5ry_int7resting_b6t_others_are_n0t}</strong></p>
+<h2 id="Timer-阿里CTF-题目分析"><a href="#Timer-阿里CTF-题目分析" class="headerlink" title="Timer(阿里CTF)题目分析"></a>Timer(阿里CTF)题目分析</h2><ul>
+<li><p>在安卓模拟器上运行程序<br> <img src="https://i.loli.net/2019/04/10/5cadadbc74e63.png" alt="流程.png"></p>
+</li>
+<li><p>程序流程 </p>
+<blockquote>
+<p>提示信息  </p>
+<blockquote>
+<p>Time remaining(s):200000<br> AliCTF{}  </p>
+</blockquote>
+<p>初步分析  </p>
+<blockquote>
+<p>应该是200000秒之后才会出现flag<br> 下一步使用安卓调试神器<a href="https://www.52pojie.cn/thread-547547-1-1.html" target="_blank" rel="noopener">JEB</a>进一步分析      </p>
+</blockquote>
+</blockquote>
+</li>
+</ul>
+<h3 id="JEB分析"><a href="#JEB分析" class="headerlink" title="JEB分析"></a>JEB分析</h3><ul>
+<li><p>JEB介绍 </p>
+<blockquote>
+<p>JEB:<a href="https://www.52pojie.cn/thread-675251-1-1.html" target="_blank" rel="noopener">IDA</a>+111=JEB,JEB相当于Windows平台上的IDA  </p>
+<p>smali代码:双击Bytecode,出现smali代码;相较于C之汇编,则smali之于Java  </p>
+<blockquote>
+<p><img src="https://i.loli.net/2019/04/10/5cadb2004a6b6.png" alt="smali.png"> </p>
+<p><a href="https://blog.csdn.net/cloverjf/article/details/78613830" target="_blank" rel="noopener">smali语法参考文章</a>  </p>
+</blockquote>
+<p>快捷键：按<code>q</code>切换到java伪代码</p>
+</blockquote>
+</li>
+<li><p>进入android程序入口类</p>
+<ul>
+<li><p>进入方式</p>
+<p><code>Bytecode/Hierarchy-net-tomorrow-MainActivity</code></p>
+<p><img src="https://i.loli.net/2019/04/10/5cadb2004c374.png" alt="入口类.png"></p>
+<p><img src="https://i.loli.net/2019/04/10/5cadb33e04764.png" alt="smali2.png"><br> &gt; 双击左边的Bytecode默认进入的就是此入口类  </p>
+</li>
+<li><p>按 <code>Q</code> 查看java伪代码</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadb3f5df43e.png" alt="伪代码.png"></p>
+</li>
+<li><p>查看onCreate函数<br> &gt; 一个activity启动回调的第一个函数就是onCreate,这个函数主要做这个activity启动的一些必要的初始化的工作。<br> &gt;<br> &gt; onCreate之后调用了还有onRestart()和onStart()等。</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadc40677139.png" alt="注释onCreate.png"></p>
+</li>
+<li><p>查看onCreate回调的MainActivity函数  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public MainActivity() &#123;</span><br><span class="line">super();</span><br><span class="line">this.beg = (((int)&gt;(System.currentTimeMillis() / 1000))) + 200000;  </span><br><span class="line"> //当前时间(beg)为200000加上当前时间(s)    </span><br><span class="line">this.k = 0;    </span><br><span class="line"> //k初始化为0,和onCreate函数中的flag字符串存在联系</span><br><span class="line">this.t = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看onCreate回调的is2函数</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadc494aef1e.png" alt="is2.png"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><ul>
+<li><p>由于md渲染问题,代码放于文末</p>
+</li>
+<li><p>运行结果</p>
+<p><code>k=1616384</code></p>
+</li>
+</ul>
+<h2 id="Android-killer修改并打包源程序"><a href="#Android-killer修改并打包源程序" class="headerlink" title="Android killer修改并打包源程序"></a>Android killer修改并打包源程序</h2><ul>
+<li><p>进入入口类</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd09e36dc6.png" alt="载入程序.png"></p>
+</li>
+<li><p>搜索字符串 <code>AliCTF</code></p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd1383063a.png" alt="AliCTF.png"></p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd1a7a01b0.png" alt="搜索字符串.png"></p>
+</li>
+<li><p>定位到变量 <code>k</code></p>
+<blockquote>
+<p>搜索<code>stringFromJNI2</code>  </p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd332ec48c.png" alt="stringFromJNI2.png">  </p>
+<blockquote>
+<p>上一条句把k存放在寄存器<code>v3</code>中,下面修改v3,就可以修改k<br> 寄存器用v开头数字结尾的符号来表示，如v0、v1、v2、…</p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>修改变量k的值</p>
+<blockquote>
+<p><code>const v3;1616384</code>  </p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd3f6dfb97.png" alt="修改变量k.png"></p>
+</blockquote>
+</li>
+<li><p>理一理思路</p>
+<blockquote>
+<p>这里我把<code>k</code>的值设置为正确的值,即执行200000次后会出现的值了  </p>
+<p>但是因为if条件判断为假,程序还是会执行200000次，才会输出flag  </p>
+<p>这里就需要把<code>&lt;=</code>改为<code>&gt;</code>  </p>
+<blockquote>
+<p>搜索<code>&lt;=</code>附近的字符串<code>AliCTF</code></p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>修改if判断条件</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadd86d23ea4.png" alt="反过来了.png"></p>
+<blockquote>
+<p>发现这里是反过来的,下一步把 <code>&gt;</code> 改成 <code>&lt;=</code> </p>
+<p>将<code>if-gtz v0, :cond_0</code>修改为<code>if-lez v0, :cond_0</code>  </p>
+<blockquote>
+<p><img src="https://i.loli.net/2019/04/10/5cadd8f83b3c1.png" alt="小于.png"></p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>编译打包程序  </p>
+<blockquote>
+<p>在编译的时候遇到以下问题<br> &gt;&gt;Project\res\values-v23\styles.xml:6: error: Error retrieving  parent for item: No resource found that matches the given name  ‘@android:style/WindowTitleBackground’.<br> &gt;&gt;<br> &gt;&gt;Project\res\values-v23\styles.xml:6: error: Error retrieving  parent for item: No resource found that matches the given name  ‘@android:style/WindowTitleBackground’.</p>
+</blockquote>
+</li>
+<li><p>解决方法</p>
+<blockquote>
+<p>找到res/value-v23/styles.xml，把resources下的东西注释掉  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&gt; &lt;resources&gt;</span><br><span class="line">&gt; &lt;!--</span><br><span class="line">&gt; ...</span><br><span class="line">&gt; --&gt;</span><br><span class="line">&gt; &lt;/resources&gt;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>&gt; 找到res/value/public.xml，把所有带Base.V23的东西（两个）注释掉  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&gt; &lt;resources&gt;</span><br><span class="line">&gt; &lt;!--</span><br><span class="line">&gt; ...</span><br><span class="line">&gt; --&gt;</span><br><span class="line">&gt; &lt;/resources&gt;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>重新编译打包  </p>
+<p><img src="https://i.loli.net/2019/04/10/5cadeb314bca4.png" alt="编译成功.png"></p>
+</li>
+</ul>
+<h3 id="模拟器载入新安装包"><a href="#模拟器载入新安装包" class="headerlink" title="模拟器载入新安装包"></a>模拟器载入新安装包</h3><ul>
+<li><p>成功获取flag</p>
+<p><img src="https://i.loli.net/2019/04/10/5cadebc91d750.png" alt="flag.png"></p>
+</li>
+<li><p>flag<br> <code>flag{Y0vAr3TimerMa3te7}</code></p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>环境问题</p>
+<blockquote>
+<p>Android Killer编译apk始终失败  </p>
+<blockquote>
+<p>通过换jdk7以及修改res/xml成功编译  </p>
+</blockquote>
+<p>运行Jeb闪退  </p>
+<blockquote>
+<p>修改jeb_winos.bat,替换java版本<br> <img src="https://i.loli.net/2019/04/10/5cadee07e601d.png" alt="java版本.png">  </p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>技术问题  </p>
+<blockquote>
+<p>不懂smati语言,但是Jeb和AK自身的伪代码转义功能较强,还是可以看懂程序流程 </p>
+<p>下来需要潜心学习smati语法</p>
+<p>本例程序代码量很少,遇到大型程序不会这么简单  </p>
+</blockquote>
+</li>
+</ul>
+<h3 id="代码部分"><a href="#代码部分" class="headerlink" title="代码部分"></a>代码部分</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"><span class="function">bool <span class="title">is2</span><span class="params">(<span class="keyword">int</span> arg4)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        bool v1 = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(arg4 &gt; <span class="number">3</span>) </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(arg4 % <span class="number">2</span> != <span class="number">0</span> &amp;&amp; arg4 % <span class="number">3</span> != <span class="number">0</span>) </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> v0 = <span class="number">5</span>;</span><br><span class="line">                <span class="keyword">while</span>(<span class="keyword">true</span>) </span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(v0 * v0 &lt;= arg4) </span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span>(arg4 % v0 != <span class="number">0</span> &amp;&amp; arg4 % (v0 + <span class="number">2</span>) != <span class="number">0</span>) </span><br><span class="line">                        &#123;</span><br><span class="line">                            v0 += <span class="number">6</span>;</span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> </span><br><span class="line">                        <span class="keyword">return</span> v1;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            v1 = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(arg4 &lt;= <span class="number">1</span>) </span><br><span class="line">            v1 = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> v1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> time = <span class="number">200000</span>;</span><br><span class="line">    <span class="keyword">int</span> k = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(time &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(is2(time))</span><br><span class="line">                k+=<span class="number">100</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                k--;  </span><br><span class="line">        time--;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; <span class="string">"k="</span> &lt;&lt; k &lt;&lt; endl ;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="逆向入门"><a href="#逆向入门" class="headerlink" title="逆向入门"></a>逆向入门</h2><p>发现不是有效的<strong>pe</strong>文件，用<strong>VisualStudio Code</strong>打开试试,发现是<strong>“image/png；base64”</strong>，猜测是经过<strong>base64</strong>加密的图片，将整段内容复制下来，<strong>base64</strong>转图片</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/Bugku/Re/index.png" alt></p>
+<p>扫描二维码，得到flag：<strong>bugku{inde_9882ihsd8-0}</strong> </p>
+<h2 id="love"><a href="#love" class="headerlink" title="love"></a>love</h2><p>盲猜flag：I love you，算了不说笑了，还是真实做题吧</p>
+<p>载入OD</p>
+<p>搜索字符串</p>
+<p><img src="https://img-blog.csdn.net/20171228160459980" alt="img"></p>
+<p>随意输入1111111111111111111</p>
+<p><img src="https://img-blog.csdn.net/20171228160500294" alt="img"></p>
+<p><img src="https://img-blog.csdn.net/20171228160501460" alt="img"></p>
+<p>发现进行了base64加密</p>
+<p>再向下单步 发现、</p>
+<p><img src="https://img-blog.csdn.net/20171228160502178" alt="img"></p>
+<p>结合IDA看下</p>
+<p><img src="https://img-blog.csdn.net/20171228160503183" alt="img"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sub_4156E0</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> v0;<span class="comment">// eax@6</span></span><br><span class="line"></span><br><span class="line">constchar*v1;<span class="comment">// eax@6</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> v2;<span class="comment">// eax@9</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> v4;<span class="comment">// [sp+0h] [bp-188h]@6</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> v5;<span class="comment">// [sp+Ch] [bp-17Ch]@1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> v6;<span class="comment">// [sp+10h] [bp-178h]@3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> j;<span class="comment">// [sp+DCh] [bp-ACh]@6</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> i;<span class="comment">// [sp+E8h] [bp-A0h]@1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> Dest[<span class="number">108</span>];<span class="comment">// [sp+F4h] [bp-94h]@5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> Str;<span class="comment">// [sp+160h] [bp-28h]@6</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> v11;<span class="comment">// [sp+17Ch] [bp-Ch]@6</span></span><br><span class="line"></span><br><span class="line">unsignedint v12;<span class="comment">// [sp+184h] [bp-4h]@1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> savedregs;<span class="comment">// [sp+188h] [bp+0h]@1</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="built_in">memset</span>(&amp;v5,<span class="number">0xCC</span>u,<span class="number">0x17C</span>u);</span><br><span class="line"></span><br><span class="line">v12 =(unsignedint)&amp;savedregs ^ __security_cookie;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>( i =<span class="number">0</span>;(signedint)i &lt;<span class="number">100</span>;++i )</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">v6 = i;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( i &gt;=<span class="number">0x64</span>)</span><br><span class="line"></span><br><span class="line">sub_411154();</span><br><span class="line"></span><br><span class="line">Dest[v6]=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub_41132F(<span class="string">"please enter the flag:"</span>, v4);</span><br><span class="line"></span><br><span class="line">sub_411375(<span class="string">"%20s"</span>,(unsignedint)&amp;Str);</span><br><span class="line"></span><br><span class="line">v0 = j_strlen(&amp;Str);</span><br><span class="line"></span><br><span class="line">v1 =(constchar*)sub_4110BE(&amp;Str, v0,&amp;v11);</span><br><span class="line"></span><br><span class="line"><span class="built_in">strncpy</span>(Dest, v1,<span class="string">'('</span>);</span><br><span class="line"></span><br><span class="line">sub_411127();</span><br><span class="line"></span><br><span class="line">i = j_strlen(Dest);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>( j =<span class="number">0</span>;(signedint)j &lt;(signedint)i;++j )</span><br><span class="line"></span><br><span class="line">Dest[j]+= j;</span><br><span class="line"></span><br><span class="line">v2 = j_strlen(Dest);</span><br><span class="line"></span><br><span class="line"><span class="built_in">strncmp</span>(Dest, Str2, v2);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( sub_411127())</span><br><span class="line"></span><br><span class="line">sub_41132F(<span class="string">"wrong flag!\n"</span>, v4);</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"></span><br><span class="line">sub_41132F(<span class="string">"rigth flag!\n"</span>, v4);</span><br><span class="line"></span><br><span class="line">sub_41126C(&amp;savedregs,&amp;dword_415890);</span><br><span class="line"></span><br><span class="line">sub_411280();</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> sub_411127();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析可知:将输入的串<strong>Str1</strong>先进行<strong>base64</strong>加密 再与串<strong>Str2</strong>比较 若相等 则输出<strong>“right flag”</strong></p>
+<p>由此，我们只需将<strong>Str2</strong>也就是<strong>“e3nifIH9b_C@n@dH”</strong>进行解密即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">s =<span class="string">"e3nifIH9b_C@n@dH"</span></span><br><span class="line"></span><br><span class="line">flag =<span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line"></span><br><span class="line">flag += chr(ord(s[i])- i)</span><br><span class="line"></span><br><span class="line">flag = base64.b64decode(flag)</span><br><span class="line"></span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+
+<p>最后拿到答案<strong>flag{i_l0ve_you}</strong></p>
+<h2 id="LoopAndLoop"><a href="#LoopAndLoop" class="headerlink" title="LoopAndLoop"></a>LoopAndLoop</h2><p>载入JEB，双击<strong>MainActivity</strong>，选择<strong>Decompilea class</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> net.bluelotus.tomorrow.easyandroid;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</span><br><span class="line"><span class="keyword">import</span> android.view.Menu;</span><br><span class="line"><span class="keyword">import</span> android.view.MenuItem;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.view.View$OnClickListener;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;  <span class="comment">// System.loadLibrary()是我们在使用Java的JNI机制时，会用到的一个非常重要的函数</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.loadLibrary(<span class="string">"lhm"</span>);  <span class="comment">// 它的作用即是把我们在Java code中声明的native方法的那个libraryload进来，或者load其他什么动态连接库</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainActivity</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">int</span> <span class="title">chec</span><span class="params">(<span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2)</span> </span>&#123;  <span class="comment">// native层的chec方法</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span> input, <span class="keyword">int</span> s)</span> </span>&#123;  <span class="comment">// check方法将我们的输入和一个int型变量s返回到chec</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.chec(input, s);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">check1</span><span class="params">(<span class="keyword">int</span> input, <span class="keyword">int</span> s)</span> </span>&#123;  <span class="comment">// check1定义v1为我们的输入，v0为循环变量1</span></span><br><span class="line">        <span class="keyword">int</span> v1 = input;</span><br><span class="line">        <span class="keyword">int</span> v0 = <span class="number">1</span>;</span><br><span class="line">    label_2:  <span class="comment">// 进入到label_2</span></span><br><span class="line">        <span class="keyword">if</span>(v0 &lt; <span class="number">100</span>) &#123;</span><br><span class="line">            v1 += v0;  <span class="comment">// 先判断v0是否小于100，如果成立，那么v1每次加上v0的值</span></span><br><span class="line">            ++v0;  <span class="comment">// v0每次也要自增1</span></span><br><span class="line">            goto label_2;  <span class="comment">// 直接走向label_2</span></span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.chec(v1, s);  <span class="comment">// 还是将得到的v1及s返回给chec方法</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">check2</span><span class="params">(<span class="keyword">int</span> input, <span class="keyword">int</span> s)</span> </span>&#123;  <span class="comment">// 和上面的check与check1一样，都是需要两个参数，一个是我们的输入，一个是s</span></span><br><span class="line">        <span class="keyword">int</span> v2;  <span class="comment">// v2还是作为chec方法的返回值</span></span><br><span class="line">        <span class="keyword">int</span> v3 = <span class="number">1000</span>;</span><br><span class="line">        <span class="keyword">int</span> v1 = input;  <span class="comment">// 定义三个int型变量，v1还是我们的输入，v3做为定值1000，而v2作为返回值(相当于一个标志)</span></span><br><span class="line">        <span class="keyword">if</span>(s % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> v0;  <span class="comment">// 当s对2取余等于0，也就是说s能被2整除时，定义一个新的循环变量v0</span></span><br><span class="line">            <span class="keyword">for</span>(v0 = <span class="number">1</span>; v0 &lt; v3; ++v0) &#123;</span><br><span class="line">                v1 += v0;  <span class="comment">// v0等于1，当小于v3的值也就是小于1000时，v1每次加上v0，v0++</span></span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            v2 = <span class="keyword">this</span>.chec(v1, s);  <span class="comment">// v2还是作为chec方法的返回值</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span>(v0 = <span class="number">1</span>; v0 &lt; v3; ++v0) &#123;<span class="comment">//如果取余不等于0，那么还是和上边一样，只不过v1每次减去v0</span></span><br><span class="line">                v1 -= v0;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            v2 = <span class="keyword">this</span>.chec(v1, s);<span class="comment">//chec方法的返回值</span></span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> v2;<span class="comment">//返回v2</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">check3</span><span class="params">(<span class="keyword">int</span> input, <span class="keyword">int</span> s)</span> </span>&#123;<span class="comment">//check3将输入给v1，将循环变量v0初值设为1，当v0小于10000，v1每次加上v0,而v0循环一次就加1</span></span><br><span class="line">        <span class="keyword">int</span> v1 = input;</span><br><span class="line">        <span class="keyword">int</span> v0;</span><br><span class="line">        <span class="keyword">for</span>(v0 = <span class="number">1</span>; v0 &lt; <span class="number">10000</span>; ++v0) &#123;</span><br><span class="line">            v1 += v0;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.chec(v1, s);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">messageMe</span><span class="params">(String text)</span> </span>&#123;<span class="comment">//messageMe方法是返回字符串"LoopOk"+text</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"LoopOk"</span> + text;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;<span class="comment">//关键的方法onCreate</span></span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        <span class="keyword">this</span>.setContentView(<span class="number">2130968600</span>);<span class="comment">//这两行和布局有关，不用管</span></span><br><span class="line">        <span class="keyword">this</span>.findViewById(<span class="number">2131492946</span>).setOnClickListener(<span class="keyword">new</span> View$OnClickListener() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;<span class="comment">//最最重要的,从名字就可以看出，当我们点击GETYOURFLAG！这个按钮时触发的onClick</span></span><br><span class="line">                <span class="keyword">int</span> v1;</span><br><span class="line">                String v2 = <span class="keyword">this</span>.val$ed.getText().toString();<span class="comment">//v2获取我们的输入并转成字符串</span></span><br><span class="line">                <span class="keyword">try</span> &#123;										  <span class="comment">//下边这个try,catch用来捕获将类型异常</span></span><br><span class="line">                    v1 = Integer.parseInt(v2);<span class="comment">//将v2这个String字符类型数据转换为Integer整型数据赋值给v1</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">catch</span>(NumberFormatException v0) &#123;</span><br><span class="line">                    <span class="keyword">this</span>.val$tv1.setText(<span class="string">"Not a Valid Integer number"</span>);<span class="comment">//如果不可以转成整数，就在屏幕打印"不是一个有效的整数"</span></span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line"> </span><br><span class="line">                <span class="keyword">if</span>(MainActivity.<span class="keyword">this</span>.check(v1, <span class="number">99</span>) == <span class="number">1835996258</span>) &#123;<span class="comment">//如果我们输入的v1和s也就是99传给check方法，</span></span><br><span class="line">                    <span class="keyword">this</span>.val$tv1.setText(<span class="string">"The flag is:"</span>);<span class="comment">//接着传向chec方法得到的返回值等于1835996258，就输出flag</span></span><br><span class="line">                    <span class="keyword">this</span>.val$tv2.setText(<span class="string">"alictf&#123;"</span> + MainActivity.<span class="keyword">this</span>.stringFromJNI2(v1) + <span class="string">"&#125;"</span>);<span class="comment">//括号内是native层stringFromJNI2()方法处理v1后的</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">this</span>.val$tv1.setText(<span class="string">"Not Right!"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onCreateOptionsMenu</span><span class="params">(Menu menu)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.getMenuInflater().inflate(<span class="number">2131558400</span>, menu);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> v1 = item.getItemId() == <span class="number">2131492961</span> ? <span class="keyword">true</span> : <span class="keyword">super</span>.onOptionsItemSelected(item);</span><br><span class="line">        <span class="keyword">return</span> v1;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> String <span class="title">stringFromJNI2</span><span class="params">(<span class="keyword">int</span> arg1)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过分析可知重要的<strong>chec</strong>和<strong>stringFromJNI2</strong>都在<strong>native</strong>层，那么就需要将<strong>liblhm.so</strong>文件载入<strong>IDA</strong>进行分析，载入后直接<strong>shift+F12</strong>搜索字符串双击<strong>MainActivity</strong>进入，接着找到引用</p>
+<p>在按<strong>F5</strong>就可以将<strong>chec</strong>反汇编成伪代码了 经过分析 可以知道<strong>chec</strong>方法根据第二个参数乘2对3取模的结果调用<strong>Java</strong>层的三个<strong>check</strong>函数对我们的输入进行处理所以我们只需要写脚本将算法逆过来就好</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#! /usr/bin/env python</span></span><br><span class="line"><span class="comment">#-*- coding: utf-8 -*-</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getinput</span><span class="params">()</span>:</span></span><br><span class="line">    target = <span class="number">1835996258</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>,<span class="number">100</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="number">2</span> * i % <span class="number">3</span> == <span class="number">0</span>:</span><br><span class="line">            target = check1(target,i - <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">elif</span> <span class="number">2</span> * i % <span class="number">3</span> == <span class="number">1</span>:</span><br><span class="line">            target = check2(target,i - <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            target = check3(target,i - <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">print</span> target</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check1</span><span class="params">(input,loopNum)</span>:</span></span><br><span class="line">    t = input</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">100</span>):</span><br><span class="line">        t = t - i</span><br><span class="line">    <span class="keyword">return</span> t</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check3</span><span class="params">(input,loopNum)</span>:</span></span><br><span class="line">    t = input</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10000</span>):</span><br><span class="line">        t = t - i</span><br><span class="line">    <span class="keyword">return</span> t</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check2</span><span class="params">(input, loopNum)</span>:</span></span><br><span class="line">    t = input</span><br><span class="line">    <span class="keyword">if</span> loopNum % <span class="number">2</span> == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">1000</span>):</span><br><span class="line">            t -= i</span><br><span class="line">        <span class="keyword">return</span> t</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">1000</span>):</span><br><span class="line">        t += i</span><br><span class="line">    <span class="keyword">return</span> t</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  getinput()</span><br></pre></td></tr></table></figure>
+
+<p>得到答案：<strong>alictf{Jan6N100p3r}</strong></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/05/Bugku-PWN/" rel="next" title="Bugku-PWN">
+                  <i class="fa fa-chevron-left"></i> Bugku-PWN
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/07/ret2dl-resolve╧Ω╜Γ/" rel="prev" title="ret2dl-resolve详解">
+                  ret2dl-resolve详解 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#入门逆向"><span class="nav-number">1.</span> <span class="nav-text">入门逆向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Easy-vb"><span class="nav-number">2.</span> <span class="nav-text">Easy_vb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Easy-re"><span class="nav-number">3.</span> <span class="nav-text">Easy_re</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏过关"><span class="nav-number">4.</span> <span class="nav-text">游戏过关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改Path法"><span class="nav-number">4.0.1.</span> <span class="nav-text">修改Path法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#直接逻辑法"><span class="nav-number">4.0.2.</span> <span class="nav-text">直接逻辑法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Timer-阿里CTF-题目分析"><span class="nav-number">5.</span> <span class="nav-text">Timer(阿里CTF)题目分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JEB分析"><span class="nav-number">5.1.</span> <span class="nav-text">JEB分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写脚本"><span class="nav-number">5.2.</span> <span class="nav-text">编写脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-killer修改并打包源程序"><span class="nav-number">6.</span> <span class="nav-text">Android killer修改并打包源程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模拟器载入新安装包"><span class="nav-number">6.1.</span> <span class="nav-text">模拟器载入新安装包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码部分"><span class="nav-number">6.3.</span> <span class="nav-text">代码部分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逆向入门"><span class="nav-number">7.</span> <span class="nav-text">逆向入门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#love"><span class="nav-number">8.</span> <span class="nav-text">love</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LoopAndLoop"><span class="nav-number">9.</span> <span class="nav-text">LoopAndLoop</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

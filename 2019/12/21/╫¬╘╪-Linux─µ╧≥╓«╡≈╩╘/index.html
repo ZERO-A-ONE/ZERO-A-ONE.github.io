@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="转载自：https://xz.aliyun.com/t/6882 调试器的实现原理要想进行调试，调试器是必不可少的，首先需要了解一下我们常用的Linux下的调试器如GDB，是如何实现的 GDB 基于ptrace编写而成的调试器，ptrace是一个Linux提供的用于调试的系统调用 函数原型如下 123456NAME     ptrace - process traceSYNOPSIS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载-Linux逆向之调试&amp;反调试">
+<meta property="og:url" content="http://yoursite.com/2019/12/21/╫¬╘╪-Linux─µ╧≥╓«╡≈╩╘/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="转载自：https://xz.aliyun.com/t/6882 调试器的实现原理要想进行调试，调试器是必不可少的，首先需要了解一下我们常用的Linux下的调试器如GDB，是如何实现的 GDB 基于ptrace编写而成的调试器，ptrace是一个Linux提供的用于调试的系统调用 函数原型如下 123456NAME     ptrace - process traceSYNOPSIS">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20191201144906-ab752400-1406-1.png">
+<meta property="og:updated_time" content="2019-12-22T19:03:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="转载-Linux逆向之调试&amp;反调试">
+<meta name="twitter:description" content="转载自：https://xz.aliyun.com/t/6882 调试器的实现原理要想进行调试，调试器是必不可少的，首先需要了解一下我们常用的Linux下的调试器如GDB，是如何实现的 GDB 基于ptrace编写而成的调试器，ptrace是一个Linux提供的用于调试的系统调用 函数原型如下 123456NAME     ptrace - process traceSYNOPSIS">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20191201144906-ab752400-1406-1.png">
+  <link rel="canonical" href="http://yoursite.com/2019/12/21/╫¬╘╪-Linux─µ╧≥╓«╡≈╩╘/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>转载-Linux逆向之调试&反调试 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/21/╫¬╘╪-Linux─µ╧≥╓«╡≈╩╘/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">转载-Linux逆向之调试&反调试
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-12-21 19:03:22" itemprop="dateCreated datePublished" datetime="2019-12-21T19:03:22-08:00">2019-12-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-12-22 11:03:56" itemprop="dateModified" datetime="2019-12-22T11:03:56-08:00">2019-12-22</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>转载自：<a href="https://xz.aliyun.com/t/6882" target="_blank" rel="noopener">https://xz.aliyun.com/t/6882</a></p>
+<h2 id="调试器的实现原理"><a href="#调试器的实现原理" class="headerlink" title="调试器的实现原理"></a>调试器的实现原理</h2><p>要想进行调试，调试器是必不可少的，首先需要了解一下我们常用的Linux下的调试器如GDB，是如何实现的</p>
+<p>GDB 基于ptrace编写而成的调试器，ptrace是一个Linux提供的用于调试的系统调用</p>
+<p>函数原型如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">NAME </span><br><span class="line">    ptrace - process trace</span><br><span class="line">SYNOPSIS</span><br><span class="line">       #include &lt;sys/ptrace.h&gt;</span><br><span class="line">       long ptrace(enum __ptrace_request request, pid_t pid,</span><br><span class="line">                   void *addr, void *data);</span><br></pre></td></tr></table></figure>
+
+<p>简单来说， <strong>ptrace系统调用提供了一种方法来让父进程可以观察和控制其它进程的执行，检查和改变其核心映像以及寄存器。 主要用来实现断点调试和系统调用跟踪</strong></p>
+<p>这个函数根据 request 参数来表示想要请求执行的行为 ，并且根据不同的request决定后续的pid、addr、data参数是否有意义。</p>
+<p>下面是几个常见的 request 参数的可选项：</p>
+<ul>
+<li><p>PTRACE_TRACEME ：表示本进程将被其父进程跟踪，此时剩下的pid、addr、data参数都没有实际意义可以全部为0</p>
+<p>这个选项只能用在被调试的进程中，也是被调试的子进程唯一能用的request选项，其他的都只能用父进程调试器使用</p>
+</li>
+<li><p>PTRACE_ATTACH：attach到一个指定的进程，使其成为当前进程跟踪的子进程，而子进程的行为等同于它进行了一次PTRACE_TRACEME操作，可想而知，gdb的attach命令使用这个参数选项实现的</p>
+<p><del>变成其他进程的爹，你就可以调试它</del></p>
+</li>
+<li><p>PTRACE_CONT：继续运行之前停止的子进程，也可以向子进程发送指定的信号，这个其实就相当于gdb中的continue命令</p>
+</li>
+</ul>
+<p>除了上面的几个，还有很多操作子进程内存数据寄存器数据的request选项，详见man手册，这里不一一展开，</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20191201144906-ab752400-1406-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20191201144906-ab752400-1406-1.png" alt="img"></a></p>
+<p>如上图所示，gdb调试的本质实际上就是父进程使用ptrace函数对子进程进行一系列的命令操作</p>
+<p>这里举一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/ptrace.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">#include &lt;sys/reg.h&gt;   /* For constants ORIG_EAX etc */</span><br><span class="line">#include &lt;sys/user.h&gt;</span><br><span class="line">#include &lt;sys/syscall.h&gt; /* SYS_write */</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main() &#123;</span><br><span class="line">    pid_t child;</span><br><span class="line">    long orig_rax;</span><br><span class="line">    int status;</span><br><span class="line">    int iscalling = 0;</span><br><span class="line">    struct user_regs_struct regs;</span><br><span class="line"></span><br><span class="line">    child = fork();</span><br><span class="line">    if(child == 0) </span><br><span class="line">    &#123;</span><br><span class="line">        ptrace(PTRACE_TRACEME, 0, 0);//发送信号给父进程表示已做好准备被调试</span><br><span class="line">        execl(&quot;/bin/ls&quot;, &quot;ls&quot;, &quot;-l&quot;, &quot;-h&quot;, 0);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        while(1)</span><br><span class="line">        &#123;</span><br><span class="line">            wait(&amp;status);//等待子进程发来信号或者子进程退出</span><br><span class="line">            if(WIFEXITED(status))</span><br><span class="line">            //WIFEXITED函数(宏)用来检查子进程是被ptrace暂停的还是准备退出</span><br><span class="line">            &#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">            orig_rax = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RAX, 0);</span><br><span class="line">            //获取rax值从而判断将要执行的系统调用号</span><br><span class="line">            if(orig_rax == SYS_write)</span><br><span class="line">            &#123;//如果系统调用是write</span><br><span class="line">                ptrace(PTRACE_GETREGS, child, 0, &amp;regs);</span><br><span class="line">                if(!iscalling)</span><br><span class="line">                &#123;</span><br><span class="line">                    iscalling = 1;</span><br><span class="line">                    //打印出系统调用write的各个参数内容</span><br><span class="line">                    printf(&quot;SYS_write call with %p, %p, %p\n&quot;,</span><br><span class="line">                            regs.rdi, regs.rsi, regs.rdx);</span><br><span class="line">                &#125;</span><br><span class="line">                else</span><br><span class="line">                &#123;</span><br><span class="line">                    printf(&quot;SYS_write call return %p\n&quot;, regs.rax);</span><br><span class="line">                    iscalling = 0;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ptrace(PTRACE_SYSCALL, child, 0, 0);</span><br><span class="line">            //PTRACE_SYSCALL,其作用是使内核在子进程进入和退出系统调用时都将其暂停</span><br><span class="line">            //得到处于本次调用之后下次调用之前的状态</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译运行后，会输出如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">$ gcc ./ptrace1.c -o ptrace1 &amp;&amp; ./ptrace1 </span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0xf</span><br><span class="line">总用量 940K</span><br><span class="line">SYS_write call return 0xf</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x35</span><br><span class="line">-rwxrwxr-x 1 zeref zeref 8.7K 11月 16 03:10 ptrace1</span><br><span class="line">SYS_write call return 0x35</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x37</span><br><span class="line">-rw-rw-r-- 1 zeref zeref  601 11月 16 03:10 ptrace1.c</span><br><span class="line">SYS_write call return 0x37</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x35</span><br><span class="line">-rwxrwxr-x 1 zeref zeref 8.7K 11月 16 03:16 ptrace2</span><br><span class="line">SYS_write call return 0x35</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x37</span><br><span class="line">-rw-rw-r-- 1 zeref zeref 1.3K 11月 16 03:16 ptrace2.c</span><br><span class="line">SYS_write call return 0x37</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x32</span><br><span class="line">-rwxrwxr-x 1 zeref zeref 892K 11月 15 22:57 test</span><br><span class="line">SYS_write call return 0x32</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x33</span><br><span class="line">-rwxrwxr-x 1 zeref zeref 8.4K 11月 15 22:51 test1</span><br><span class="line">SYS_write call return 0x33</span><br><span class="line">SYS_write call with 0x1, 0x9e1020, 0x35</span><br><span class="line">-rw-rw-r-- 1 zeref zeref  174 11月 15 22:51 test1.c</span><br><span class="line">SYS_write call return 0x35</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，每一次进行系统调用前以及调用后的寄存器内容都发生的变化，并且输出了<code>ls -l -h</code>的内容</p>
+<p>这只是ptrace的部分功能，ptrace能做到的事情还有更多，比如还能修改内存，修改寄存器的值，插入字节码实现下断点的功能，这里仅仅简单介绍一下gdb调试器的大概实现原理</p>
+<p>如果对编写调试器感兴趣的话，可以康康这个大佬的博客： <a href="https://veritas501.space/2017/10/16/翻译_编写一个Linux调试器/" target="_blank" rel="noopener">veritas501</a></p>
+<h2 id="反调试"><a href="#反调试" class="headerlink" title="反调试"></a>反调试</h2><p>介绍完调试的原理，就需要思考下一个问题，如果防止别人调试我们写好的程序？</p>
+<p>最简单的办法如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/ptrace.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    if (ptrace(PTRACE_TRACEME, 0, 0, 0) ==-1 )</span><br><span class="line">    &#123;</span><br><span class="line">        printf(&quot;don&apos;t trace me:(\n&quot;);</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;no one trace me:)\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据前面说的，只要能当其他进程的爹，就能调试他，但ptrace有个规定是，每个进程只能被<code>PTRACE_TRACEME</code>一次，因此只要程序的开头就先执行一次<code>ptrace(PTRACE_TRACEME, 0, 0, 0)</code>，当gdb再想attach的时候就会发现已经执行了一次不能再执行了从而返回-1</p>
+<p><del>这大概就是我先当了我自己的爹，别人就不能当我爹吧</del></p>
+<p>运行情况如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ ./anti1 </span><br><span class="line">no one trace me:)</span><br><span class="line">----</span><br><span class="line">$ gdb ./anti1</span><br><span class="line">$pwndbg&gt; r</span><br><span class="line">Starting program: /home/zeref/桌面/debug&amp;anti/anti1 </span><br><span class="line">don&apos;t trace me:(</span><br><span class="line">[Inferior 1 (process 21216) exited with code 01]</span><br></pre></td></tr></table></figure>
+
+<p>那如果遇到这种反调试该如何绕过呢？</p>
+<p>一般有以下几种操作：</p>
+<ol>
+<li><p>打patch，把有关ptrace函数的部分nop掉</p>
+</li>
+<li><p>利用hook技术，把ptrace函数给替换成自定义的ptrace函数，从而可以任意指定它的返回值</p>
+</li>
+<li><p>充分利用gdb的catch命令，<code>catch syscall ptrace</code>会在发生ptrace调用的时候停下，因此在第二次停住的时候<code>set $rax=0</code>，从而绕过程序中<code>ptrace(PTRACE_TRACEME, 0, 0, 0) ==-1</code>的判断</p>
+<p>效果如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ gdb ./anti1</span><br><span class="line"> $pwndbg&gt; catch syscall ptrace</span><br><span class="line"> Catchpoint 1 (syscall &apos;ptrace&apos; [101])</span><br><span class="line"> $pwndbg&gt; r</span><br><span class="line"> Starting program: /home/zeref/桌面/debug&amp;anti/anti1 </span><br><span class="line"> Catchpoint 1 (call to syscall ptrace), 0x00007ffff7b0ae2e in ptrace (request=PTRACE_TRACEME) at ../sysdeps/unix/sysv/linux/ptrace.c:45</span><br><span class="line"></span><br><span class="line"> $pwndbg&gt; c</span><br><span class="line"> Continuing.</span><br><span class="line"></span><br><span class="line"> Catchpoint 1 (returned from syscall ptrace), 0x00007ffff7b0ae2e in ptrace (request=PTRACE_TRACEME) at ../sysdeps/unix/sysv/linux/ptrace.c:45</span><br><span class="line"></span><br><span class="line"> 在连续si到即将执行ret时</span><br><span class="line"> $pwndbg&gt; set $rax=0</span><br><span class="line"> $pwndbg&gt; c</span><br><span class="line"> Continuing.</span><br><span class="line"> no one trace me:)</span><br><span class="line"> [Inferior 1 (process 21279) exited normally]</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><strong>那么问题又来了，如何防止我们的程序被这种骚操作绕过反调试呢？</strong></p>
+<p>分析一下上面的绕过方法，发现本质上都是为了使得<code>ptrace(PTRACE_TRACEME, 0, 0, 0)</code>无效，因为使之无效化又不影响主程序的逻辑，那便可以完美绕过</p>
+<p>所以这里一种方法是这样，想办法生成一个子进程，并且ptrace跟踪它，并且使他与父进程的运行逻辑密不可分，这样一来单纯的干掉一个ptrace函数调用就不能绕过反调试</p>
+<p>比如，可以通过自己定义syscall的方式来实现父子进程之间的身份认证，确保子进程是与父进程在通讯，而不是与gdb在通讯</p>
+<p>例子如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;sys/ptrace.h&gt;</span><br><span class="line">#include &lt;sys/syscall.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">#include &lt;sys/user.h&gt;</span><br><span class="line">#define SYS_CALL_myread 12345</span><br><span class="line">#define SYS_CALL_mywrite 67890</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">void myread(char *str,int len)</span><br><span class="line">&#123;</span><br><span class="line">    syscall(SYS_CALL_myread, str,len,0);</span><br><span class="line">&#125;</span><br><span class="line">void mywrite(char *str)</span><br><span class="line">&#123;</span><br><span class="line">    syscall(SYS_CALL_mywrite, str,strlen(str),1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void tracee() </span><br><span class="line">&#123;</span><br><span class="line">    ptrace(PTRACE_TRACEME, 0, 0, 0);</span><br><span class="line">    raise(SIGCONT);//向自身发送SIGCONT信号，表示继续执行</span><br><span class="line">    char *str1=&quot;what is your name?\n&quot;;</span><br><span class="line">    static char name[0x10];</span><br><span class="line">    char *ptr_name=name;</span><br><span class="line">    mywrite(str1);</span><br><span class="line">    myread(ptr_name,0x10);</span><br><span class="line"></span><br><span class="line">    puts(&quot;welcome!&quot;);</span><br><span class="line">    mywrite(ptr_name);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void tracer(pid_t child_pid)</span><br><span class="line">&#123;</span><br><span class="line">    int status;</span><br><span class="line">    struct user_regs_struct regs;</span><br><span class="line"></span><br><span class="line">    waitpid(child_pid, &amp;status, 0);</span><br><span class="line">    //如果子进程的ptrace被patch掉，则无法接收到status</span><br><span class="line">    if (!WIFSTOPPED(status))</span><br><span class="line">    &#123;//宏用来指出子进程是正常退出的，返回一个非零值</span><br><span class="line">        printf(&quot;gg\n&quot;);</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125;</span><br><span class="line">    ptrace(PTRACE_SETOPTIONS, child_pid, 0, PTRACE_O_EXITKILL);</span><br><span class="line">    //如果子进程处于退出状态则发送一个SIGKILL信号给它</span><br><span class="line"></span><br><span class="line">    while (WIFSTOPPED(status))</span><br><span class="line">    &#123;</span><br><span class="line">        ptrace(PTRACE_SYSCALL, child_pid, 0, 0);//在子进程进程syscall之前断下</span><br><span class="line">        waitpid(child_pid, &amp;status, 0);</span><br><span class="line">        ptrace(PTRACE_GETREGS, child_pid, 0, &amp;regs);//获取寄存器值</span><br><span class="line"></span><br><span class="line">        if (regs.orig_rax == SYS_CALL_mywrite)</span><br><span class="line">        &#123;</span><br><span class="line">            //str,strlen(str),1</span><br><span class="line">            regs.orig_rax = SYS_write;</span><br><span class="line">            unsigned long long int tmp = regs.rdx;</span><br><span class="line">            regs.rdx = regs.rsi;</span><br><span class="line">            regs.rsi = regs.rdi;</span><br><span class="line">            regs.rdi=tmp;</span><br><span class="line"></span><br><span class="line">            ptrace(PTRACE_SETREGS, child_pid, 0, &amp;regs);</span><br><span class="line">            //设置寄存器值，使其改为正确的syscall</span><br><span class="line">        &#125;</span><br><span class="line">        if (regs.orig_rax == SYS_CALL_myread)</span><br><span class="line">        &#123;</span><br><span class="line">            //str,strlen(str),0</span><br><span class="line">            regs.orig_rax = SYS_read;</span><br><span class="line">            unsigned long long int tmp = regs.rdx;</span><br><span class="line">            regs.rdx = regs.rsi;</span><br><span class="line">            regs.rsi = regs.rdi;</span><br><span class="line">            regs.rdi=tmp;</span><br><span class="line">            ptrace(PTRACE_SETREGS, child_pid, 0, &amp;regs);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ptrace(PTRACE_SYSCALL, child_pid, 0, 0);</span><br><span class="line">        waitpid(child_pid, &amp;status, 0);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main() </span><br><span class="line">&#123;</span><br><span class="line">    pid_t child_pid = fork();</span><br><span class="line">    if (child_pid &lt; 0) </span><br><span class="line">    &#123;</span><br><span class="line">        printf(&quot;gg\n&quot;);</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125;</span><br><span class="line">    if (child_pid == 0) </span><br><span class="line">    &#123;</span><br><span class="line">        tracee();</span><br><span class="line">    &#125; </span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        tracer(child_pid);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方法可以在一定程度上加大反调试力度，但其实还是有办法应对的，可以通过逆向发现父子进程直接的互动无非就是syscall的系统调用号和参数的转换，那只要逆的明明白白，仍然可以强行打patch，把myread，mywrite又改回正常的read，write就可以绕过反调试了</p>
+<p><strong>所以又该怎么样继续加大反调试的力度呢？</strong></p>
+<p>可以考虑如下操作</p>
+<ol>
+<li>加大力度，定义更多的syscal来代替libc函数，增大逆向难度</li>
+<li>不仅仅单纯的替换系统调用号和参数，可以加入数据的交互，比如通过管道通信添加加密与解密的操作</li>
+<li>给程序加很多花里胡哨的混淆，增加理解程序逻辑难度</li>
+<li>……</li>
+</ol>
+<p><strong>这大概就是攻击与防御的乐趣吧，如果哪位大佬还有更骚操作和想法请务必评论区分享一波</strong></p>
+<h3 id="其他小技巧"><a href="#其他小技巧" class="headerlink" title="其他小技巧"></a>其他小技巧</h3><p>上面是专门针对ptrace进行的反调试与绕过反调试的分析，下面还有几种比较偏门的反调试措施，但是这些措施都比较容易绕过，通过打patch基本上都可以绕过，这里就简单介绍一下</p>
+<p><strong>1.检测/proc/self/status</strong></p>
+<p>检查 <code>/proc/self/status</code> 中的 <code>TracerPID</code> - 正常运行时为0，在有debugger挂载的情况下变为debugger的PID。因此通过不断读取这个值可以发现是否存在调试器，进行对应处理</p>
+<p>例子如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;sys/ptrace.h&gt;</span><br><span class="line">#include &lt;sys/syscall.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">#include &lt;sys/user.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">void test()</span><br><span class="line">&#123;</span><br><span class="line">    FILE *fp;</span><br><span class="line">    int TracerPid=0;</span><br><span class="line">    fp=fopen(&quot;/proc/self/status&quot;,&quot;r&quot;);</span><br><span class="line">    // printf(&quot;%p\n&quot;,fp);</span><br><span class="line">    static char buf[0x100];</span><br><span class="line">    char *ptr=&amp;buf;</span><br><span class="line">    while(fgets(ptr, 0x100, fp))</span><br><span class="line">    &#123;</span><br><span class="line">        if (strstr(ptr,&quot;TracerPid&quot;))</span><br><span class="line">        &#123;   </span><br><span class="line">            char tmp[0x10];</span><br><span class="line">            int len=strlen(ptr);</span><br><span class="line">            TracerPid=atoi((char *)ptr+len-3);</span><br><span class="line">            if (TracerPid != 0)</span><br><span class="line">            &#123;</span><br><span class="line">                puts(&quot;don&apos;t debug me!&quot;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    while(1)</span><br><span class="line">    &#123;</span><br><span class="line">        test();</span><br><span class="line">        sleep(1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似的操作还有扫描整个虚拟地址空间，在text段查找被修改的字节码，如当调试器下断点的时候实际上会插入int3的字节码，从而达到断下的目的，如果扫描到这些特征字节码（如0xcc等等）就马上停止程序，从而达到反调试的作用，同样的比较容易被绕过，这里就只提供一种思路，不再举具体例子</p>
+<p><strong>2.检测/proc/self/cmdline</strong></p>
+<p>这种操作本质上就是在检测输入的命令内容，如果输入执行<code>gdb ./xx</code>或者<code>strace ./xx</code>就会被检测到</p>
+<p>总体还是还是比较鸡肋的，如果先进gdb在attach pid的话就检测不到。。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) </span><br><span class="line">&#123;</span><br><span class="line">   char buf1[0x20], buf2[0x100];</span><br><span class="line">   FILE* fp;</span><br><span class="line"></span><br><span class="line">   snprintf(buf1, 24, &quot;/proc/%d/cmdline&quot;, getppid());</span><br><span class="line">   fp = fopen(buf1, &quot;r&quot;);</span><br><span class="line">   fgets(buf2, 0x100, fp);</span><br><span class="line">   fclose(fp);</span><br><span class="line"></span><br><span class="line">   if(!strcmp(buf2, &quot;gdb&quot;) || !strcmp(buf2, &quot;strace&quot;)||!strcmp(buf2, &quot;ltrace&quot;))</span><br><span class="line">   &#123;</span><br><span class="line">       printf(&quot;Debugger detected&quot;);</span><br><span class="line">       return 1;</span><br><span class="line">   &#125;  </span><br><span class="line">   printf(&quot;All good&quot;);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.忽略int3异常信号</strong></p>
+<p>调试中最常见的操作便是下断点，而一般的下断点的方法就是在即将执行的指令前插入int3的字节码 (CC) ，在程序执行到int3时，就会触发 SIGTRAP 信号，而调试器就会接收到这些信号进行并对子进程进行处理，而如果子进程通过设置signal函数忽略SIGTRAP  信号，就可以使得断点无效，也就能达到反调试的作用</p>
+<p>但是这个操作似乎只适用于反调试远古时期的gdb，现在的最新版本gdb基本上都防不住，仅提供一种思路</p>
+<p><strong>4.设置时间间隔</strong></p>
+<p>在程序启动时，通过alarm设置定时，到达时则中止程序 ，这样就不能长时间调试程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;signal.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void alarmHandler(int sig)</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;don&apos; t debug me&quot;);</span><br><span class="line">   exit(1);</span><br><span class="line">&#125;</span><br><span class="line">void__attribute__((constructor))setupSig(void) </span><br><span class="line">&#123;//设置程序一开始就执行</span><br><span class="line">   signal(SIGALRM, alarmHandler);</span><br><span class="line">   alarm(3);</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char *argv[]) </span><br><span class="line">&#123;</span><br><span class="line">   getchar();</span><br><span class="line">   puts(&quot;hello!&quot;);</span><br><span class="line">   puts(&quot;hello!&quot;);</span><br><span class="line">   puts(&quot;hello!&quot;);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然还是比较容易绕过，方法很多很多</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://blog.toby.moe/linux-anti-debugging/" target="_blank" rel="noopener">https://blog.toby.moe/linux-anti-debugging/</a></p>
+<p><a href="http://www.voidcn.com/article/p-hogkwhfh-ys.html" target="_blank" rel="noopener">http://www.voidcn.com/article/p-hogkwhfh-ys.html</a></p>
+<p><a href="https://blog.csdn.net/stonesharp/article/details/8211526" target="_blank" rel="noopener">https://blog.csdn.net/stonesharp/article/details/8211526</a></p>
+<p><a href="http://drops.xmd5.com/static/drops/mobile-16969.html" target="_blank" rel="noopener">http://drops.xmd5.com/static/drops/mobile-16969.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/12/10/IDA╜┼▒╛▒╩╝╟╥╗/" rel="next" title="IDA脚本笔记一">
+                  <i class="fa fa-chevron-left"></i> IDA脚本笔记一
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/12/22/╟│╠╕╒╗╥τ│÷╠ε│Σ▓╝╛╓-1/" rel="prev" title="浅谈栈溢出填充布局-1">
+                  浅谈栈溢出填充布局-1 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#调试器的实现原理"><span class="nav-number">1.</span> <span class="nav-text">调试器的实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反调试"><span class="nav-number">2.</span> <span class="nav-text">反调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#其他小技巧"><span class="nav-number">2.1.</span> <span class="nav-text">其他小技巧</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

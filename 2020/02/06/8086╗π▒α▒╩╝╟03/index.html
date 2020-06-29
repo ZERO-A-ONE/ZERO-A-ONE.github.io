@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Call和Retcall和ret指令都是转移指令，他们都修改IP，或同时修改CS和IP，他们经常被共同用来实现程序的设计 ret和retf ret指令用栈中的数据修改IP的内容，从而实现近转移 CPU执行ret指令时，进行下面两步操作 (IP)=((ss)*16+(sp)) (sp)=(sp)+2   CPU执行ret指令时，相当于进行： pop IP     retf指令用栈中的数据修改CS和I">
+<meta property="og:type" content="article">
+<meta property="og:title" content="8086汇编笔记03">
+<meta property="og:url" content="http://yoursite.com/2020/02/06/8086╗π▒α▒╩╝╟03/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="Call和Retcall和ret指令都是转移指令，他们都修改IP，或同时修改CS和IP，他们经常被共同用来实现程序的设计 ret和retf ret指令用栈中的数据修改IP的内容，从而实现近转移 CPU执行ret指令时，进行下面两步操作 (IP)=((ss)*16+(sp)) (sp)=(sp)+2   CPU执行ret指令时，相当于进行： pop IP     retf指令用栈中的数据修改CS和I">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-02-07T00:10:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="8086汇编笔记03">
+<meta name="twitter:description" content="Call和Retcall和ret指令都是转移指令，他们都修改IP，或同时修改CS和IP，他们经常被共同用来实现程序的设计 ret和retf ret指令用栈中的数据修改IP的内容，从而实现近转移 CPU执行ret指令时，进行下面两步操作 (IP)=((ss)*16+(sp)) (sp)=(sp)+2   CPU执行ret指令时，相当于进行： pop IP     retf指令用栈中的数据修改CS和I">
+  <link rel="canonical" href="http://yoursite.com/2020/02/06/8086╗π▒α▒╩╝╟03/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>8086汇编笔记03 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/06/8086╗π▒α▒╩╝╟03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">8086汇编笔记03
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-06 00:09:56 / Geändert am: 16:10:12" itemprop="dateCreated datePublished" datetime="2020-02-06T00:09:56-08:00">2020-02-06</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Call和Ret"><a href="#Call和Ret" class="headerlink" title="Call和Ret"></a>Call和Ret</h2><p>call和ret指令都是转移指令，他们都修改IP，或同时修改CS和IP，他们经常被共同用来实现程序的设计</p>
+<h2 id="ret和retf"><a href="#ret和retf" class="headerlink" title="ret和retf"></a>ret和retf</h2><ul>
+<li>ret指令用栈中的数据修改IP的内容，从而实现近转移<ul>
+<li>CPU执行ret指令时，进行下面两步操作<ul>
+<li>(IP)=((ss)*16+(sp))</li>
+<li>(sp)=(sp)+2</li>
+</ul>
+</li>
+<li>CPU执行ret指令时，相当于进行：<ul>
+<li>pop IP</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>retf指令用栈中的数据修改CS和IP的内容，从而实现远转移<ul>
+<li>CPU执行retf指令时，进行下面两步操作<ul>
+<li>(IP)=((ss)*16+(sp))</li>
+<li>(sp)=(sp)+2</li>
+<li>(CS)=((ss)*16+(sp))</li>
+<li>(sp)=(sp)+2</li>
+</ul>
+</li>
+<li>CPU执行ret指令时，相当于进行：<ul>
+<li>pop IP</li>
+<li>pop CS</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>使用ret的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">assume  cs:codesg</span><br><span class="line">stack segment</span><br><span class="line">    db 16 dup (0)</span><br><span class="line">stack ends</span><br><span class="line">codesg segment</span><br><span class="line">    mov ax,4c00h</span><br><span class="line">    int 21h</span><br><span class="line">start:</span><br><span class="line">    mov ax,stack</span><br><span class="line">    mov ss,ax</span><br><span class="line">    mov sp,16</span><br><span class="line">    mov ax,0</span><br><span class="line">    push ax</span><br><span class="line">    mov bx,0</span><br><span class="line">    ret</span><br><span class="line">codesg ends</span><br><span class="line">end start</span><br></pre></td></tr></table></figure>
+
+<p>使用retf的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">assume  cs:codesg</span><br><span class="line">stack segment</span><br><span class="line">    db 16 dup (0)</span><br><span class="line">stack ends</span><br><span class="line">codesg segment</span><br><span class="line">    mov ax,4c00h</span><br><span class="line">    int 21h</span><br><span class="line">start:</span><br><span class="line">    mov ax,stack</span><br><span class="line">    mov ss,ax</span><br><span class="line">    mov sp,16</span><br><span class="line">    mov ax,0</span><br><span class="line">    push ax</span><br><span class="line">    push cs</span><br><span class="line">    mov bx,0</span><br><span class="line">    retf</span><br><span class="line">codesg ends</span><br><span class="line">end start</span><br></pre></td></tr></table></figure>
+
+<h1 id="call指令"><a href="#call指令" class="headerlink" title="call指令"></a>call指令</h1><p>call指令经常跟ret指令配合使用，因此CPU执行call指令，进行两步操作：</p>
+<ul>
+<li>将当前的IP或CS和IP压入栈中</li>
+<li>转移(jump)</li>
+</ul>
+<p>call指令不能实现短转移，除此之外，call指令实现转移的方法和jmp指令的原理相同</p>
+<h4 id="依据位移经行转移的call指令"><a href="#依据位移经行转移的call指令" class="headerlink" title="依据位移经行转移的call指令"></a>依据位移经行转移的call指令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call 标号 （将当前的IP压栈后，转到标号处执行指令）</span><br></pre></td></tr></table></figure>
+
+<p>CPU执行此种格式的call指令时，进行如下的操作：</p>
+<ul>
+<li>(sp)=(sp)-2</li>
+<li>((ss)*16+(sp))=(IP)</li>
+<li>(IP)=(IP)+16位位移</li>
+</ul>
+<p>相当于进行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push IP</span><br><span class="line">jmp near ptr 标号</span><br></pre></td></tr></table></figure>
+
+<p>一些解释：</p>
+<ul>
+<li>16位移 = “标号”处的地址 - call指令后的第一个字节的地址</li>
+<li>16位位移的范围为-32769~32767，用补码表示</li>
+<li>16位位移由编译程序在编译时算出</li>
+</ul>
+<h4 id="转移的目的地址在指令中的call指令"><a href="#转移的目的地址在指令中的call指令" class="headerlink" title="转移的目的地址在指令中的call指令"></a>转移的目的地址在指令中的call指令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call far ptr 标号 （实现的是段间转移）</span><br></pre></td></tr></table></figure>
+
+<p>CPU执行此种格式的指令时，进行如下的操作：</p>
+<ul>
+<li>(sp)=sp-2</li>
+<li>((ss)*16+(sp))=(CS)</li>
+<li>(sp)=sp-2</li>
+<li>((ss)*16+(sp))=(IP)</li>
+<li>(CS)=标号所在的段地址</li>
+<li>(IP)=标号所在的段地址</li>
+</ul>
+<p>相当于进行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">push CS</span><br><span class="line">push IP</span><br><span class="line">jmp far ptr 标号</span><br></pre></td></tr></table></figure>
+
+<h4 id="转移地址在寄存器中的call指令"><a href="#转移地址在寄存器中的call指令" class="headerlink" title="转移地址在寄存器中的call指令"></a>转移地址在寄存器中的call指令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call 16位寄存器</span><br></pre></td></tr></table></figure>
+
+<p>CPU执行此种格式的指令时，进行如下的操作：</p>
+<ul>
+<li>(sp)=(sp)-2</li>
+<li>((ss)*16+(sp))=(IP)</li>
+<li>(IP)=(16位寄存器)</li>
+</ul>
+<p>相当于进行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push IP</span><br><span class="line">jmp 16位寄存器</span><br></pre></td></tr></table></figure>
+
+<h4 id="转移地址在内存中的call指令"><a href="#转移地址在内存中的call指令" class="headerlink" title="转移地址在内存中的call指令"></a>转移地址在内存中的call指令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call word ptr 内存单元地址</span><br></pre></td></tr></table></figure>
+
+<p>相当于进行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push IP</span><br><span class="line">jmp word ptr 内存单元地址</span><br></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov sp,10h</span><br><span class="line">mov ax,0123h</span><br><span class="line">mov ds:[0],ax</span><br><span class="line">call word ptr ds:[0]</span><br></pre></td></tr></table></figure>
+
+<p>执行后，(IP)=0123H，(sp)=0EH</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call dword ptr 内存单元地址</span><br></pre></td></tr></table></figure>
+
+<p>相当于进行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">push CS</span><br><span class="line">push IP</span><br><span class="line">jmp dword ptr 内存单元地址</span><br></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov sp,10h</span><br><span class="line">mov ax,0123h</span><br><span class="line">mov ds:[0],ax</span><br><span class="line">mov word ptr ds:[2],0</span><br><span class="line">call word ptr ds:[0]</span><br></pre></td></tr></table></figure>
+
+<p>执行后，(CS)=0，(IP)=0123H，(sp)=0CH </p>
+<h2 id="mul指令"><a href="#mul指令" class="headerlink" title="mul指令"></a>mul指令</h2><p>mul是乘法指令</p>
+<ul>
+<li>相乘的两个数，要么都是8位，要么都是16位<ul>
+<li>8位：AL中和8位寄存器或内存字节单元中</li>
+<li>16位：AX中和16位寄存器或内存字节单元中</li>
+</ul>
+</li>
+<li>运算结果<ul>
+<li>8位：AX中</li>
+<li>16位：DX（高位）和AX（地位）中</li>
+</ul>
+</li>
+</ul>
+<p>格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mul reg</span><br><span class="line">mul	内存单元</span><br></pre></td></tr></table></figure>
+
+<p>内存单元可以用不同的寻址方式给出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mul byte ptr ds:[0]</span><br></pre></td></tr></table></figure>
+
+<p>含义为：(ax)=(al)*((ds)*16+0)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mul word ptr [bx+si+8]</span><br></pre></td></tr></table></figure>
+
+<p>含义为：</p>
+<ul>
+<li>(ax)=(al)*((ds)*16+(bx)+(si)+8)结果的低16位</li>
+<li>(dx)=(al)*((ds)*16+(bx)+(si)+8)结果的高16位</li>
+</ul>
+<h2 id="参数和结果传递的问题"><a href="#参数和结果传递的问题" class="headerlink" title="参数和结果传递的问题"></a>参数和结果传递的问题</h2><p>子程序一般都要根据提供的参数处理一定的事务，处理后，将结果（返回值）提供给调用者</p>
+<p>用寄存器来存储参数和结果是最常使用的方法。对于存放参数的寄存器和存放结果的寄存器，调用者和子程序的读写操作恰恰相反：</p>
+<ul>
+<li>调用者将参数送入参数寄存器，从结果寄存器中取到返回值</li>
+<li>子程序从参数寄存器中取到参数，将返回值送入结果寄存器</li>
+</ul>
+<p>除了寄存器、内存传递参数外，还有一种通用的方法使用栈来传递参数</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/04/8086╗π▒α▒╩╝╟02/" rel="next" title="8086汇编笔记02">
+                  <i class="fa fa-chevron-left"></i> 8086汇编笔记02
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/07/8086╗π▒α▒╩╝╟04/" rel="prev" title="8086汇编笔记04">
+                  8086汇编笔记04 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Call和Ret"><span class="nav-number">1.</span> <span class="nav-text">Call和Ret</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret和retf"><span class="nav-number">2.</span> <span class="nav-text">ret和retf</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#call指令"><span class="nav-number"></span> <span class="nav-text">call指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#依据位移经行转移的call指令"><span class="nav-number">0.0.1.</span> <span class="nav-text">依据位移经行转移的call指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#转移的目的地址在指令中的call指令"><span class="nav-number">0.0.2.</span> <span class="nav-text">转移的目的地址在指令中的call指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#转移地址在寄存器中的call指令"><span class="nav-number">0.0.3.</span> <span class="nav-text">转移地址在寄存器中的call指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#转移地址在内存中的call指令"><span class="nav-number">0.0.4.</span> <span class="nav-text">转移地址在内存中的call指令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mul指令"><span class="nav-number">1.</span> <span class="nav-text">mul指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数和结果传递的问题"><span class="nav-number">2.</span> <span class="nav-text">参数和结果传递的问题</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

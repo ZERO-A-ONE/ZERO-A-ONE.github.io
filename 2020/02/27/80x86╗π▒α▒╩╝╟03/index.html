@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="标号、变量和数据结构当程序中要跳转到另一位置时，需要有一个标识来指示位置，这就是标号，通过在目的地址的前面放一个标号，可以在指令中使用标号来代替直接使用地址 变量的值在程序运行中是经常改变的，所以它必须定义在可写的段内，如data和data?，或者在堆栈内。按照定义的位置不同，MASM中的变量也分为全局变量和局部变量 在MASM中标号和变量的命名规范是相同的：  可以用字母、数字、下划线以及符号@">
+<meta property="og:type" content="article">
+<meta property="og:title" content="80x86汇编笔记03">
+<meta property="og:url" content="http://yoursite.com/2020/02/27/80x86╗π▒α▒╩╝╟03/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="标号、变量和数据结构当程序中要跳转到另一位置时，需要有一个标识来指示位置，这就是标号，通过在目的地址的前面放一个标号，可以在指令中使用标号来代替直接使用地址 变量的值在程序运行中是经常改变的，所以它必须定义在可写的段内，如data和data?，或者在堆栈内。按照定义的位置不同，MASM中的变量也分为全局变量和局部变量 在MASM中标号和变量的命名规范是相同的：  可以用字母、数字、下划线以及符号@">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-02-28T19:32:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="80x86汇编笔记03">
+<meta name="twitter:description" content="标号、变量和数据结构当程序中要跳转到另一位置时，需要有一个标识来指示位置，这就是标号，通过在目的地址的前面放一个标号，可以在指令中使用标号来代替直接使用地址 变量的值在程序运行中是经常改变的，所以它必须定义在可写的段内，如data和data?，或者在堆栈内。按照定义的位置不同，MASM中的变量也分为全局变量和局部变量 在MASM中标号和变量的命名规范是相同的：  可以用字母、数字、下划线以及符号@">
+  <link rel="canonical" href="http://yoursite.com/2020/02/27/80x86╗π▒α▒╩╝╟03/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>80x86汇编笔记03 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/27/80x86╗π▒α▒╩╝╟03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">80x86汇编笔记03
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-27 19:32:11" itemprop="dateCreated datePublished" datetime="2020-02-27T19:32:11-08:00">2020-02-27</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2020-02-28 11:32:36" itemprop="dateModified" datetime="2020-02-28T11:32:36-08:00">2020-02-28</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="标号、变量和数据结构"><a href="#标号、变量和数据结构" class="headerlink" title="标号、变量和数据结构"></a>标号、变量和数据结构</h2><p>当程序中要跳转到另一位置时，需要有一个标识来指示位置，这就是标号，通过在目的地址的前面放一个标号，可以在指令中使用标号来代替直接使用地址</p>
+<p>变量的值在程序运行中是经常改变的，所以它必须定义在可写的段内，如data和data?，或者在堆栈内。按照定义的位置不同，MASM中的变量也分为全局变量和局部变量</p>
+<p>在MASM中标号和变量的命名规范是相同的：</p>
+<ul>
+<li>可以用字母、数字、下划线以及符号@、$和？</li>
+<li>第一个符号不能是数字</li>
+<li>长度不能超过240个字符</li>
+<li>不能使用指令名等关键字</li>
+<li>在作用域内必须是唯一的</li>
+</ul>
+<h2 id="标号的定义"><a href="#标号的定义" class="headerlink" title="标号的定义"></a>标号的定义</h2><p>格式一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标号名： 目的指令</span><br></pre></td></tr></table></figure>
+
+<p>格式二：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标号名:: 目的指令</span><br></pre></td></tr></table></figure>
+
+<p>标号的作用域是当前的子程序，在不同子程序中可以存在同样名字的标号，这也就意味着这种格式不能从一个子程序通过标号跳转到另一个子程序中。如果是在需要从一个子程序中用指令跳转到另一个子程序中的标号位置时候，我们用格式二</p>
+<h2 id><a href="#" class="headerlink" title="@@"></a>@@</h2><p>因为标号有限，我们一般用下面的方式来取标号，节省标号开支</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mov	cx,1234h</span><br><span class="line">cmp flag,1</span><br><span class="line">je	@F	；F这里是Forward的意思</span><br><span class="line">mov	cx,1000h</span><br><span class="line">@@:</span><br><span class="line">	lopp @B ;B这里是Before的意思</span><br></pre></td></tr></table></figure>
+
+<p>当用@@做标号时，@F表示本条指令后的第一个@@标号，@B表示本条指令前的第一个@@标号</p>
+<blockquote>
+<p>当程序中可以有多个@@标号，@B和@F只寻找匹配最近的一个</p>
+</blockquote>
+<p>不要在间隔太远的代码中使用@@符号，距离最好限制在编辑器能够显示的同一屏幕的范围内</p>
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>全局变量的作用域是整个程序，Win32汇编的全局变量定义在data或data？段内，可以同时定义变量的类型和长度，格式如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">变量名	类型	初始值1，初始值2，……</span><br><span class="line">变量名	类型	初重复数量 dup(始值1，初始值2，……)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">表示方式</th>
+<th align="center">缩写</th>
+<th align="center">长度（字节）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">字节</td>
+<td align="center">byte</td>
+<td align="center">db</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">字</td>
+<td align="center">word</td>
+<td align="center">dw</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center">双字(double word)</td>
+<td align="center">dword</td>
+<td align="center">dd</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center">三字(far word)</td>
+<td align="center">fword</td>
+<td align="center">df</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center">四字(quad word)</td>
+<td align="center">qword</td>
+<td align="center">dq</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">十字节BCD码(ten byte)</td>
+<td align="center">tbyte</td>
+<td align="center">dt</td>
+<td align="center">10</td>
+</tr>
+<tr>
+<td align="center">有符号字节(sign byte)</td>
+<td align="center">sbyte</td>
+<td align="center"></td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">有符号子(sign byte)</td>
+<td align="center">sword</td>
+<td align="center"></td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center">有符号双字(sign dword)</td>
+<td align="center">sdword</td>
+<td align="center"></td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center">单精度浮点数</td>
+<td align="center">real4</td>
+<td align="center"></td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center">双精度浮点数</td>
+<td align="center">real8</td>
+<td align="center"></td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">10字节浮点数</td>
+<td align="center">real10</td>
+<td align="center"></td>
+<td align="center">10</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>所有使用到变量类型的情况中，只有定义全局变量的时候才可以用缩写</p>
+</blockquote>
+<p>在byte类型变量的定义中，可以用引号定义字符串和数值定义的方法混用</p>
+<p>假设要定义两个字符串Hello,World!和Hello again，每个字符串后面中回车和换行符，最后以一个0字符结尾，可以定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">szText	db	&quot;Hello World!&quot;,0dh,0ah,\</span><br><span class="line">&quot;Hello again&quot;,0dh,0ah,0</span><br></pre></td></tr></table></figure>
+
+<p>DOS和Windows采用回车+换行(CR/LF)表示下一行，而UNIX/Linux采用换行符(LF)表示下一行，macOS则采用回车符(CR)表示下一行</p>
+<ul>
+<li>CR用符号”\r”表示，十进制ASCII代码是13，十六进制代码为0x0D</li>
+<li>LF使用”\n“符号表示，ASCII代码是10，十六进制为0x0A</li>
+</ul>
+<p>全局变量在定义中既可以指定初值，也可以预留，在data？段中，只能用问号预留空间，在data？段中不能指定初始值</p>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>局部变量这个概念出现以后，两个以上子程序都要用到的数据才被定义为全局变量统一放在数据段中，仅在子程序内部使用的变量则放在堆栈中，这样还可以使得子程序编程黑匣子的模样，使程序的模块结构更加分明</p>
+<p>局部变量的作用域是单个子程序，在进入子程序的时候，通过修改堆栈指针esp来预留出需要的空间，再用ret指令返回主程序之前，同样通过恢复esp丢弃这些空间</p>
+<p>局部变量因为空间是临时分配的，所以无法定义含有初始化值的变量，对局部变量的初始化一般在子程序中由指令完成</p>
+<h4 id="局部变量的定义"><a href="#局部变量的定义" class="headerlink" title="局部变量的定义"></a>局部变量的定义</h4><p>MASM用local伪指令提供了对局部变量的支持，格式是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local 变量名1[[重复数量]][:类型]，变量名2[[重复数量]][:类型]……</span><br></pre></td></tr></table></figure>
+
+<p>local伪指令必须紧接在子程序定义的伪指令proc后，其它指令开始前，这是因为局部变量的数目必须在子程序开始的时候就确定下来系统才知道如何分配，在一个local语句定义不下的时候，可以有多个local语句，<strong>语法中的数据类型不能用缩写</strong></p>
+<ul>
+<li>Win32汇编默认的类型是dword，如果定义dword类型的局部变量，则类型可以省略</li>
+<li>当定义数组的时候，可以[]括号起来。<strong>不能使用定义全局变量的dup伪指令</strong></li>
+<li>局部变量不能和已定义的全局变量同名</li>
+<li>局部变量的作用域是当前子程序，所以在不同的子程序中可以有同名的局部变量</li>
+</ul>
+<p>一些例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">local	loc1[1024]:byte	;定义了一个1024字节长的局部变量loc1</span><br><span class="line">local	loc2	;定义了一个名为loc2的局部变量，类型是默认值dword</span><br><span class="line">local	loc3：WNDCLASS	;定义了一个WNDCLASS数据结构，名为loc3</span><br></pre></td></tr></table></figure>
+
+<h4 id="局部变量的使用"><a href="#局部变量的使用" class="headerlink" title="局部变量的使用"></a>局部变量的使用</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">TestProc proc	;名为TestProc的子程序</span><br><span class="line">local	@loc1:dword,@loc2:word</span><br><span class="line">local	@loc3:byte	;用local语句定义了3个变量</span><br><span class="line">mov	eax,@loc1	;对应类型进行转储，然后返回</span><br><span class="line">mov	ax,@loc2</span><br><span class="line">mov	al,@loc3</span><br><span class="line">ret</span><br><span class="line">TestProc	endp</span><br></pre></td></tr></table></figure>
+
+<p>其实在编译后的文件再反汇编的话，可以发现编译器编译后的指令比源程序多了前后两段指令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">push ebp</span><br><span class="line">mov	ebp,esp</span><br><span class="line">add	esp,FFFFFFF8</span><br><span class="line">……</span><br><span class="line">leave</span><br></pre></td></tr></table></figure>
+
+<p>这就是使用局部变量所必须的指令，分别用于局部变量的准备工作和扫尾工作</p>
+<h5 id="分析过程："><a href="#分析过程：" class="headerlink" title="分析过程："></a>分析过程：</h5><ul>
+<li>当调用者执行了call TestProc指令后，CPU把返回的地址（当前地址）压入堆栈，再转移（jmp）到子程序执行</li>
+<li>esp在程序的执行过程中可能随时用到，不可能用esp来随时存取局部变量，ebp寄存器是以堆栈段为默认数据段的，所以，可以用ebp做指针指向堆栈代替esp</li>
+<li>于是，在初始化前，先用一句push ebp指令把原来的ebp保存起来，然后把esp的值传递给ebp</li>
+</ul>
+<p>因为在80386处理器中，以dword(32位)为界对齐时读取内存速度最快，所以MASM宁可浪费一些内存单元进行对齐</p>
+<p>在程序退出前，必须把正确的esp设置回去，否则，ret指令会从堆栈中取出错误的地址返回，因为有<code>mov ebp,esp</code>，所以要返回的时候只要先<code>mov esp,ebp</code>，然后再<code>pop ebp</code>，堆栈就是正确的了</p>
+<p>在80386指令集中有一条指令可以在一句中实现这些功能，就是leave指令，所以，编译器在ret指令之前只使用了一句leave指令</p>
+<p>和全局变量不一样，局部变量的初始值是随机的，是其他子程序执行后在堆栈里留下的垃圾（因为我们知道，腾出空间只是改变栈指针esp），所以，对局部变量的值一定要初始化，特别是定义为结构后当参数传递给API函数的时候</p>
+<h2 id="变量的使用"><a href="#变量的使用" class="headerlink" title="变量的使用"></a>变量的使用</h2><p>在MASM中以不同的类型访问不会对变量造成影响。在MASM中，如果要用指定类型之外的长度访问变量，必须显式地指出要访问地长度，这样编译器忽略语法上的长度检验，仅使用变量地地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">类型	ptr	变量名</span><br></pre></td></tr></table></figure>
+
+<p>类型可以是byte，word，dword，fword，qword，real8和real10，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov	ax,word	ptr	szBuffer</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>指定类型地参数访问并不会去检测长度是否溢出</p>
+</blockquote>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.data</span><br><span class="line">bTest1 db 12h</span><br><span class="line">wTest2 dw 1234h</span><br><span class="line">dwTest3 dd 12345678h</span><br><span class="line">……</span><br><span class="line">.code</span><br><span class="line">mov	al,bTest1</span><br><span class="line">mov	ax,word ptr bTest1</span><br><span class="line">mov eax,dowrd ptr bTest1</span><br></pre></td></tr></table></figure>
+
+<p><code>mov al,bTest1</code>这一句显然使al等于12h，下面的两句，ax和eax难道等于0012h和00000012h吗？实际运行的结果使3412h和78123412h</p>
+<p>下面是反汇编后的结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">;.data段中的变量</span><br><span class="line">;.data段中变量是按顺序从低地址往高地址排列的，对于超过一个字节的数据，80386处理器的数据排列方式是小端序</span><br><span class="line">00403000 12 34 12 78 56 34 12</span><br><span class="line">;.code段中的代码</span><br><span class="line">00401000	A000304000	mov	al,byte	ptr [00403000]</span><br><span class="line">00401005	66A10030400	mov	ax,word	ptr [00403000]</span><br><span class="line">0040100B	A100304000	mov eax,dword	ptr [00403000]</span><br></pre></td></tr></table></figure>
+
+<p>在执行指令<code>mov ax,word ptr bTest1</code>的时候，是从bTest1的地址403000h处取一个字，其长度已经超过了bTest1的范围并落到了wTest2中。从内存中看，是取了bTest1的数据12h和wTest2的低位数据34h，在这两个字节中，12h位于低地址，所以ax中的数值是3412h</p>
+<p>同理，看<code>mov eax,dword ptr bTest1</code>这条指令取了bTest1，wTest2的全部和dwTest3的最低位78h，在内存中的排列是12h 34h 12h 78h，所以eax等于78123412h</p>
+<blockquote>
+<p>这个例子说明了汇编用ptr强制覆盖变量长度的时候，实质上是只用了变量的地址而禁止编译器进行检验。编译器并不会考虑定界的问题，程序员在使用的时候必须对内存中的数据排列有个全局概念，以免越界存取到意料之外的数据</p>
+</blockquote>
+<p>如果只是想把bTest1的一个字节拓展到一个字或一个双字再放到ax或eax中，高位保持0而不是越界存取到其他的变量，80386处理器提供的movzx指令可以实现这个功能，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movzx	ax,bTest1	;ax == 0012h</span><br><span class="line">movzx	eax,bTest1	;eax == 00000012h</span><br><span class="line">movzx	eax,cl		;eax == 000000(cl)</span><br><span class="line">movzx	eax,ax		;eax == 0000(ax)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>用movzx指令进行数据长度扩展是Win32汇编中常用技巧</p>
+</blockquote>
+<p>movsx是有符号的数据扩展</p>
+<h2 id="变量的尺寸和数量"><a href="#变量的尺寸和数量" class="headerlink" title="变量的尺寸和数量"></a>变量的尺寸和数量</h2><p>在源程序中用到变量的尺寸和数量的时候，可以用sizeof和lengthof伪指令来实现，格式是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sizeof	变量名、数据类型或数据结构名</span><br><span class="line">lengthof	变量名</span><br></pre></td></tr></table></figure>
+
+<p>它们的区别是：</p>
+<ul>
+<li>sizeof伪指令可以取得变量、数据类型或数据结构以字节为单位的长度</li>
+<li>lengthof则可以取得变量中数据的项数</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">stWndClass	WNDCALSS &lt;&gt;</span><br><span class="line">szHello	db	&apos;Hello,world&apos;,0</span><br><span class="line">dwTest	dd	1,2,3,4</span><br><span class="line">...</span><br><span class="line">.code</span><br><span class="line">...</span><br><span class="line">mov	eax,sizeof stWndClass</span><br><span class="line">mov ebx,sizeof	WNDCLASS</span><br><span class="line">mov ecx,sizeof	szHello</span><br><span class="line">mov edx,sizeof	doword</span><br><span class="line">mov esi,sizeof	dwTest</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行后eax的值是stWndClass结构的长度：40</li>
+<li>ebx同样是：40</li>
+<li>ecx的值是szHello的长度：13</li>
+<li>edx的值是一个双字的长度：4</li>
+</ul>
+<p>如果把所有的sizeof换成lengthof：</p>
+<ul>
+<li>那么eax会等于1，因为只定义了1项WNDCLASS</li>
+<li>ecx同样等于13</li>
+<li>esi则等于4</li>
+<li>lengthof WNDCLASST和lengthof dword是非法的用法，编译器报错</li>
+</ul>
+<p>如果分两行定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">szHello	db	&apos;hello&apos;,0dh,0ah</span><br><span class="line">		db	&apos;world&apos;,0</span><br></pre></td></tr></table></figure>
+
+<p>sizeof szHello的值是7而不是13.因为MASM中的变量定义只认一行，后一行实际上是另一个没有名称的数据定义</p>
+<h2 id="获取变量地址"><a href="#获取变量地址" class="headerlink" title="获取变量地址"></a>获取变量地址</h2><p>获取变量地址的操作对于全局变量和局部变量是不同的</p>
+<h3 id="全局变量-1"><a href="#全局变量-1" class="headerlink" title="全局变量"></a>全局变量</h3><p>对于全局变量，它的地址在编译的时候已经由编译器确定了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov	寄存器，offset 变量名</span><br></pre></td></tr></table></figure>
+
+<p>其中offset是取变量地址的伪操作符</p>
+<h3 id="局部变量-1"><a href="#局部变量-1" class="headerlink" title="局部变量"></a>局部变量</h3><p>对于局部变量，它是用ebp来做指针操作的，假设ebp的值是40100h，那么第一个局部变量的地址是ebp-4即400FCh</p>
+<p>由于ebp的值随着程序的执行环境不同可能是不同的，所以局部变量的地址值在编译的时候也是不确定的，不能用offset伪操作符来获取它的地址</p>
+<h3 id="取指针的地址"><a href="#取指针的地址" class="headerlink" title="取指针的地址"></a>取指针的地址</h3><p>80386处理器中有一条指令用来获取指针的地址，就是lea指令，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lea	eax,[ebp-4]</span><br></pre></td></tr></table></figure>
+
+<p>该指令可以在运行时按照ebp的值实际计算出地址放到eax中</p>
+<p>如果要在invoke伪指令的参数中用到一个局部变量的地址，MASM对此有一个专用的伪操作符addr，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addr 局部变量名 或 全局变量名</span><br></pre></td></tr></table></figure>
+
+<p>当addr后跟全局变量名的时候，用法和offset是相同的</p>
+<p>当addr后面跟局部变量名的时候，编译器自动用lea指令先把地址取到eax中，然后用eax来代替变量地址</p>
+<blockquote>
+<p>addr伪操作符只能在invoke的参数中使用，不能用在类似的场合：</p>
+<p><code>move ax,addr 局部变量名</code></p>
+</blockquote>
+<p>假设在一个子程序中有如下invoke指令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">invoke	Test,eax,addr szHello</span><br></pre></td></tr></table></figure>
+
+<p>编译器会把invoke伪指令和addr翻译成下面这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lea eax,[ebp-4]</span><br><span class="line">push eax	;参数2：addr szHello</span><br><span class="line">push eax	;参数1：eax</span><br><span class="line">call Test</span><br></pre></td></tr></table></figure>
+
+<p>编译器会报错，也就是说，要用到的eax的值不再有效，所以挡在invoke中使用addr伪操作符时，注意在它的前面不能用eax，否则eax的值会被覆盖掉，当然eax在addr的后面的参数中用是可以的</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/27/╗π▒α╠°╫¬╓╕┴ε╗π╫▄/" rel="next" title="汇编跳转指令汇总">
+                  <i class="fa fa-chevron-left"></i> 汇编跳转指令汇总
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/03/03/80x86╗π▒α▒╩╝╟04/" rel="prev" title="80x86汇编笔记04">
+                  80x86汇编笔记04 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#标号、变量和数据结构"><span class="nav-number">1.</span> <span class="nav-text">标号、变量和数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标号的定义"><span class="nav-number">2.</span> <span class="nav-text">标号的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">@@</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量"><span class="nav-number">4.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量"><span class="nav-number">4.1.</span> <span class="nav-text">全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部变量"><span class="nav-number">4.2.</span> <span class="nav-text">局部变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#局部变量的定义"><span class="nav-number">4.2.1.</span> <span class="nav-text">局部变量的定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#局部变量的使用"><span class="nav-number">4.2.2.</span> <span class="nav-text">局部变量的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#分析过程："><span class="nav-number">4.2.2.1.</span> <span class="nav-text">分析过程：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量的使用"><span class="nav-number">5.</span> <span class="nav-text">变量的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量的尺寸和数量"><span class="nav-number">6.</span> <span class="nav-text">变量的尺寸和数量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取变量地址"><span class="nav-number">7.</span> <span class="nav-text">获取变量地址</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量-1"><span class="nav-number">7.1.</span> <span class="nav-text">全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部变量-1"><span class="nav-number">7.2.</span> <span class="nav-text">局部变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取指针的地址"><span class="nav-number">7.3.</span> <span class="nav-text">取指针的地址</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

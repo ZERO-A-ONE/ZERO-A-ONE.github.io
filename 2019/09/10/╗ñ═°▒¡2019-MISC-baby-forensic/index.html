@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="这是一题以内存取证为主题，包含着密码学和USB流量分析的杂项题，还是很有趣的，首先我们拿到了一个名为data.vmem的内存文件，可以知道这就是内存取证的题目 内存取证我们需要使用到一个叫做volatility的内存取证神器 Volatility是开源的Windows，Linux，macOS，Android的内存取证分析工具，由Python编写成，命令行操作，支持各种操作系统 使用Volatili">
+<meta property="og:type" content="article">
+<meta property="og:title" content="护网杯2019-MISC-baby_forensic">
+<meta property="og:url" content="http://yoursite.com/2019/09/10/╗ñ═°▒¡2019-MISC-baby-forensic/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="这是一题以内存取证为主题，包含着密码学和USB流量分析的杂项题，还是很有趣的，首先我们拿到了一个名为data.vmem的内存文件，可以知道这就是内存取证的题目 内存取证我们需要使用到一个叫做volatility的内存取证神器 Volatility是开源的Windows，Linux，macOS，Android的内存取证分析工具，由Python编写成，命令行操作，支持各种操作系统 使用Volatili">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/session_0.WinSta0.Default.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/QQ%E6%88%AA%E5%9B%BE20190910153112.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/1100338-20180814105104990-181933183.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/QQ%E6%88%AA%E5%9B%BE20190910161715.png">
+<meta property="og:updated_time" content="2019-09-11T21:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="护网杯2019-MISC-baby_forensic">
+<meta name="twitter:description" content="这是一题以内存取证为主题，包含着密码学和USB流量分析的杂项题，还是很有趣的，首先我们拿到了一个名为data.vmem的内存文件，可以知道这就是内存取证的题目 内存取证我们需要使用到一个叫做volatility的内存取证神器 Volatility是开源的Windows，Linux，macOS，Android的内存取证分析工具，由Python编写成，命令行操作，支持各种操作系统 使用Volatili">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/session_0.WinSta0.Default.png">
+  <link rel="canonical" href="http://yoursite.com/2019/09/10/╗ñ═°▒¡2019-MISC-baby-forensic/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>护网杯2019-MISC-baby_forensic | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/10/╗ñ═°▒¡2019-MISC-baby-forensic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">护网杯2019-MISC-baby_forensic
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-10 23:39:57" itemprop="dateCreated datePublished" datetime="2019-09-10T23:39:57-07:00">2019-09-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-09-11 14:40:28" itemprop="dateModified" datetime="2019-09-11T14:40:28-07:00">2019-09-11</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是一题以内存取证为主题，包含着密码学和USB流量分析的杂项题，还是很有趣的，首先我们拿到了一个名为<strong>data.vmem</strong>的内存文件，可以知道这就是内存取证的题目</p>
+<h2 id="内存取证"><a href="#内存取证" class="headerlink" title="内存取证"></a>内存取证</h2><p>我们需要使用到一个叫做<strong>volatility</strong>的内存取证神器</p>
+<p><strong>Volatility</strong>是开源的<strong>Windows</strong>，<strong>Linux</strong>，<strong>macOS</strong>，<strong>Android</strong>的内存取证分析工具，由<strong>Python</strong>编写成，命令行操作，支持各种操作系统</p>
+<h3 id="使用Volatility"><a href="#使用Volatility" class="headerlink" title="使用Volatility"></a>使用Volatility</h3><p>判断镜像信息，获取操作系统类型</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f ?.img/raw/... imageinfo</span><br></pre></td></tr></table></figure>
+
+<p>知道操作系统类型后，用<code>--profile</code>指定</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f ?.img --profile=...</span><br></pre></td></tr></table></figure>
+
+<p>查看当前显示的notepad文本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility  -f file.raw --profile=WinXPSP2x86 notepad</span><br></pre></td></tr></table></figure>
+
+<p>查看当前运行的进程</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility  -f file.raw --profile=WinXPSP2x86 psscan/pslist</span><br></pre></td></tr></table></figure>
+
+<p>扫描所有的文件列表(常常结合grep)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility  -f file.raw --profile=WinXPSP2x86 filescan</span><br></pre></td></tr></table></figure>
+
+<p>常常配合的grep为</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| grep "doc\|docx\|rtf" //查看文档</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| grep "jpg\|jpeg\|png\|tif\|gif\|bmp"//查看图片</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| grep "Desktop"//查看桌面</span><br></pre></td></tr></table></figure>
+
+<p>根据offset提取出文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility  -f file.raw --profile=WinXPSP2x86 dumpfiles -D . -Q 0x.....</span><br></pre></td></tr></table></figure>
+
+<p>扫描 Windows 的服务</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f file.raw --profile=WinXPSP2x86 svcscan</span><br></pre></td></tr></table></figure>
+
+<p>查看网络连接</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f file.raw --profile=WinXPSP2x86 connscan</span><br></pre></td></tr></table></figure>
+
+<p>查看命令行上的操作</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f file.raw --profile=WinXPSP2x86 cmdscan</span><br></pre></td></tr></table></figure>
+
+<p>根据pid dump出相应的进程</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f easy_dump.img --profile=Win7SP1x64 memdump -p 2580 -D 目录</span><br></pre></td></tr></table></figure>
+
+<p>查看截图</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.data --profile=Win7SP1x64 screenshot --dump-dir=.</span><br></pre></td></tr></table></figure>
+
+<p>获取 IE 浏览器的使用情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 iehistory</span><br></pre></td></tr></table></figure>
+
+<p>列举缓存在内存的注册表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 hivelist</span><br></pre></td></tr></table></figure>
+
+<p>打印出注册表中的数据</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 hivedump -o 注册表的 virtual 地址</span><br></pre></td></tr></table></figure>
+
+<p>获取SAM表中的用户</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 printkey -K “SAM\Domains\Account\Users\Names”</span><br></pre></td></tr></table></figure>
+
+<p>获取最后登录系统的账户</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 printkey -K “SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon”</span><br></pre></td></tr></table></figure>
+
+<p>提取出内存中记录的 当时正在运行的程序有哪些，运行过多少次，最后一次运行的时间等信息 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility -f mem.vmem –profile=WinXPSP2x86 userassist</span><br></pre></td></tr></table></figure>
+
+<h3 id="取证"><a href="#取证" class="headerlink" title="取证"></a>取证</h3><h4 id="获取镜像信息"><a href="#获取镜像信息" class="headerlink" title="获取镜像信息"></a>获取镜像信息</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Volatility Foundation Volatility Framework 2.6</span><br><span class="line">INFO    : volatility.debug    : Determining profile based on KDBG search...</span><br><span class="line">          Suggested Profile(s) : WinXPSP2x86, WinXPSP3x86 (Instantiated with WinXPSP2x86)</span><br><span class="line">                     AS Layer1 : IA32PagedMemoryPae (Kernel AS)</span><br><span class="line">                     AS Layer2 : FileAddressSpace (/root/文档/baby_forensic/data.vmem)</span><br><span class="line">                      PAE type : PAE</span><br><span class="line">                           DTB : 0xb18000L</span><br><span class="line">                          KDBG : 0x80546ae0L</span><br><span class="line">          Number of Processors : 1</span><br><span class="line">     Image Type (Service Pack) : 3</span><br><span class="line">                KPCR for CPU 0 : 0xffdff000L</span><br><span class="line">             KUSER_SHARED_DATA : 0xffdf0000L</span><br><span class="line">           Image date and time : 2019-09-04 14:28:47 UTC+0000</span><br><span class="line">     Image local date and time : 2019-09-04 22:28:47 +0800</span><br></pre></td></tr></table></figure>
+
+<p>可以知道这个镜像是WindowsXP的内存镜像我们接下来继续取证</p>
+<h4 id="搜索进程"><a href="#搜索进程" class="headerlink" title="搜索进程"></a>搜索进程</h4><p>首先我们要看一下出题人在镜像里干了什么</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Offset(V)  Name                    PID   PPID   Thds     Hnds   Sess  Wow64 Start                          Exit                          </span><br><span class="line">---------- -------------------- ------ ------ ------ -------- ------ ------ ------------------------------ ------------------------------</span><br><span class="line">0x817bd830 System                    4      0     58      173 ------      0                                                              </span><br><span class="line">0x8163eb88 smss.exe                372      4      3       19 ------      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x814229d8 csrss.exe               460    372     10      400      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x813c1020 winlogon.exe            484    372     24      462      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x81560020 services.exe            668    484     16      270      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x812b7cd0 lsass.exe               680    484     25      359      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x816c8cc8 vmacthlp.exe            836    668      1       25      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x81333b38 svchost.exe             848    668     21      201      0      0 2019-09-04 14:27:46 UTC+0000                                 </span><br><span class="line">0x812fa020 svchost.exe             932    668     11      263      0      0 2019-09-04 14:27:47 UTC+0000                                 </span><br><span class="line">0x80ed83c0 svchost.exe            1028    668     71     1193      0      0 2019-09-04 14:27:47 UTC+0000                                 </span><br><span class="line">0x81559020 svchost.exe            1072    668      5       59      0      0 2019-09-04 14:27:47 UTC+0000                                 </span><br><span class="line">0x81330020 svchost.exe            1116    668     15      201      0      0 2019-09-04 14:27:47 UTC+0000                                 </span><br><span class="line">0x81433420 explorer.exe           1428   1392     15      370      0      0 2019-09-04 14:27:48 UTC+0000                                 </span><br><span class="line">0x81323c20 spoolsv.exe            1564    668     15      138      0      0 2019-09-04 14:27:48 UTC+0000                                 </span><br><span class="line">0x815f2020 svchost.exe            1976    668      5       88      0      0 2019-09-04 14:28:05 UTC+0000                                 </span><br><span class="line">0x815f1da0 VGAuthService.e         188    668      2       60      0      0 2019-09-04 14:28:05 UTC+0000                                 </span><br><span class="line">0x81542da0 vmtoolsd.exe            256    668      9      266      0      0 2019-09-04 14:28:05 UTC+0000                                 </span><br><span class="line">0x80e848b0 wmiprvse.exe            988    848      9      190      0      0 2019-09-04 14:28:13 UTC+0000                                 </span><br><span class="line">0x80e81020 alg.exe                1172    668      7      110      0      0 2019-09-04 14:28:14 UTC+0000                                 </span><br><span class="line">0x81534020 rundll32.exe           1220   1428      4       78      0      0 2019-09-04 14:28:14 UTC+0000                                 </span><br><span class="line">0x815ddda0 vmtoolsd.exe           1660   1428      7      175      0      0 2019-09-04 14:28:14 UTC+0000                                 </span><br><span class="line">0x80e7b020 ctfmon.exe             1668   1428      1       71      0      0 2019-09-04 14:28:14 UTC+0000                                 </span><br><span class="line">0x80eaab78 wscntfy.exe            1088   1028      1       39      0      0 2019-09-04 14:28:15 UTC+0000                                 </span><br><span class="line">0x81528090 cmd.exe                1636   1428      1       34      0      0 2019-09-04 14:28:34 UTC+0000                                 </span><br><span class="line">0x815258b0 conime.exe             1676   1636      1       38      0      0 2019-09-04 14:28:34 UTC+0000                                 </span><br><span class="line">0x80ea56a8 wordpad.exe            1448   1428      4      113      0      0 2019-09-04 14:28:42 UTC+0000</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这里有两个值得关注的应用程序进程,分别是<strong>wordpad.exe</strong>、<strong>cmd.exe</strong>，但是我们还是没法得出出题人到底在干嘛，我们进行下一步</p>
+<h4 id="查看截图"><a href="#查看截图" class="headerlink" title="查看截图"></a>查看截图</h4><p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/session_0.WinSta0.Default.png" alt></p>
+<p>好像还是不知道在干什么，只可以知道大概是开启了一个<strong>cmd</strong>，然后启动了一个类似<strong>wireshark</strong>的程序，也许正在抓包</p>
+<h4 id="查看CMD命令"><a href="#查看CMD命令" class="headerlink" title="查看CMD命令"></a>查看CMD命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">**************************************************</span><br><span class="line">CommandProcess: csrss.exe Pid: 460</span><br><span class="line">CommandHistory: 0x36e3850 Application: cmd.exe Flags: Allocated, Reset</span><br><span class="line">CommandCount: 1 LastAdded: 0 LastDisplayed: 0</span><br><span class="line">FirstCommand: 0 CommandCountMax: 50</span><br><span class="line">ProcessHandle: 0x5e0</span><br><span class="line">Cmd #0 @ 0x55d868: hill_matrix 3,2,2,9,7,7,6,4,9</span><br></pre></td></tr></table></figure>
+
+<p>这里获得了一个重要的信息：<strong>hill_matrix 3,2,2,9,7,7,6,4,9</strong></p>
+<h4 id="查看可疑文件"><a href="#查看可疑文件" class="headerlink" title="查看可疑文件"></a>查看可疑文件</h4><p>查看文档：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0x000000000181c2c8      1      0 R--rwd \Device\HarddiskVolume1\WINDOWS\system32\shdocvw.dll</span><br><span class="line">0x00000000019333d8      1      0 R--rw- \Device\HarddiskVolume1\WINDOWS\system32\mydocs.dll</span><br><span class="line">0x0000000001a4c658      1      0 R--rwd \Device\HarddiskVolume1\WINDOWS\system32\shdocvw.dll</span><br></pre></td></tr></table></figure>
+
+<p>查看图片：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tures\Administrator.bmp</span><br><span class="line">0x00000000017e02d0      1      0 R--rwd \Device\HarddiskVolume1\WINDOWS\system32\wlnotify.dll</span><br><span class="line">0x0000000001a44f28      1      0 R--rwd \Device\HarddiskVolume1\WINDOWS\Web\Wallpaper\Bliss.bmp</span><br><span class="line">0x0000000001aa0868      1      0 R--rwd \Device\HarddiskVolume1\WINDOWS\system32\wlnotify.dll</span><br></pre></td></tr></table></figure>
+
+<p>查看桌面：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0x00000000012d8ef8      1      0 R--r-- \Device\HarddiskVolume1\Documents and Settings\Administrator\桌面\disk.zip</span><br><span class="line">0x00000000017e1f90      1      0 R--rwd \Device\HarddiskVolume1\Documents and Settings\All Users\「开始」菜单\程序\附件\远程桌面连接.lnk</span><br><span class="line">0x000000000186f6a8      3      1 R--rwd \Device\HarddiskVolume1\Documents and Settings\All Users\桌面</span><br><span class="line">0x000000000186f740      3      1 R--rwd \Device\HarddiskVolume1\Documents and Settings\Administrator\桌面</span><br></pre></td></tr></table></figure>
+
+<p>可以发现桌面上存在着一个<strong>disk.zip</strong>，我们把它<strong>dump</strong>出来解压可以得到一个<strong>disk.img</strong>文件，解压我们可以直接得到一个流量抓包文件<strong>usb.pcapng</strong>，这样子验证了我们的猜想，当时的确是再用<strong>wireshark</strong>抓包，且还可知这是一个<strong>USB</strong>协议流量包</p>
+<h2 id="USB流量分析"><a href="#USB流量分析" class="headerlink" title="USB流量分析"></a>USB流量分析</h2><p>把拿到的<strong>usb.pcapng</strong>文件拖进wireshark分析</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/QQ%E6%88%AA%E5%9B%BE20190910153112.png" alt></p>
+<p>可以知道这的确是个USB流量，开始前，我们先介绍一些USB的基础知识。USB有不同的规格，以下是使用USB的三种方式：<strong>USB UART、USB HID、USB Memory</strong></p>
+<p>UART或者Universal Asynchronous Receiver/Transmitter。这种方式下，设备只是简单的将USB用于接受和发射数据，除此之外就再没有其他通讯功能了。</p>
+<p>HID是人性化的接口。这一类通讯适用于交互式，有这种功能的设备有：键盘，鼠标，游戏手柄和数字显示设备。</p>
+<p>最后是USB Memory，或者说是数据存储。External HDD, thumb drive / flash drive,等都是这一类的。</p>
+<p>其中使用的最广的不是USB HID 就是USB Memory了。</p>
+<p>每一个USB设备（尤其是HID或者Memory）都有一个供应商ID（Vendor Id）和产品识别码（Product Id）。Vendor Id是用来标记哪个厂商生产了这个USB设备。Product Id用来标记不同的产品，他并不是一个特殊的数字，当然最好不同</p>
+<p>我们分析可以知道，USB协议的数据部分在Leftover Capture Data域之中，在Mac和Linux下可以用tshark命令可以将 leftover capture data单独提取出来，命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tshark -r example.pcap -T fields -e usb.capdata //如果想导入usbdata.txt文件中，后面加上参数：&gt;usbdata.txt</span><br></pre></td></tr></table></figure>
+
+<p>USB数据包长度为八个字节，这里我们只关注USB流量中的键盘流量和鼠标流量</p>
+<p>键盘数据包的数据长度为<strong>8</strong>个字节，击键信息集中在第<strong>3</strong>个字节，每次<strong>key stroke</strong>都会产生一个<strong>keyboard event usb packet</strong></p>
+<p>鼠标数据包的数据长度为<strong>4</strong>个字节，第<strong>一</strong>个字节代表<strong>按键</strong>，当取<strong>0x00</strong>时，代表<strong>没有按键</strong>、为<strong>0x01</strong>时，代表按<strong>左键</strong>，为<strong>0x02</strong>时，代表当前按键为<strong>右键</strong>。第二个字节可以看成是一个<strong>signed   byte</strong>类型，其最高位为符号位，当这个值为<strong>正</strong>时，代表鼠标<strong>水平右移</strong>多少像素，为<strong>负</strong>时，代表<strong>水平左移</strong>多少像素。第三个字节与第二字节类似，代表<strong>垂直上下移动</strong>的偏移</p>
+<blockquote>
+<p>usb keyboard的映射表 根据这个映射表将第三个字节取出来，对应对照表得到解码</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/1100338-20180814105104990-181933183.png" alt></p>
+</blockquote>
+<h4 id="键盘流量分析"><a href="#键盘流量分析" class="headerlink" title="键盘流量分析"></a>键盘流量分析</h4><p>我们可以写出脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">mappings = &#123; <span class="number">0x04</span>:<span class="string">"A"</span>,  <span class="number">0x05</span>:<span class="string">"B"</span>,  <span class="number">0x06</span>:<span class="string">"C"</span>, <span class="number">0x07</span>:<span class="string">"D"</span>, <span class="number">0x08</span>:<span class="string">"E"</span>, <span class="number">0x09</span>:<span class="string">"F"</span>, <span class="number">0x0A</span>:<span class="string">"G"</span>,  <span class="number">0x0B</span>:<span class="string">"H"</span>, <span class="number">0x0C</span>:<span class="string">"I"</span>,  <span class="number">0x0D</span>:<span class="string">"J"</span>, <span class="number">0x0E</span>:<span class="string">"K"</span>, <span class="number">0x0F</span>:<span class="string">"L"</span>, <span class="number">0x10</span>:<span class="string">"M"</span>, <span class="number">0x11</span>:<span class="string">"N"</span>,<span class="number">0x12</span>:<span class="string">"O"</span>,  <span class="number">0x13</span>:<span class="string">"P"</span>, <span class="number">0x14</span>:<span class="string">"Q"</span>, <span class="number">0x15</span>:<span class="string">"R"</span>, <span class="number">0x16</span>:<span class="string">"S"</span>, <span class="number">0x17</span>:<span class="string">"T"</span>, <span class="number">0x18</span>:<span class="string">"U"</span>,<span class="number">0x19</span>:<span class="string">"V"</span>, <span class="number">0x1A</span>:<span class="string">"W"</span>, <span class="number">0x1B</span>:<span class="string">"X"</span>, <span class="number">0x1C</span>:<span class="string">"Y"</span>, <span class="number">0x1D</span>:<span class="string">"Z"</span>, <span class="number">0x1E</span>:<span class="string">"1"</span>, <span class="number">0x1F</span>:<span class="string">"2"</span>, <span class="number">0x20</span>:<span class="string">"3"</span>, <span class="number">0x21</span>:<span class="string">"4"</span>, <span class="number">0x22</span>:<span class="string">"5"</span>,  <span class="number">0x23</span>:<span class="string">"6"</span>, <span class="number">0x24</span>:<span class="string">"7"</span>, <span class="number">0x25</span>:<span class="string">"8"</span>, <span class="number">0x26</span>:<span class="string">"9"</span>, <span class="number">0x27</span>:<span class="string">"0"</span>, <span class="number">0x28</span>:<span class="string">"n"</span>, <span class="number">0x2a</span>:<span class="string">"[DEL]"</span>,  <span class="number">0X2B</span>:<span class="string">"    "</span>, <span class="number">0x2C</span>:<span class="string">" "</span>,  <span class="number">0x2D</span>:<span class="string">"-"</span>, <span class="number">0x2E</span>:<span class="string">"="</span>, <span class="number">0x2F</span>:<span class="string">"["</span>,  <span class="number">0x30</span>:<span class="string">"]"</span>,  <span class="number">0x31</span>:<span class="string">"\\"</span>, <span class="number">0x32</span>:<span class="string">"~"</span>, <span class="number">0x33</span>:<span class="string">";"</span>,  <span class="number">0x34</span>:<span class="string">"'"</span>, <span class="number">0x36</span>:<span class="string">","</span>,  <span class="number">0x37</span>:<span class="string">"."</span> &#125;</span><br><span class="line">nums = []</span><br><span class="line">keys = open(<span class="string">'usbdata.txt'</span>)</span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> keys:</span><br><span class="line">    <span class="keyword">if</span> line[<span class="number">0</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">1</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">3</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">4</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">9</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">10</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">12</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">13</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">15</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">16</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">18</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">19</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">21</span>]!=<span class="string">'0'</span> <span class="keyword">or</span> line[<span class="number">22</span>]!=<span class="string">'0'</span>:</span><br><span class="line">         <span class="keyword">continue</span></span><br><span class="line">    nums.append(int(line[<span class="number">6</span>:<span class="number">8</span>],<span class="number">16</span>))</span><br><span class="line">    <span class="comment"># 00:00:xx:....</span></span><br><span class="line">keys.close()</span><br><span class="line">output = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> nums:</span><br><span class="line">    <span class="keyword">if</span> n == <span class="number">0</span> :</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    <span class="keyword">if</span> n <span class="keyword">in</span> mappings:</span><br><span class="line">        output += mappings[n]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        output += <span class="string">'[unknown]'</span></span><br><span class="line">print(<span class="string">'output :n'</span> + output)</span><br></pre></td></tr></table></figure>
+
+<p>如果直接从dat文件开始分析则脚本为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">DataFileName = <span class="string">"usb.dat"</span></span><br><span class="line">presses = []</span><br><span class="line">normalKeys = &#123;<span class="string">"04"</span>:<span class="string">"a"</span>, <span class="string">"05"</span>:<span class="string">"b"</span>, <span class="string">"06"</span>:<span class="string">"c"</span>, <span class="string">"07"</span>:<span class="string">"d"</span>, <span class="string">"08"</span>:<span class="string">"e"</span>, <span class="string">"09"</span>:<span class="string">"f"</span>, <span class="string">"0a"</span>:<span class="string">"g"</span>, <span class="string">"0b"</span>:<span class="string">"h"</span>, <span class="string">"0c"</span>:<span class="string">"i"</span>, <span class="string">"0d"</span>:<span class="string">"j"</span>, <span class="string">"0e"</span>:<span class="string">"k"</span>, <span class="string">"0f"</span>:<span class="string">"l"</span>, <span class="string">"10"</span>:<span class="string">"m"</span>, <span class="string">"11"</span>:<span class="string">"n"</span>, <span class="string">"12"</span>:<span class="string">"o"</span>, <span class="string">"13"</span>:<span class="string">"p"</span>, <span class="string">"14"</span>:<span class="string">"q"</span>, <span class="string">"15"</span>:<span class="string">"r"</span>, <span class="string">"16"</span>:<span class="string">"s"</span>, <span class="string">"17"</span>:<span class="string">"t"</span>, <span class="string">"18"</span>:<span class="string">"u"</span>, <span class="string">"19"</span>:<span class="string">"v"</span>, <span class="string">"1a"</span>:<span class="string">"w"</span>, <span class="string">"1b"</span>:<span class="string">"x"</span>, <span class="string">"1c"</span>:<span class="string">"y"</span>, <span class="string">"1d"</span>:<span class="string">"z"</span>,<span class="string">"1e"</span>:<span class="string">"1"</span>, <span class="string">"1f"</span>:<span class="string">"2"</span>, <span class="string">"20"</span>:<span class="string">"3"</span>, <span class="string">"21"</span>:<span class="string">"4"</span>, <span class="string">"22"</span>:<span class="string">"5"</span>, <span class="string">"23"</span>:<span class="string">"6"</span>,<span class="string">"24"</span>:<span class="string">"7"</span>,<span class="string">"25"</span>:<span class="string">"8"</span>,<span class="string">"26"</span>:<span class="string">"9"</span>,<span class="string">"27"</span>:<span class="string">"0"</span>,<span class="string">"28"</span>:<span class="string">"&lt;RET&gt;"</span>,<span class="string">"29"</span>:<span class="string">"&lt;ESC&gt;"</span>,<span class="string">"2a"</span>:<span class="string">"&lt;DEL&gt;"</span>, <span class="string">"2b"</span>:<span class="string">"\t"</span>,<span class="string">"2c"</span>:<span class="string">"&lt;SPACE&gt;"</span>,<span class="string">"2d"</span>:<span class="string">"-"</span>,<span class="string">"2e"</span>:<span class="string">"="</span>,<span class="string">"2f"</span>:<span class="string">"["</span>,<span class="string">"30"</span>:<span class="string">"]"</span>,<span class="string">"31"</span>:<span class="string">"\\"</span>,<span class="string">"32"</span>:<span class="string">"&lt;NON&gt;"</span>,<span class="string">"33"</span>:<span class="string">";"</span>,<span class="string">"34"</span>:<span class="string">"'"</span>,<span class="string">"35"</span>:<span class="string">"&lt;GA&gt;"</span>,<span class="string">"36"</span>:<span class="string">","</span>,<span class="string">"37"</span>:<span class="string">"."</span>,<span class="string">"38"</span>:<span class="string">"/"</span>,<span class="string">"39"</span>:<span class="string">"&lt;CAP&gt;"</span>,<span class="string">"3a"</span>:<span class="string">"&lt;F1&gt;"</span>,<span class="string">"3b"</span>:<span class="string">"&lt;F2&gt;"</span>, <span class="string">"3c"</span>:<span class="string">"&lt;F3&gt;"</span>,<span class="string">"3d"</span>:<span class="string">"&lt;F4&gt;"</span>,<span class="string">"3e"</span>:<span class="string">"&lt;F5&gt;"</span>,<span class="string">"3f"</span>:<span class="string">"&lt;F6&gt;"</span>,<span class="string">"40"</span>:<span class="string">"&lt;F7&gt;"</span>,<span class="string">"41"</span>:<span class="string">"&lt;F8&gt;"</span>,<span class="string">"42"</span>:<span class="string">"&lt;F9&gt;"</span>,<span class="string">"43"</span>:<span class="string">"&lt;F10&gt;"</span>,<span class="string">"44"</span>:<span class="string">"&lt;F11&gt;"</span>,<span class="string">"45"</span>:<span class="string">"&lt;F12&gt;"</span>&#125;</span><br><span class="line">shiftKeys = &#123;<span class="string">"04"</span>:<span class="string">"A"</span>, <span class="string">"05"</span>:<span class="string">"B"</span>, <span class="string">"06"</span>:<span class="string">"C"</span>, <span class="string">"07"</span>:<span class="string">"D"</span>, <span class="string">"08"</span>:<span class="string">"E"</span>, <span class="string">"09"</span>:<span class="string">"F"</span>, <span class="string">"0a"</span>:<span class="string">"G"</span>, <span class="string">"0b"</span>:<span class="string">"H"</span>, <span class="string">"0c"</span>:<span class="string">"I"</span>, <span class="string">"0d"</span>:<span class="string">"J"</span>, <span class="string">"0e"</span>:<span class="string">"K"</span>, <span class="string">"0f"</span>:<span class="string">"L"</span>, <span class="string">"10"</span>:<span class="string">"M"</span>, <span class="string">"11"</span>:<span class="string">"N"</span>, <span class="string">"12"</span>:<span class="string">"O"</span>, <span class="string">"13"</span>:<span class="string">"P"</span>, <span class="string">"14"</span>:<span class="string">"Q"</span>, <span class="string">"15"</span>:<span class="string">"R"</span>, <span class="string">"16"</span>:<span class="string">"S"</span>, <span class="string">"17"</span>:<span class="string">"T"</span>, <span class="string">"18"</span>:<span class="string">"U"</span>, <span class="string">"19"</span>:<span class="string">"V"</span>, <span class="string">"1a"</span>:<span class="string">"W"</span>, <span class="string">"1b"</span>:<span class="string">"X"</span>, <span class="string">"1c"</span>:<span class="string">"Y"</span>, <span class="string">"1d"</span>:<span class="string">"Z"</span>,<span class="string">"1e"</span>:<span class="string">"!"</span>, <span class="string">"1f"</span>:<span class="string">"@"</span>, <span class="string">"20"</span>:<span class="string">"#"</span>, <span class="string">"21"</span>:<span class="string">"$"</span>, <span class="string">"22"</span>:<span class="string">"%"</span>, <span class="string">"23"</span>:<span class="string">"^"</span>,<span class="string">"24"</span>:<span class="string">"&amp;"</span>,<span class="string">"25"</span>:<span class="string">"*"</span>,<span class="string">"26"</span>:<span class="string">"("</span>,<span class="string">"27"</span>:<span class="string">")"</span>,<span class="string">"28"</span>:<span class="string">"&lt;RET&gt;"</span>,<span class="string">"29"</span>:<span class="string">"&lt;ESC&gt;"</span>,<span class="string">"2a"</span>:<span class="string">"&lt;DEL&gt;"</span>, <span class="string">"2b"</span>:<span class="string">"\t"</span>,<span class="string">"2c"</span>:<span class="string">"&lt;SPACE&gt;"</span>,<span class="string">"2d"</span>:<span class="string">"_"</span>,<span class="string">"2e"</span>:<span class="string">"+"</span>,<span class="string">"2f"</span>:<span class="string">"&#123;"</span>,<span class="string">"30"</span>:<span class="string">"&#125;"</span>,<span class="string">"31"</span>:<span class="string">"|"</span>,<span class="string">"32"</span>:<span class="string">"&lt;NON&gt;"</span>,<span class="string">"33"</span>:<span class="string">"\""</span>,<span class="string">"34"</span>:<span class="string">":"</span>,<span class="string">"35"</span>:<span class="string">"&lt;GA&gt;"</span>,<span class="string">"36"</span>:<span class="string">"&lt;"</span>,<span class="string">"37"</span>:<span class="string">"&gt;"</span>,<span class="string">"38"</span>:<span class="string">"?"</span>,<span class="string">"39"</span>:<span class="string">"&lt;CAP&gt;"</span>,<span class="string">"3a"</span>:<span class="string">"&lt;F1&gt;"</span>,<span class="string">"3b"</span>:<span class="string">"&lt;F2&gt;"</span>, <span class="string">"3c"</span>:<span class="string">"&lt;F3&gt;"</span>,<span class="string">"3d"</span>:<span class="string">"&lt;F4&gt;"</span>,<span class="string">"3e"</span>:<span class="string">"&lt;F5&gt;"</span>,<span class="string">"3f"</span>:<span class="string">"&lt;F6&gt;"</span>,<span class="string">"40"</span>:<span class="string">"&lt;F7&gt;"</span>,<span class="string">"41"</span>:<span class="string">"&lt;F8&gt;"</span>,<span class="string">"42"</span>:<span class="string">"&lt;F9&gt;"</span>,<span class="string">"43"</span>:<span class="string">"&lt;F10&gt;"</span>,<span class="string">"44"</span>:<span class="string">"&lt;F11&gt;"</span>,<span class="string">"45"</span>:<span class="string">"&lt;F12&gt;"</span>&#125;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># check argv</span></span><br><span class="line">    <span class="keyword">if</span> len(sys.argv) != <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Usage : "</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        python UsbKeyboardHacker.py data.pcap"</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Tips : "</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        To use this python script , you must install the tshark first."</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        You can use `sudo apt-get install tshark` to install it"</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Author : "</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        Angel_Kitty &lt;angelkitty6698@gmail.com&gt;"</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        If you have any questions , please contact me by email."</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"        Thank you for using."</span></span><br><span class="line">        exit(<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># get argv</span></span><br><span class="line">    pcapFilePath = sys.argv[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># get data of pcap</span></span><br><span class="line">    os.system(<span class="string">"tshark -r %s -T fields -e usb.capdata &gt; %s"</span> % (pcapFilePath, DataFileName))</span><br><span class="line">    <span class="comment"># read data</span></span><br><span class="line">    <span class="keyword">with</span> open(DataFileName, <span class="string">"r"</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">            presses.append(line[<span class="number">0</span>:<span class="number">-1</span>])</span><br><span class="line">    <span class="comment"># handle</span></span><br><span class="line">    result = <span class="string">""</span></span><br><span class="line">    <span class="keyword">for</span> press <span class="keyword">in</span> presses:</span><br><span class="line">        Bytes = press.split(<span class="string">":"</span>)</span><br><span class="line">        <span class="keyword">if</span> Bytes[<span class="number">0</span>] == <span class="string">"00"</span>:</span><br><span class="line">            <span class="keyword">if</span> Bytes[<span class="number">2</span>] != <span class="string">"00"</span>:</span><br><span class="line">                result += normalKeys[Bytes[<span class="number">2</span>]]</span><br><span class="line">        <span class="keyword">elif</span> Bytes[<span class="number">0</span>] == <span class="string">"20"</span>: <span class="comment"># shift key is pressed.</span></span><br><span class="line">            <span class="keyword">if</span> Bytes[<span class="number">2</span>] != <span class="string">"00"</span>:</span><br><span class="line">                result += shiftKeys[Bytes[<span class="number">2</span>]]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">print</span> <span class="string">"[-] Unknow Key : %s"</span> % (Bytes[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"[+] Found : %s"</span> % (result)</span><br><span class="line">    <span class="comment"># clean the temp data</span></span><br><span class="line">    os.system(<span class="string">"rm ./%s"</span> % (DataFileName))</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>运行后我们得到一串信息：<strong>AAAAAAAAAA’ZITLQOSENPPI’.HILLDECODE</strong></p>
+<h4 id="鼠标流量分析"><a href="#鼠标流量分析" class="headerlink" title="鼠标流量分析"></a>鼠标流量分析</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">nums = [] </span><br><span class="line">keys = open(<span class="string">'usbdata.txt'</span>,<span class="string">'r'</span>) </span><br><span class="line">posx = <span class="number">0</span> </span><br><span class="line">posy = <span class="number">0</span> </span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> keys: </span><br><span class="line"><span class="keyword">if</span> len(line) != <span class="number">12</span> : </span><br><span class="line">     <span class="keyword">continue</span> </span><br><span class="line">x = int(line[<span class="number">3</span>:<span class="number">5</span>],<span class="number">16</span>) </span><br><span class="line">y = int(line[<span class="number">6</span>:<span class="number">8</span>],<span class="number">16</span>) </span><br><span class="line"><span class="keyword">if</span> x &gt; <span class="number">127</span> : </span><br><span class="line">    x -= <span class="number">256</span> </span><br><span class="line"><span class="keyword">if</span> y &gt; <span class="number">127</span> : </span><br><span class="line">    y -= <span class="number">256</span> </span><br><span class="line">posx += x </span><br><span class="line">posy += y </span><br><span class="line">btn_flag = int(line[<span class="number">0</span>:<span class="number">2</span>],<span class="number">16</span>)  <span class="comment"># 1 for left , 2 for right , 0 for nothing </span></span><br><span class="line"><span class="keyword">if</span> btn_flag == <span class="number">1</span> : </span><br><span class="line">    <span class="keyword">print</span> posx , posy </span><br><span class="line">keys.close()</span><br></pre></td></tr></table></figure>
+
+<h2 id="密码学分析"><a href="#密码学分析" class="headerlink" title="密码学分析"></a>密码学分析</h2><p>经过多种密码尝试最终得出这是一个希尔密码，其实特征也很明显，有一个矩阵还有一个密文，这里推介一个希尔密码的在线加解密网站：<a href="https://www.dcode.fr/hill-cipher" target="_blank" rel="noopener">https://www.dcode.fr/hill-cipher</a></p>
+<p>我们得到一串信息：<strong>AAAAAAAAAA’ZITLQOSENPPI’.HILLDECODE</strong></p>
+<p>在希尔密码中：</p>
+<p><strong>ALPHABET (A=0) ABCDEFGHIJKLMNOPQRSTUVWXYZ</strong></p>
+<p><strong>ALPHABET (A=1) ZABCDEFGHIJKLMNOPQRSTUVWXY</strong></p>
+<p>而这题我们获得了十个A则可知加密方式为：</p>
+<p><strong>ALPHABET (A=10) QRSTUVWXYZABCDEFGHIJKLMNOP</strong></p>
+<p>我们之前获得了一个重要的信息：<strong>hill_matrix 3,2,2,9,7,7,6,4,9</strong></p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%8A%A4%E7%BD%91%E6%9D%AF2019-MISC-baby_forensic/QQ%E6%88%AA%E5%9B%BE20190910161715.png" alt></p>
+<p>解密可以得到：<strong>ZKNNTCUPZXOU</strong>，这题有一个小坑应全部转为小写才是正确的flag，故真正的flag应为：zknntcupzxou</p>
+<blockquote>
+<p>参考文章</p>
+<ol>
+<li>深入理解USB流量数据包的抓取与分析【<a href="https://www.cnblogs.com/ECJTUACM-873284962/p/9473808.html】" target="_blank" rel="noopener">https://www.cnblogs.com/ECJTUACM-873284962/p/9473808.html】</a></li>
+<li>CTF MISC-USB流量分析出题记录【<a href="https://www.cnblogs.com/hackxf/p/10670844.html】" target="_blank" rel="noopener">https://www.cnblogs.com/hackxf/p/10670844.html】</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/09/X86║═X87╗π▒α╓╕┴ε┤≤╚½/" rel="next" title="X86和X87汇编指令大全">
+                  <i class="fa fa-chevron-left"></i> X86和X87汇编指令大全
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/14/PWNTOOLS╡─╩╣╙├/" rel="prev" title="PWNTOOLS的使用">
+                  PWNTOOLS的使用 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#内存取证"><span class="nav-number">1.</span> <span class="nav-text">内存取证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Volatility"><span class="nav-number">1.1.</span> <span class="nav-text">使用Volatility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取证"><span class="nav-number">1.2.</span> <span class="nav-text">取证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取镜像信息"><span class="nav-number">1.2.1.</span> <span class="nav-text">获取镜像信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#搜索进程"><span class="nav-number">1.2.2.</span> <span class="nav-text">搜索进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看截图"><span class="nav-number">1.2.3.</span> <span class="nav-text">查看截图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看CMD命令"><span class="nav-number">1.2.4.</span> <span class="nav-text">查看CMD命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看可疑文件"><span class="nav-number">1.2.5.</span> <span class="nav-text">查看可疑文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#USB流量分析"><span class="nav-number">2.</span> <span class="nav-text">USB流量分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#键盘流量分析"><span class="nav-number">2.0.1.</span> <span class="nav-text">键盘流量分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#鼠标流量分析"><span class="nav-number">2.0.2.</span> <span class="nav-text">鼠标流量分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密码学分析"><span class="nav-number">3.</span> <span class="nav-text">密码学分析</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

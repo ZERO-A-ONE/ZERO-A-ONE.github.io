@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="动态链接因为程序分为静态链接跟动态链接，因为好多库函数在程序中并不一定都用到，所以在处理动态链接程序的时候，elf文件会采取一种叫做延迟绑定（lazy  binding）的技术，也就是当我们位于动态链接库的函数被调用的时候，编译器才会真正确定这个函数在进程中的位置,下面我们通过一个程序来展示这个过程   123456#include &amp;lt;stdio.h&amp;gt;int main()&amp;#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="延迟绑定小谈">
+<meta property="og:url" content="http://yoursite.com/2019/10/14/╤╙│┘░≤╢¿╨í╠╕/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="动态链接因为程序分为静态链接跟动态链接，因为好多库函数在程序中并不一定都用到，所以在处理动态链接程序的时候，elf文件会采取一种叫做延迟绑定（lazy  binding）的技术，也就是当我们位于动态链接库的函数被调用的时候，编译器才会真正确定这个函数在进程中的位置,下面我们通过一个程序来展示这个过程   123456#include &amp;lt;stdio.h&amp;gt;int main()&amp;#123;">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image004.jpg">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%96%B0%E6%89%8B%E5%90%91%E2%80%94%E2%80%94%E6%B5%85%E8%B0%88PLT%E5%92%8CGOT/5970003-bcf9343191848103.png">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%96%B0%E6%89%8B%E5%90%91%E2%80%94%E2%80%94%E6%B5%85%E8%B0%88PLT%E5%92%8CGOT/5970003-9baedd55881a39dd.png">
+<meta property="og:updated_time" content="2019-10-15T06:52:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="延迟绑定小谈">
+<meta name="twitter:description" content="动态链接因为程序分为静态链接跟动态链接，因为好多库函数在程序中并不一定都用到，所以在处理动态链接程序的时候，elf文件会采取一种叫做延迟绑定（lazy  binding）的技术，也就是当我们位于动态链接库的函数被调用的时候，编译器才会真正确定这个函数在进程中的位置,下面我们通过一个程序来展示这个过程   123456#include &amp;lt;stdio.h&amp;gt;int main()&amp;#123;">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg">
+  <link rel="canonical" href="http://yoursite.com/2019/10/14/╤╙│┘░≤╢¿╨í╠╕/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>延迟绑定小谈 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/╤╙│┘░≤╢¿╨í╠╕/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">延迟绑定小谈
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-14 08:51:48 / Geändert am: 23:52:18" itemprop="dateCreated datePublished" datetime="2019-10-14T08:51:48-07:00">2019-10-14</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h1><p>因为程序分为静态链接跟动态链接，因为好多库函数在程序中并不一定都用到，所以在处理动态链接程序的时候，elf文件会采取一种叫做延迟绑定（lazy  binding）的技术，也就是当我们位于动态链接库的函数被调用的时候，编译器才会真正确定这个函数在进程中的位置,下面我们通过一个程序来展示这个过程  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Hello Pwn\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，这个<strong>puts</strong>是调用的<strong>libc</strong>这个动态链接库导出的一个函数。编译它，看看<strong>puts</strong>是怎么被调用的 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.plt:<span class="number">080482E0</span> ; <span class="function"><span class="keyword">int</span> <span class="title">puts</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s)</span></span></span><br><span class="line">.plt:080482E0 _puts           proc near               ; CODE XREF: main+19↓p</span><br><span class="line">.plt:<span class="number">080482E0</span></span><br><span class="line">.plt:<span class="number">080482E0</span> s               = dword ptr  <span class="number">4</span></span><br><span class="line">.plt:<span class="number">080482E0</span></span><br><span class="line">.plt:<span class="number">080482E0</span>                 jmp     ds:off_804A00Cc</span><br><span class="line">.plt:<span class="number">080482E0</span> _puts           endp</span><br><span class="line">.plt:<span class="number">080482E0</span></span><br></pre></td></tr></table></figure>
+
+<p> <strong>puts</strong>会<strong>call</strong>到<strong>off_804A00Cc</strong>这里，这里就是“<strong>jmp</strong> [<strong>GOT</strong>表地址]”的这样一条指令， 跟一下，看看这个<strong>off_804A00C</strong>在第一次调用时是什么东西 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">Breakpoint *<span class="number">0x08048424</span></span><br><span class="line">pwndbg&gt; si</span><br><span class="line"><span class="number">0x080482e0</span> in <span class="built_in">puts</span>@plt ()</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span><br><span class="line">─────────────────────────────────[ REGISTERS ]──────────────────────────────────</span><br><span class="line"> EAX  0xf7fb4dbc (environ) —▸ 0xffffd10c —▸ 0xffffd2ff ◂— 'XDG_VTNR=7'</span><br><span class="line"> EBX  <span class="number">0x0</span></span><br><span class="line"> ECX  <span class="number">0xffffd070</span> ◂— <span class="number">0x1</span></span><br><span class="line"> EDX  <span class="number">0xffffd094</span> ◂— <span class="number">0x0</span></span><br><span class="line"> EDI  <span class="number">0xf7fb3000</span> (_GLOBAL_OFFSET_TABLE_) ◂— <span class="number">0x1b1db0</span></span><br><span class="line"> ESI  <span class="number">0xf7fb3000</span> (_GLOBAL_OFFSET_TABLE_) ◂— <span class="number">0x1b1db0</span></span><br><span class="line"> EBP  <span class="number">0xffffd058</span> ◂— <span class="number">0x0</span></span><br><span class="line"> ESP  <span class="number">0xffffd03c</span> —▸ <span class="number">0x8048429</span> ◂— add    esp, <span class="number">0x10</span></span><br><span class="line"> EIP  <span class="number">0x80482e0</span> (<span class="built_in">puts</span>@plt) ◂— jmp    dword ptr [<span class="number">0x804a00c</span>]</span><br><span class="line">───────────────────────────────────[ DISASM ]───────────────────────────────────</span><br><span class="line"> ► <span class="number">0x80482e0</span>  &lt;<span class="built_in">puts</span>@plt&gt;                  jmp    dword ptr [<span class="number">0x804a00c</span>]</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x80482e6</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">6</span>&gt;                push   <span class="number">0</span></span><br><span class="line">   <span class="number">0x80482eb</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">11</span>&gt;               jmp    <span class="number">0x80482d0</span></span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x80482d0</span>                              push   dword ptr [<span class="number">0x804a004</span>]</span><br><span class="line">   <span class="number">0x80482d6</span>                              jmp    dword ptr [<span class="number">0x804a008</span>] &lt;<span class="number">0xf7fee000</span>&gt;</span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0xf7fee000</span> &lt;_dl_runtime_resolve&gt;       push   eax</span><br><span class="line">   <span class="number">0xf7fee001</span> &lt;_dl_runtime_resolve+<span class="number">1</span>&gt;     push   ecx</span><br><span class="line">   <span class="number">0xf7fee002</span> &lt;_dl_runtime_resolve+<span class="number">2</span>&gt;     push   edx</span><br><span class="line">   <span class="number">0xf7fee003</span> &lt;_dl_runtime_resolve+<span class="number">3</span>&gt;     mov    edx, dword ptr [esp + <span class="number">0x10</span>]</span><br><span class="line">   <span class="number">0xf7fee007</span> &lt;_dl_runtime_resolve+<span class="number">7</span>&gt;     mov    eax, dword ptr [esp + <span class="number">0xc</span>]</span><br><span class="line">   <span class="number">0xf7fee00b</span> &lt;_dl_runtime_resolve+<span class="number">11</span>&gt;    call   _dl_fixup &lt;<span class="number">0xf7fe77e0</span>&gt;</span><br><span class="line">───────────────────────────────────[ STACK ]────────────────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ esp  <span class="number">0xffffd03c</span> —▸ <span class="number">0x8048429</span> ◂— add    esp, <span class="number">0x10</span></span><br><span class="line"><span class="number">01</span>:<span class="number">0004</span>│      <span class="number">0xffffd040</span> —▸ <span class="number">0x80484c0</span> ◂— dec    eax <span class="comment">/* 'Hello Pwn\n' */</span></span><br><span class="line">02:0008│      0xffffd044 —▸ 0xffffd104 —▸ 0xffffd2de ◂— '/home/syc/Downloads/retdll/a.out'</span><br><span class="line">03:000c│      0xffffd048 —▸ 0xffffd10c —▸ 0xffffd2ff ◂— 'XDG_VTNR=7'</span><br><span class="line"><span class="number">04</span>:<span class="number">0010</span>│      <span class="number">0xffffd04c</span> —▸ <span class="number">0x8048461</span> ◂— lea    eax, [ebx - <span class="number">0xf8</span>]</span><br><span class="line"><span class="number">05</span>:<span class="number">0014</span>│      <span class="number">0xffffd050</span> —▸ <span class="number">0xf7fb33dc</span> (__exit_funcs) —▸ <span class="number">0xf7fb41e0</span> (initial) ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">06</span>:<span class="number">0018</span>│      <span class="number">0xffffd054</span> —▸ <span class="number">0xffffd070</span> ◂— <span class="number">0x1</span></span><br><span class="line"><span class="number">07</span>:<span class="number">001</span>c│ ebp  <span class="number">0xffffd058</span> ◂— <span class="number">0x0</span></span><br><span class="line">─────────────────────────────────[ BACKTRACE ]──────────────────────────────────</span><br><span class="line"> ► f <span class="number">0</span>  <span class="number">80482e0</span> <span class="built_in">puts</span>@plt</span><br><span class="line">   f <span class="number">1</span>  <span class="number">8048429</span></span><br><span class="line">   f <span class="number">2</span> f7e19637 __libc_start_main+<span class="number">247</span></span><br><span class="line">────────────────────────────────────────────────────────────────────────────────</span><br></pre></td></tr></table></figure>
+
+<p>可以发现，是<strong>0x80482e6</strong>这个地址，并不直接是<strong>libc</strong>的<strong>puts</strong>函数的地址。这是因为<strong>linux</strong>在程序加载时使用了延迟绑定(<strong>lazyload</strong>)，只有等到这个函数被调用了，才去把这个函数在<strong>libc</strong>的地址放到<strong>GOT</strong>表中。接下来，会再<strong>push</strong>一个<strong>0</strong>，再<strong>push</strong>一个<strong>dword ptr  [0x804a004]</strong>，最后跳到<strong>libc</strong>的<strong>_dl_runtime_resolve</strong>（<code>call   _dl_fixup</code>）去执行。这个函数的目的，是根据2个参数获取到导出函数（这里是<strong>puts</strong>）的地址，然后放到相应的<strong>GOT</strong>表，并且调用它。而这个函数的地址也是从<strong>GOT</strong>表取并且jmp [xxx]过去的，但是这个函数不会延迟绑定，因为所有函数都是用它做的延迟绑定</p>
+<p> 了解一下elf各段之间的关系 ，才能更好的理解前面从PLT到GOT的过程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/retdll$ readelf -S a.out</span><br><span class="line">There are <span class="number">29</span> section headers, starting at offset <span class="number">0x114c</span>:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ <span class="number">0</span>]                   <span class="literal">NULL</span>            <span class="number">00000000</span> <span class="number">000000</span> <span class="number">000000</span> <span class="number">00</span>      <span class="number">0</span>   <span class="number">0</span>  <span class="number">0</span></span><br><span class="line">  [ <span class="number">1</span>] .interp           PROGBITS        <span class="number">08048154</span> <span class="number">000154</span> <span class="number">000013</span> <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">1</span></span><br><span class="line">  [ <span class="number">2</span>] .note.ABI-tag     NOTE            <span class="number">08048168</span> <span class="number">000168</span> <span class="number">000020</span> <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [ <span class="number">3</span>] .note.gnu.build-i NOTE            <span class="number">08048188</span> <span class="number">000188</span> <span class="number">000024</span> <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [ <span class="number">4</span>] .gnu.hash         GNU_HASH        <span class="number">080481</span>ac <span class="number">0001</span>ac <span class="number">000020</span> <span class="number">04</span>   A  <span class="number">5</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [ <span class="number">5</span>] .dynsym           DYNSYM          <span class="number">080481</span>cc <span class="number">0001</span>cc <span class="number">000050</span> <span class="number">10</span>   A  <span class="number">6</span>   <span class="number">1</span>  <span class="number">4</span></span><br><span class="line">  [ <span class="number">6</span>] .dynstr           STRTAB          <span class="number">0804821</span>c <span class="number">00021</span>c <span class="number">00004</span>a <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">1</span></span><br><span class="line">  [ <span class="number">7</span>] .gnu.version      VERSYM          <span class="number">08048266</span> <span class="number">000266</span> <span class="number">00000</span>a <span class="number">02</span>   A  <span class="number">5</span>   <span class="number">0</span>  <span class="number">2</span></span><br><span class="line">  [ <span class="number">8</span>] .gnu.version_r    VERNEED         <span class="number">08048270</span> <span class="number">000270</span> <span class="number">000020</span> <span class="number">00</span>   A  <span class="number">6</span>   <span class="number">1</span>  <span class="number">4</span></span><br><span class="line">  [ <span class="number">9</span>] .rel.dyn          REL             <span class="number">08048290</span> <span class="number">000290</span> <span class="number">000008</span> <span class="number">08</span>   A  <span class="number">5</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">10</span>] .rel.plt          REL             <span class="number">08048298</span> <span class="number">000298</span> <span class="number">000010</span> <span class="number">08</span>  AI  <span class="number">5</span>  <span class="number">24</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">11</span>] .init             PROGBITS        <span class="number">080482</span>a8 <span class="number">0002</span>a8 <span class="number">000023</span> <span class="number">00</span>  AX  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">12</span>] .plt              PROGBITS        <span class="number">080482</span>d0 <span class="number">0002</span>d0 <span class="number">000030</span> <span class="number">04</span>  AX  <span class="number">0</span>   <span class="number">0</span> <span class="number">16</span></span><br><span class="line">  [<span class="number">13</span>] .plt.got          PROGBITS        <span class="number">08048300</span> <span class="number">000300</span> <span class="number">000008</span> <span class="number">00</span>  AX  <span class="number">0</span>   <span class="number">0</span>  <span class="number">8</span></span><br><span class="line">  [<span class="number">14</span>] .text             PROGBITS        <span class="number">08048310</span> <span class="number">000310</span> <span class="number">000192</span> <span class="number">00</span>  AX  <span class="number">0</span>   <span class="number">0</span> <span class="number">16</span></span><br><span class="line">  [<span class="number">15</span>] .fini             PROGBITS        <span class="number">080484</span>a4 <span class="number">0004</span>a4 <span class="number">000014</span> <span class="number">00</span>  AX  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">16</span>] .rodata           PROGBITS        <span class="number">080484b</span>8 <span class="number">0004b</span>8 <span class="number">000013</span> <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">17</span>] .eh_frame_hdr     PROGBITS        <span class="number">080484</span>cc <span class="number">0004</span>cc <span class="number">00002</span>c <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">18</span>] .eh_frame         PROGBITS        <span class="number">080484f</span>8 <span class="number">0004f</span>8 <span class="number">0000</span>cc <span class="number">00</span>   A  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">19</span>] .init_array       INIT_ARRAY      <span class="number">08049f</span>08 <span class="number">000f</span>08 <span class="number">000004</span> <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">20</span>] .fini_array       FINI_ARRAY      <span class="number">08049f</span>0c <span class="number">000f</span>0c <span class="number">000004</span> <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">21</span>] .jcr              PROGBITS        <span class="number">08049f</span>10 <span class="number">000f</span>10 <span class="number">000004</span> <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">22</span>] .dynamic          DYNAMIC         <span class="number">08049f</span>14 <span class="number">000f</span>14 <span class="number">0000e8</span> <span class="number">08</span>  WA  <span class="number">6</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">23</span>] .got              PROGBITS        <span class="number">08049f</span>fc <span class="number">000f</span>fc <span class="number">000004</span> <span class="number">04</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">24</span>] .got.plt          PROGBITS        <span class="number">0804</span>a000 <span class="number">001000</span> <span class="number">000014</span> <span class="number">04</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">25</span>] .data             PROGBITS        <span class="number">0804</span>a014 <span class="number">001014</span> <span class="number">000008</span> <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">4</span></span><br><span class="line">  [<span class="number">26</span>] .bss              NOBITS          <span class="number">0804</span>a01c <span class="number">00101</span>c <span class="number">000004</span> <span class="number">00</span>  WA  <span class="number">0</span>   <span class="number">0</span>  <span class="number">1</span></span><br><span class="line">  [<span class="number">27</span>] .comment          PROGBITS        <span class="number">00000000</span> <span class="number">00101</span>c <span class="number">000035</span> <span class="number">01</span>  MS  <span class="number">0</span>   <span class="number">0</span>  <span class="number">1</span></span><br><span class="line">  [<span class="number">28</span>] .shstrtab         STRTAB          <span class="number">00000000</span> <span class="number">001051</span> <span class="number">0000f</span>a <span class="number">00</span>      <span class="number">0</span>   <span class="number">0</span>  <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>我们一般只关注几个比较重要的 section </p>
+<table>
+<thead>
+<tr>
+<th align="center">.dynsym</th>
+<th align="center">动态链接符号表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>.dynstr</strong></td>
+<td align="center"><strong>动态链接的字符串</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>.rel.dyn</strong></td>
+<td align="center"><strong>变量重定位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>.rel.plt</strong></td>
+<td align="center"><strong>函数重定位</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>.got</strong></td>
+<td align="center"><strong>全局变量偏移表</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>.got.plt</strong></td>
+<td align="center"><strong>全局函数偏移表</strong></td>
+</tr>
+</tbody></table>
+<h2 id="dynamic"><a href="#dynamic" class="headerlink" title=".dynamic"></a>.dynamic</h2><p>包含了一些关于动态链接的关键信息，在里这它长这样，事实上这个section所有程序都差不多 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/retdll$ readelf -d a.out</span><br><span class="line"></span><br><span class="line">Dynamic section at offset <span class="number">0xf14</span> contains <span class="number">24</span> entries:</span><br><span class="line">  Tag        Type                         Name/Value</span><br><span class="line"> <span class="number">0x00000001</span> (NEEDED)                     Shared library: [libc.so<span class="number">.6</span>]</span><br><span class="line"> <span class="number">0x0000000c</span> (INIT)                       <span class="number">0x80482a8</span></span><br><span class="line"> <span class="number">0x0000000d</span> (FINI)                       <span class="number">0x80484a4</span></span><br><span class="line"> <span class="number">0x00000019</span> (INIT_ARRAY)                 <span class="number">0x8049f08</span></span><br><span class="line"> <span class="number">0x0000001b</span> (INIT_ARRAYSZ)               <span class="number">4</span> (bytes)</span><br><span class="line"> <span class="number">0x0000001a</span> (FINI_ARRAY)                 <span class="number">0x8049f0c</span></span><br><span class="line"> <span class="number">0x0000001c</span> (FINI_ARRAYSZ)               <span class="number">4</span> (bytes)</span><br><span class="line"> <span class="number">0x6ffffef5</span> (GNU_HASH)                   <span class="number">0x80481ac</span></span><br><span class="line"> <span class="number">0x00000005</span> (STRTAB)                     <span class="number">0x804821c</span></span><br><span class="line"> <span class="number">0x00000006</span> (SYMTAB)                     <span class="number">0x80481cc</span></span><br><span class="line"> <span class="number">0x0000000a</span> (STRSZ)                      <span class="number">74</span> (bytes)</span><br><span class="line"> <span class="number">0x0000000b</span> (SYMENT)                     <span class="number">16</span> (bytes)</span><br><span class="line"> <span class="number">0x00000015</span> (DEBUG)                      <span class="number">0x0</span></span><br><span class="line"> <span class="number">0x00000003</span> (PLTGOT)                     <span class="number">0x804a000</span></span><br><span class="line"> <span class="number">0x00000002</span> (PLTRELSZ)                   <span class="number">16</span> (bytes)</span><br><span class="line"> <span class="number">0x00000014</span> (PLTREL)                     REL</span><br><span class="line"> <span class="number">0x00000017</span> (JMPREL)                     <span class="number">0x8048298</span></span><br><span class="line"> <span class="number">0x00000011</span> (REL)                        <span class="number">0x8048290</span></span><br><span class="line"> <span class="number">0x00000012</span> (RELSZ)                      <span class="number">8</span> (bytes)</span><br><span class="line"> <span class="number">0x00000013</span> (RELENT)                     <span class="number">8</span> (bytes)</span><br><span class="line"> <span class="number">0x6ffffffe</span> (VERNEED)                    <span class="number">0x8048270</span></span><br><span class="line"> <span class="number">0x6fffffff</span> (VERNEEDNUM)                 <span class="number">1</span></span><br><span class="line"> <span class="number">0x6ffffff0</span> (VERSYM)                     <span class="number">0x8048266</span></span><br><span class="line"> <span class="number">0x00000000</span> (<span class="literal">NULL</span>)                       <span class="number">0x0</span></span><br></pre></td></tr></table></figure>
+
+<p>然后<strong>.dynamic</strong>每个元素的结构体是这样的， 一个 <strong>Elf_Dyn</strong> 是一个键值对，其中 <strong>d_tag</strong> 是键，<strong>d_value</strong> 是值 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    Elf32_Sword d_tag;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        Elf32_Word d_val;</span><br><span class="line">        Elf32_Addr d_ptr;</span><br><span class="line">    &#125; d_un;</span><br><span class="line">&#125; Elf32_Dyn;</span><br></pre></td></tr></table></figure>
+
+<p>这个<strong>section</strong>的用处就是他包含了很多动态链接所需的关键信息，我们现在只关心<code>DT_STRTAB</code>, <code>DT_SYMTAB</code>, <code>DT_JMPREL</code>这三项，这三个东西分别包含了指向<code>.dynstr</code>, <code>.dynsym</code>, <code>.rel.plt</code>这3个section的指针</p>
+<h3 id="DT-JMPREL-rel-plt"><a href="#DT-JMPREL-rel-plt" class="headerlink" title="DT_JMPREL(.rel.plt)"></a>DT_JMPREL(.rel.plt)</h3><p> 可以看到<code>puts</code>符号位于<strong>.rel.plt</strong>的第一个，也就是偏移为<strong>0×0</strong>的地方，这里的<code>r_offset</code>（偏移量）就是<strong>.got.plt</strong>的地址 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/retdll$ readelf -r a.out</span><br><span class="line"></span><br><span class="line">Relocation section '.rel.dyn' at offset 0x290 contains 1 entries:</span><br><span class="line"> Offset     Info    Type            Sym.Value  Sym. Name</span><br><span class="line"><span class="number">08049f</span>fc  <span class="number">00000206</span> R_386_GLOB_DAT    <span class="number">00000000</span>   __gmon_start__</span><br><span class="line"></span><br><span class="line">Relocation section '.rel.plt' at offset 0x298 contains 2 entries:</span><br><span class="line"> Offset     Info    Type            Sym.Value  Sym. Name</span><br><span class="line"><span class="number">0804</span>a00c  <span class="number">00000107</span> R_386_JUMP_SLOT   <span class="number">00000000</span>   <span class="built_in">puts</span>@GLIBC_2<span class="number">.0</span></span><br><span class="line"><span class="number">0804</span>a010  <span class="number">00000307</span> R_386_JUMP_SLOT   <span class="number">00000000</span>   __libc_start_main@GLIBC_2<span class="number">.0</span></span><br></pre></td></tr></table></figure>
+
+<p>这里是重定位表（不过跟windows那个重定位表概念不同），也是一个结构体数组，每个项对应一个导入函数。结构体定义如下： </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Addr    r_offset; <span class="comment">//指向GOT表的指针</span></span><br><span class="line">  Elf32_Word    r_info;</span><br><span class="line">  <span class="comment">//一些关于导入符号的信息，我们只关心从第二个字节开始的值((val)&gt;&gt;8)，忽略那个07</span></span><br><span class="line">  <span class="comment">//1和3是这个导入函数的符号在.dynsym中的下标，</span></span><br><span class="line">  <span class="comment">//如果往回看的话你会发现1和3刚好和.dynsym的puts和__libc_start_main对应</span></span><br><span class="line">&#125; Elf32_Rel;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DT-STRTAB-dynstr"><a href="#DT-STRTAB-dynstr" class="headerlink" title="DT_STRTAB(.dynstr)"></a>DT_STRTAB(.dynstr)</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LOAD:<span class="number">0804821</span>C ; ELF String Table</span><br><span class="line">LOAD:<span class="number">0804821</span>C byte_804821C    db <span class="number">0</span>                    ; DATA XREF: LOAD:<span class="number">080481</span>DC↑o</span><br><span class="line">LOAD:<span class="number">0804821</span>C                                         ; LOAD:<span class="number">080481</span>EC↑o ...</span><br><span class="line">LOAD:0804821D aLibcSo6        db 'libc.so.6',0</span><br><span class="line">LOAD:08048227 aIoStdinUsed    db '_IO_stdin_used',0   ; DATA XREF: LOAD:0804820C↑o</span><br><span class="line">LOAD:08048236 aPuts           db 'puts',0             ; DATA XREF: LOAD:080481DC↑o</span><br><span class="line">LOAD:0804823B aLibcStartMain  db '__libc_start_main',0</span><br></pre></td></tr></table></figure>
+
+<p> 一个字符串表，<strong>index</strong>为<strong>0</strong>的地方永远是<strong>0</strong>，然后后面是动态链接所需的字符串，<strong>0</strong>结尾，包括导入函数名，比方说这里很明显有个<strong>puts</strong>。到时候，相关数据结构引用一个字符串时，用的是相对这个section头的偏移，比方说，在这里，就是字符串相对<strong>0x804821C</strong>的偏移 </p>
+<h3 id="DT-SYMTAB-dynsym"><a href="#DT-SYMTAB-dynsym" class="headerlink" title="DT_SYMTAB(.dynsym)"></a>DT_SYMTAB(.dynsym)</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Downloads/retdll$  readelf -s a.out</span><br><span class="line"></span><br><span class="line">Symbol table '.dynsym' contains 5 entries:</span><br><span class="line">   Num:    Value  Size Type    Bind   Vis      Ndx Name</span><br><span class="line">     <span class="number">0</span>: <span class="number">00000000</span>     <span class="number">0</span> NOTYPE  LOCAL  DEFAULT  UND </span><br><span class="line">     <span class="number">1</span>: <span class="number">00000000</span>     <span class="number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="built_in">puts</span>@GLIBC_2<span class="number">.0</span> (<span class="number">2</span>)</span><br><span class="line">     <span class="number">2</span>: <span class="number">00000000</span>     <span class="number">0</span> NOTYPE  WEAK   DEFAULT  UND __gmon_start__</span><br><span class="line">     <span class="number">3</span>: <span class="number">00000000</span>     <span class="number">0</span> FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2<span class="number">.0</span> (<span class="number">2</span>)</span><br><span class="line">     <span class="number">4</span>: <span class="number">080484b</span>c     <span class="number">4</span> OBJECT  GLOBAL DEFAULT   <span class="number">16</span> _IO_stdin_used</span><br></pre></td></tr></table></figure>
+
+<p> 这个东西，是一个符号表（结构体数组），里面记录了各种符号的信息，每个结构体对应一个符号。我们这里只关心函数符号，比方说上面的<strong>puts</strong>。结构体定义如下 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Word    st_name; <span class="comment">//符号名，是相对.dynstr起始的偏移，这种引用字符串的方式在前面说过了</span></span><br><span class="line">  Elf32_Addr    st_value;</span><br><span class="line">  Elf32_Word    st_size;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">char</span> st_info; <span class="comment">//对于导入函数符号而言，它是0x12</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">char</span> st_other;</span><br><span class="line">  Elf32_Section st_shndx;</span><br><span class="line">&#125;Elf32_Sym; <span class="comment">//对于导入函数符号而言，其他字段都是0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF32_R_SYM(info) ((info)&gt;&gt;8)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF32_R_TYPE(info) ((unsigned char)(info))</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF32_R_INFO(sym, type) (((sym)&lt;&lt;8)+(unsigned char)(type))</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="解析符号"><a href="#解析符号" class="headerlink" title="解析符号"></a>解析符号</h2><p> 假设<strong>.dynsym</strong>的地址为<strong>080481cc</strong>，又因为<strong>puts</strong>函数对应的<strong>num</strong>为<strong>1</strong> ，则程序会去<strong>0x080481cc+0x10*1</strong>寻找<strong>st_name</strong>即<strong>puts</strong>字符串在<strong>.dynstr</strong>中的偏移 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gef➤  x/<span class="number">4</span>wx <span class="number">0x080481cc</span>+<span class="number">0x10</span>*<span class="number">1</span></span><br><span class="line"><span class="number">0x80481dc</span>:    <span class="number">0x0000001a</span>    <span class="number">0x00000000</span>    <span class="number">0x00000000</span>    <span class="number">0x00000012</span></span><br></pre></td></tr></table></figure>
+
+<p>解释一下这一串地址<code>0x080481cc+0x10*1</code>的意义</p>
+<blockquote>
+<ul>
+<li>0x080481cc 对应.dynsym的地址</li>
+<li>0×10 ： 每一条symbol信息的大小在SYMENT中体现，为16 bytes （可以用readelf -d fun命令查看）</li>
+<li>1 ： num值为1</li>
+</ul>
+</blockquote>
+<p>可以看到0x080481dc对应的第一个值为0x1a， 再利用如下命令即可找到puts符号 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gef➤  x/s 0x0804821c+0x1a</span><br><span class="line">0x8048236:    &quot;puts&quot;</span><br></pre></td></tr></table></figure>
+
+<p>0x0804821c+0x1a 解析</p>
+<blockquote>
+<ul>
+<li>0x0804821c 对应于.dynstr的地址</li>
+<li>0x1a 对应刚才得到的偏移</li>
+</ul>
+</blockquote>
+<h1 id="函数执行流程分析"><a href="#函数执行流程分析" class="headerlink" title="函数执行流程分析"></a>函数执行流程分析</h1><p>用gdb运行这个程序，并在puts函数处下断点 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">► <span class="number">0x80482e0</span>  &lt;<span class="built_in">puts</span>@plt&gt;                  jmp    dword ptr [<span class="number">0x804a00c</span>]</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x80482e6</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">6</span>&gt;                push   <span class="number">0</span></span><br><span class="line">   <span class="number">0x80482eb</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">11</span>&gt;               jmp    <span class="number">0x80482d0</span></span><br></pre></td></tr></table></figure>
+
+<p>执行到我们下的断点处发现，会跳转到<code>0x804a00c</code>这个地址 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/wx <span class="number">0x804a00c</span></span><br><span class="line"><span class="number">0x804a00c</span>:	<span class="number">0x080482e6</span></span><br></pre></td></tr></table></figure>
+
+<p>0x0804a00c这个地址处存储的内容为&lt;puts@plt+6&gt;的地址，因为这个程序第一次运行所以got表中没有保存read函数的地址，所以程序又跳转会&lt;puts@plt+6&gt;，所以紧接着会执行 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x80482e6</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">6</span>&gt;                push   <span class="number">0</span></span><br><span class="line"><span class="number">0x80482eb</span>  &lt;<span class="built_in">puts</span>@plt+<span class="number">11</span>&gt;               jmp    <span class="number">0x80482d0</span></span><br></pre></td></tr></table></figure>
+
+<p>先将0×0压栈（0×0 表示相对.rel.plt的偏移，通过上面分析我们可以知道，read符号在.rel.plt中的位置为第一个，所以偏移为0），又跳转到0x80482d0，看一下该地处的内容 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">2</span>i <span class="number">0x080482d0</span></span><br><span class="line">   <span class="number">0x80482d0</span>:	push   DWORD PTR ds:<span class="number">0x804a004</span></span><br><span class="line">   <span class="number">0x80482d6</span>:	jmp    DWORD PTR ds:<span class="number">0x804a008</span></span><br></pre></td></tr></table></figure>
+
+<p>会将<strong>0x804a004</strong>压栈，然后跳转到<strong>0x804a008</strong>处。</p>
+<ul>
+<li><strong>0x804a004</strong>处对应一个指向内部数据结构的指针，类型是 <strong>link_map</strong>，在动态装载器内部使用，包含了进行符号解析需要的当前 <strong>ELF</strong> 对象的信息。在它的 <strong>l_info</strong> 域中保存了 .<strong>dynamic</strong> 段中大多数条目的指针构成的一个数组，我们后面会利用它。 <strong>link_map</strong>的指针，这个结构是干什么的，我们不关心，但是有一点要知道，它包含了.<strong>dynamic</strong>的指针，通过这个<strong>link_map</strong>，<strong>_dl_runtime_resolve</strong>函数可以访问到.<strong>dynamic</strong>这个<strong>section</strong> </li>
+<li><strong>0x0804a008</strong> 处为函数 <strong>dl_runtime_resolve</strong>(<strong>link_map</strong>,<strong>rel_offset</strong>)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/4wx 0xf7fee000</span><br><span class="line">0xf7fee000 &lt;_dl_runtime_resolve&gt;:	0x8b525150	0x8b102454	0xe80c2444	0xffff97d0</span><br></pre></td></tr></table></figure>
+
+<p> 0xe80c2444是<strong>.dynamic</strong>的指针，与前面图中一致</p>
+<p> 我们看一下dl_runtime_resolve()函数的实现 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">20</span>i <span class="number">0xf7fee000</span></span><br><span class="line">   <span class="number">0xf7fee000</span> &lt;_dl_runtime_resolve&gt;:	push   eax</span><br><span class="line">   <span class="number">0xf7fee001</span> &lt;_dl_runtime_resolve+<span class="number">1</span>&gt;:	push   ecx</span><br><span class="line">   <span class="number">0xf7fee002</span> &lt;_dl_runtime_resolve+<span class="number">2</span>&gt;:	push   edx</span><br><span class="line">   <span class="number">0xf7fee003</span> &lt;_dl_runtime_resolve+<span class="number">3</span>&gt;:	mov    edx,DWORD PTR [esp+<span class="number">0x10</span>]</span><br><span class="line">   <span class="number">0xf7fee007</span> &lt;_dl_runtime_resolve+<span class="number">7</span>&gt;:	mov    eax,DWORD PTR [esp+<span class="number">0xc</span>]</span><br><span class="line">   <span class="number">0xf7fee00b</span> &lt;_dl_runtime_resolve+<span class="number">11</span>&gt;:	call   <span class="number">0xf7fe77e0</span> &lt;_dl_fixup&gt;</span><br><span class="line">   <span class="number">0xf7fee010</span> &lt;_dl_runtime_resolve+<span class="number">16</span>&gt;:	pop    edx</span><br><span class="line">   <span class="number">0xf7fee011</span> &lt;_dl_runtime_resolve+<span class="number">17</span>&gt;:	mov    ecx,DWORD PTR [esp]</span><br><span class="line">   <span class="number">0xf7fee014</span> &lt;_dl_runtime_resolve+<span class="number">20</span>&gt;:	mov    DWORD PTR [esp],eax</span><br><span class="line">   <span class="number">0xf7fee017</span> &lt;_dl_runtime_resolve+<span class="number">23</span>&gt;:	mov    eax,DWORD PTR [esp+<span class="number">0x4</span>]</span><br><span class="line">   <span class="number">0xf7fee01b</span> &lt;_dl_runtime_resolve+<span class="number">27</span>&gt;:	ret    <span class="number">0xc</span></span><br><span class="line">   <span class="number">0xf7fee01e</span>:	xchg   ax,ax</span><br><span class="line">   <span class="number">0xf7fee020</span> &lt;_dl_runtime_profile&gt;:	push   esp</span><br><span class="line">   <span class="number">0xf7fee021</span> &lt;_dl_runtime_profile+<span class="number">1</span>&gt;:	add    DWORD PTR [esp],<span class="number">0x8</span></span><br><span class="line">   <span class="number">0xf7fee025</span> &lt;_dl_runtime_profile+<span class="number">5</span>&gt;:	push   ebp</span><br><span class="line">   <span class="number">0xf7fee026</span> &lt;_dl_runtime_profile+<span class="number">6</span>&gt;:	push   eax</span><br><span class="line">   <span class="number">0xf7fee027</span> &lt;_dl_runtime_profile+<span class="number">7</span>&gt;:	push   ecx</span><br><span class="line">   <span class="number">0xf7fee028</span> &lt;_dl_runtime_profile+<span class="number">8</span>&gt;:	push   edx</span><br><span class="line">   <span class="number">0xf7fee029</span> &lt;_dl_runtime_profile+<span class="number">9</span>&gt;:	mov    ecx,esp</span><br><span class="line">   <span class="number">0xf7fee02b</span> &lt;_dl_runtime_profile+<span class="number">11</span>&gt;:	sub    esp,<span class="number">0x8</span></span><br></pre></td></tr></table></figure>
+
+<p>在<strong>0xf7fee00b</strong>地址处调用了 <strong>_dl_fixup()</strong>函数，并且采用寄存器传参，<strong>dl_fixup()</strong>是在<strong>dl-runtime.c</strong>中实现的， <strong>_dl_fixup</strong>函数传入的两个参数一个是<strong>rdi</strong>寄存器中存储的<strong>link_map</strong>，<strong>rsi</strong>是<strong>GOT</strong>表中关于<strong>PLT</strong>重定位的索引值，后面要根据该索引值写入新的地址 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">_dl_fixup (struct link_map *l, ElfW(Word) reloc_arg)</span><br><span class="line">｛</span><br><span class="line">    const PLTREL *const reloc = (const void *) (D_PTR (l, l_info[DT_JMPREL]) + reloc_offset);</span><br><span class="line">    const ElfW(Sym) *sym = &amp;symtab[ELFW(R_SYM) (reloc-&gt;r_info)];</span><br><span class="line">    assert (ELFW(R_TYPE)(reloc-&gt;r_info) == ELF_MACHINE_JMP_SLOT);</span><br><span class="line">    result = _dl_lookup_symbol_x (strtab + sym-&gt;st_name, l, &amp;sym, l-&gt;l_scope,version, ELF_RTYPE_CLASS_PLT, flags, NULL);</span><br><span class="line">    value = DL_FIXUP_MAKE_VALUE (result, sym ? (LOOKUP_VALUE_ADDRESS (result) + sym-&gt;st_value) : 0);</span><br><span class="line">    return elf_machine_fixup_plt (l, result, reloc, rel_addr, value);</span><br><span class="line">｝</span><br></pre></td></tr></table></figure>
+
+<p>逐行解释</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_dl_fixup (struct link_map *l, ElfW(Word) reloc_arg)</span><br></pre></td></tr></table></figure>
+
+<p>这里面 <strong>link_map</strong>还是一开始传进来的<strong>link_map</strong>,但一开始传进来的<strong>rel_offset</strong>改为用<strong>reloc_arg</strong>表示：<code>reloc_arg=reloffset</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const PLTREL *const reloc = (const void *) (D_PTR (l, l_info[DT_JMPREL]) + reloc_offset);</span><br></pre></td></tr></table></figure>
+
+<p>用来计算重定位入口<strong>reloc</strong>，<strong>JMPREL</strong>即<strong>.rel.plt</strong>地址，<strong>reloc_offset</strong>即<strong>reloc_arg</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const ElfW(Sym) *sym = &amp;symtab[ELFW(R_SYM) (reloc-&gt;r_info)];</span><br></pre></td></tr></table></figure>
+
+<p>找到在.<strong>dynsym</strong>中对应的条目，<strong>[ELFW(R_SYM) (reloc-&gt;r_info)]</strong>就是为了找到对应的<strong>num[?]</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">assert (ELFW(R_TYPE)(reloc-&gt;r_info) == ELF_MACHINE_JMP_SLOT);</span><br></pre></td></tr></table></figure>
+
+<p>检查<strong>reloc-&gt;r_info</strong>的最低位是不是<strong>R_386_JUMP_SLOT=7</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result = _dl_lookup_symbol_x (strtab + sym-&gt;st_name, l, &amp;sym, l-&gt;l_scope,version, ELF_RTYPE_CLASS_PLT, flags, NULL);</span><br></pre></td></tr></table></figure>
+
+<p>根据<strong>st_name</strong>对应的偏移，去<strong>.dynstr(STRTAB)</strong>中查找对应的字符串，<strong>result</strong>为<strong>libc</strong>基地址(不知道是怎么找到<strong>result</strong>的，反正知道就好了。。。)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value = DL_FIXUP_MAKE_VALUE (result, sym ? (LOOKUP_VALUE_ADDRESS (result) + sym-&gt;st_value) : 0);</span><br></pre></td></tr></table></figure>
+
+<p><strong>value</strong>为函数的实际地址，在<strong>libc</strong>基地址的基础上加上函数在<strong>libc</strong>中的偏移</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">return elf_machine_fixup_plt (l, result, reloc, rel_addr, value);</span><br></pre></td></tr></table></figure>
+
+<p>将函数地址写到<strong>got</strong>表对应位置</p>
+<p>简单来说_dl_runtime_resolve就是会</p>
+<ol>
+<li>用<strong>link_map</strong>访问.<strong>dynamic</strong>，取出.<strong>dynstr</strong>, .<strong>dynsym</strong>, <strong>.rel.plt</strong>的指针</li>
+<li><strong>.rel.plt + 第二个参数</strong>求出当前函数的重定位表项<strong>Elf32_Rel</strong>的指针，记作<strong>rel</strong></li>
+<li><strong>rel-&gt;r_info &gt;&gt; 8</strong>作为.<strong>dynsym</strong>的下标，求出当前函数的符号表项<strong>Elf32_Sym</strong>的指针，记作<strong>sym</strong></li>
+<li><strong>.dynstr + sym-&gt;st_name</strong>得出符号名字符串指针</li>
+<li>在动态链接库查找这个函数的地址，并且把地址赋值给<strong>*rel-&gt;r_offset</strong>，即<strong>GOT</strong>表</li>
+<li>调用这个函数</li>
+</ol>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image003.jpg" alt></p>
+<blockquote>
+<h5 id="从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF-的ehdr中找到文件的偏移e-phoff处，在这其中找到为PT-DYNAMIC-的d-tag的phdr，从这个地址开始处找到DT-DYNAMIC的节，最后从其中找到这样一个Elf32-Sym结构，它的st-name所指的字符串与给定的名称相符，就用st-value便是了"><a href="#从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF-的ehdr中找到文件的偏移e-phoff处，在这其中找到为PT-DYNAMIC-的d-tag的phdr，从这个地址开始处找到DT-DYNAMIC的节，最后从其中找到这样一个Elf32-Sym结构，它的st-name所指的字符串与给定的名称相符，就用st-value便是了" class="headerlink" title="从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF 的ehdr中找到文件的偏移e_phoff处，在这其中找到为PT_DYNAMIC  的d_tag的phdr，从这个地址开始处找到DT_DYNAMIC的节，最后从其中找到这样一个Elf32_Sym结构，它的st_name所指的字符串与给定的名称相符，就用st_value便是了"></a>从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF 的ehdr中找到文件的偏移e_phoff处，在这其中找到为PT_DYNAMIC  的d_tag的phdr，从这个地址开始处找到DT_DYNAMIC的节，最后从其中找到这样一个Elf32_Sym结构，它的st_name所指的字符串与给定的名称相符，就用st_value便是了</h5></blockquote>
+<h1 id="深入理解"><a href="#深入理解" class="headerlink" title="深入理解"></a>深入理解</h1><figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">  <span class="number">0xf7fee000</span> &lt;_dl_runtime_resolve&gt;       push   eax</span><br><span class="line">  <span class="number">0xf7fee001</span> &lt;_dl_runtime_resolve+<span class="number">1</span>&gt;     push   ecx</span><br><span class="line">  <span class="number">0xf7fee002</span> &lt;_dl_runtime_resolve+<span class="number">2</span>&gt;     push   edx</span><br><span class="line">  <span class="number">0xf7fee003</span> &lt;_dl_runtime_resolve+<span class="number">3</span>&gt;     mov    edx, dword ptr [esp + <span class="number">0x10</span>]</span><br><span class="line">  <span class="number">0xf7fee007</span> &lt;_dl_runtime_resolve+<span class="number">7</span>&gt;     mov    eax, dword ptr [esp + <span class="number">0xc</span>]</span><br><span class="line">► <span class="number">0xf7fee00b</span> &lt;_dl_runtime_resolve+<span class="number">11</span>&gt;    call   _dl_fixup &lt;<span class="number">0xf7fe77e0</span>&gt;</span><br><span class="line">       arg[<span class="number">0</span>]: <span class="number">0xffffd094</span> ◂— <span class="number">0x0</span></span><br><span class="line">       arg[<span class="number">1</span>]: <span class="number">0xffffd070</span> ◂— <span class="number">0x1</span></span><br></pre></td></tr></table></figure>
+
+<p>调用函数过程中已经压入了两个参数：第一个是动态链接库的<strong>struct link_map*</strong> 指针，另一个是<strong>rel</strong>的索引值， 这里是给下面的fixup函数以寄存器传递参数 </p>
+<p>真正的解析在<strong>do_lookup</strong>中实现了，我这里还是它的实现伪代码:</p>
+<figure class="highlight cc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Elf32_Addr  <span class="title">do_lookup</span><span class="params">(struct link_map* lmap,<span class="keyword">char</span>* symname)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">link_map</span>* <span class="title">search_lmap</span>=<span class="title">NULL</span>;</span></span><br><span class="line">	Elf32_Sym* symtab;</span><br><span class="line">	Elf32_Sym* sym;</span><br><span class="line">	<span class="keyword">char</span>* strtab;</span><br><span class="line">	<span class="keyword">char</span>* find_name;</span><br><span class="line">	<span class="keyword">int</span> symindx;   </span><br><span class="line">	Elf32_Word hash=elf_hash_name(symname);</span><br><span class="line">	for_each_search_lmap_in_search_list(lmap,search_lmap)</span><br><span class="line">	&#123;</span><br><span class="line">		symtab=search_lmap-&gt;l_info[DT_SYMTAB].d_un.d_ptr;</span><br><span class="line">		strtab=search_lmap-&gt;l_info[DT_STRTAB].d_un.d_ptr;</span><br><span class="line">		<span class="keyword">for</span> (symindx=search_lmap-&gt;l_buckets[hash % search_lmap-&gt;l_nbuckets];</span><br><span class="line">		symindx!=<span class="number">0</span>;symindx=search_lmap-&gt;l_chain[symindx])</span><br><span class="line">		&#123;</span><br><span class="line">			sym=&amp;symtab[symindx];</span><br><span class="line">			find_name=strtab+sym-&gt;st_name;</span><br><span class="line">			<span class="keyword">if</span> (<span class="built_in">strcmp</span>(find_name,symname)==<span class="number">0</span>)</span><br><span class="line">				<span class="keyword">return</span> sym-&gt;st_value+search_lmap-&gt;l_addr;</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/image004.jpg" alt></p>
+<h1 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h1><p>函数第一次被调用过程</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%96%B0%E6%89%8B%E5%90%91%E2%80%94%E2%80%94%E6%B5%85%E8%B0%88PLT%E5%92%8CGOT/5970003-bcf9343191848103.png" alt="img"></p>
+<p>第一步由函数调用跳入到<strong>PLT</strong>表中，然后第二步<strong>PLT</strong>表跳到<strong>GOT</strong>表中，可以看到第三步由<strong>GOT</strong>表回跳到<strong>PLT</strong>表中，这时候进行压栈，把代表函数的<strong>ID</strong>压栈，接着第四步跳转到公共的<strong>PLT</strong>表项中，第5步进入到<strong>GOT</strong>表中，然后<strong>_dl_runtime_resolve</strong>对动态函数进行地址解析和重定位，第七步把动态函数真实的地址写入到<strong>GOT</strong>表项中，然后执行函数并返回。</p>
+<p>函数之后被调用过程</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/%E6%96%B0%E6%89%8B%E5%90%91%E2%80%94%E2%80%94%E6%B5%85%E8%B0%88PLT%E5%92%8CGOT/5970003-9baedd55881a39dd.png" alt="img"></p>
+<p>可以看到，第一步还是由函数调用跳入到<strong>PLT</strong>表，但是第二步跳入到<strong>GOT</strong>表中时，由于这个时候该表项已经是动态函数的真实地址了，所以可以直接执行然后返回。</p>
+<p>对于动态函数的调用，第一次要经过地址解析和回写到<strong>GOT</strong>表项中，第二次直接调用即可</p>
+<h1 id="ret2dl-resolve-利用"><a href="#ret2dl-resolve-利用" class="headerlink" title="ret2dl-resolve 利用"></a>ret2dl-resolve 利用</h1><p>主要是看 <strong>.dynamic</strong>能否可写 </p>
+<h2 id="改写-dynamic的DT-STRTAB"><a href="#改写-dynamic的DT-STRTAB" class="headerlink" title="改写.dynamic的DT_STRTAB"></a>改写.dynamic的DT_STRTAB</h2><p>这个只有在<strong>checksec</strong>时<strong>No RELRO</strong>可行，即<strong>.dynamic</strong>可写。因为<strong>ret2dl-resolve</strong>会从<strong>.dynamic</strong>里面拿.<strong>dynstr</strong>字符串表的指针，然后加上<strong>offset</strong>取得函数名并且在动态链接库中搜索这个函数名，然后调用。而假如说我们能够<strong>改写</strong>这个指针到一块我们能够操纵的内存空间，当<strong>resolve</strong>的时候，就能<strong>resolve</strong>成我们所指定的任意库函数。比方说，原本是一个<strong>free</strong>函数，我们就把原本是<strong>free</strong>字符串的那个偏移位置设为<strong>system</strong>字符串，<strong>第一次</strong>调用<code>free(&quot;bin/sh&quot;)</code>（因为只有第一次才会resolve），就等于调用了<code>system(&quot;/bin/sh&quot;)</code></p>
+<h2 id="操纵第二个参数，使其指向我们所构造的Elf32-Rel"><a href="#操纵第二个参数，使其指向我们所构造的Elf32-Rel" class="headerlink" title="操纵第二个参数，使其指向我们所构造的Elf32_Rel"></a>操纵第二个参数，使其指向我们所构造的Elf32_Rel</h2><p>如果<code>.dynamic</code>不可写，那么以上方法就没用了，所以有第二种利用方法。要知道，前面的<code>_dl_runtime_resolve</code>在第二步时</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; .rel.plt + 第二个参数`求出当前函数的重定位表项`Elf32_Rel`的指针，记作`rel</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>这个时候，<code>_dl_runtime_resolve</code>并没有检查<code>.rel.plt + 第二个参数</code>后是否造成越界访问，所以我们能给一个很大的<code>.rel.plt</code>的offset（64位的话就是下标），然后使得加上去之后的地址指向我们所能操纵的一块内存空间，比方说<code>.bss</code>。</p>
+<p>然后第三步</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; rel-&gt;r_info &gt;&gt; 8`作为`.dynsym`的下标，求出当前函数的符号表项`Elf32_Sym`的指针，记作`sym</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p> 所以在我们所伪造的<code>Elf32_Rel</code>，需要放一个<code>r_info</code>字段，大概长这样就行<code>0xXXXXXX07</code>，其中XXXXXX是相对<code>.dynsym</code>表的下标，注意不是偏移，所以是偏移除以<code>Elf32_Sym</code>的大小，即除以<code>0x10</code>（32位下）。然后这里同样也没有进行越界访问的检查，所以可以用类似的方法，伪造出这个<code>Elf32_Sym</code>。至于为什么是07，因为这是一个导入函数，而导入函数一般都是07，所以写成07就好。</p>
+<p>然后第四步</p>
+<blockquote>
+<p><code>.dynstr + sym-&gt;st_name</code>得出符号名字符串指针</p>
+</blockquote>
+<p>同样类似，没有进行越界访问检查，所以这个字符串也能够伪造。</p>
+<p>所以，最终的利用思路，大概是</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x80482d0</span>				push dword ptr [<span class="number">0x804a004</span>]</span><br><span class="line"><span class="number">0x80482d6</span>				jmp  dword ptr [<span class="number">0x804a008</span>]</span><br></pre></td></tr></table></figure>
+
+<p>构造ROP，跳转到resolve的PLT，<code>push link_map</code>的位置，就是上图所示的这个地方。此时，栈中必须要有已经伪造好的指向伪造的<code>Elf32_Rel</code>的偏移，然后是返回地址（<code>system</code>的话无所谓），再然后是参数（如果是<code>system</code>函数的话就要是指向<code>&quot;/bin/sh\x00&quot;</code>的指针）</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/12/DES-ECB/" rel="next" title="DES-ECB">
+                  <i class="fa fa-chevron-left"></i> DES-ECB
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/15/pwn200/" rel="prev" title="pwn200">
+                  pwn200 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动态链接"><span class="nav-number">1.</span> <span class="nav-text">动态链接</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dynamic"><span class="nav-number">1.1.</span> <span class="nav-text">.dynamic</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DT-JMPREL-rel-plt"><span class="nav-number">1.1.1.</span> <span class="nav-text">DT_JMPREL(.rel.plt)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DT-STRTAB-dynstr"><span class="nav-number">1.1.2.</span> <span class="nav-text">DT_STRTAB(.dynstr)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DT-SYMTAB-dynsym"><span class="nav-number">1.1.3.</span> <span class="nav-text">DT_SYMTAB(.dynsym)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解析符号"><span class="nav-number">1.2.</span> <span class="nav-text">解析符号</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#函数执行流程分析"><span class="nav-number">2.</span> <span class="nav-text">函数执行流程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF-的ehdr中找到文件的偏移e-phoff处，在这其中找到为PT-DYNAMIC-的d-tag的phdr，从这个地址开始处找到DT-DYNAMIC的节，最后从其中找到这样一个Elf32-Sym结构，它的st-name所指的字符串与给定的名称相符，就用st-value便是了"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">从一个ELF动态链接库文件中，根据已知的函数名称，找到相应的函数起始地址，那么过程是这样的，先从前面的ELF 的ehdr中找到文件的偏移e_phoff处，在这其中找到为PT_DYNAMIC  的d_tag的phdr，从这个地址开始处找到DT_DYNAMIC的节，最后从其中找到这样一个Elf32_Sym结构，它的st_name所指的字符串与给定的名称相符，就用st_value便是了</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#深入理解"><span class="nav-number">3.</span> <span class="nav-text">深入理解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#流程图"><span class="nav-number">4.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ret2dl-resolve-利用"><span class="nav-number">5.</span> <span class="nav-text">ret2dl-resolve 利用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#改写-dynamic的DT-STRTAB"><span class="nav-number">5.1.</span> <span class="nav-text">改写.dynamic的DT_STRTAB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操纵第二个参数，使其指向我们所构造的Elf32-Rel"><span class="nav-number">5.2.</span> <span class="nav-text">操纵第二个参数，使其指向我们所构造的Elf32_Rel</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

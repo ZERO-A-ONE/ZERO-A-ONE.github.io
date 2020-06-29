@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="搜索libc https://libc.nullbyte.cat/  恢复linux下静态编译程序的符号表先去https://github.com/push0ebp/sig-database把sig文件都下载下来，然后用ida打开程序之后 选择FILE--&amp;gt;LOAD_FILE--&amp;gt;FLIRT,选择对应版本的libc即可 但是要把相对应的.sig放在($IDA)/sig/pc/目录下 源">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTF-PWN-Tips-1">
+<meta property="og:url" content="http://yoursite.com/2019/11/16/CTF-PWN-Tips-1/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="搜索libc https://libc.nullbyte.cat/  恢复linux下静态编译程序的符号表先去https://github.com/push0ebp/sig-database把sig文件都下载下来，然后用ida打开程序之后 选择FILE--&amp;gt;LOAD_FILE--&amp;gt;FLIRT,选择对应版本的libc即可 但是要把相对应的.sig放在($IDA)/sig/pc/目录下 源">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-17T19:25:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CTF-PWN-Tips-1">
+<meta name="twitter:description" content="搜索libc https://libc.nullbyte.cat/  恢复linux下静态编译程序的符号表先去https://github.com/push0ebp/sig-database把sig文件都下载下来，然后用ida打开程序之后 选择FILE--&amp;gt;LOAD_FILE--&amp;gt;FLIRT,选择对应版本的libc即可 但是要把相对应的.sig放在($IDA)/sig/pc/目录下 源">
+  <link rel="canonical" href="http://yoursite.com/2019/11/16/CTF-PWN-Tips-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>CTF-PWN-Tips-1 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/16/CTF-PWN-Tips-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">CTF-PWN-Tips-1
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-11-16 19:25:34" itemprop="dateCreated datePublished" datetime="2019-11-16T19:25:34-08:00">2019-11-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-11-17 11:25:52" itemprop="dateModified" datetime="2019-11-17T11:25:52-08:00">2019-11-17</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="搜索libc"><a href="#搜索libc" class="headerlink" title="搜索libc"></a>搜索libc</h1><p> <a href="https://libc.nullbyte.cat/" target="_blank" rel="noopener">https://libc.nullbyte.cat/</a> </p>
+<h1 id="恢复linux下静态编译程序的符号表"><a href="#恢复linux下静态编译程序的符号表" class="headerlink" title="恢复linux下静态编译程序的符号表"></a>恢复linux下静态编译程序的符号表</h1><p>先去<a href="https://github.com/push0ebp/sig-database" target="_blank" rel="noopener">https://github.com/push0ebp/sig-database</a>把sig文件都下载下来，然后用ida打开程序之后</p>
+<p>选择<code>FILE--&gt;LOAD_FILE--&gt;FLIRT</code>,选择对应版本的<code>libc</code>即可</p>
+<p>但是要把相对应的<code>.sig</code>放在<code>($IDA)/sig/pc/</code>目录下</p>
+<h1 id="源码调试glibc"><a href="#源码调试glibc" class="headerlink" title="源码调试glibc"></a>源码调试glibc</h1><p>三部曲</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install glibc-source</span><br><span class="line">sudo apt install libc6-dbg</span><br><span class="line">sudo tar -xf /usr/src/glibc/glibc-2.23.tar.xz</span><br></pre></td></tr></table></figure>
+
+<p>搞好后</p>
+<p>程序运行时贴上去<br><code>/usr/src/glibc/glibc-2.23/</code>时源码目录，然后后面的文件夹要自己指定下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; directory /usr/src/glibc/glibc-2.23/stdlib/</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以快乐<code>debug</code>了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">   <span class="number">0x7f7c75a3f030</span> &lt;<span class="built_in">exit</span>&gt;          lea    rsi, [rip + <span class="number">0x38a5c1</span>] &lt;<span class="number">0x7f7c75dc95f8</span>&gt;</span><br><span class="line">   <span class="number">0x7f7c75a3f037</span> &lt;<span class="built_in">exit</span>+<span class="number">7</span>&gt;        sub    rsp, <span class="number">8</span></span><br><span class="line"> ► <span class="number">0x7f7c75a3f03b</span> &lt;<span class="built_in">exit</span>+<span class="number">11</span>&gt;       mov    edx, <span class="number">1</span></span><br><span class="line">   <span class="number">0x7f7c75a3f040</span> &lt;<span class="built_in">exit</span>+<span class="number">16</span>&gt;       call   __run_exit_handlers &lt;<span class="number">0x7f7c75a3ef10</span>&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x7f7c75a3f045</span>                 nop    word ptr cs:[rax + rax]</span><br><span class="line">   <span class="number">0x7f7c75a3f04f</span>                 nop    </span><br><span class="line">   <span class="number">0x7f7c75a3f050</span> &lt;on_exit&gt;       push   rbp</span><br><span class="line">   <span class="number">0x7f7c75a3f051</span> &lt;on_exit+<span class="number">1</span>&gt;     push   rbx</span><br><span class="line">   <span class="number">0x7f7c75a3f052</span> &lt;on_exit+<span class="number">2</span>&gt;     mov    rbx, rdi</span><br><span class="line">   <span class="number">0x7f7c75a3f055</span> &lt;on_exit+<span class="number">5</span>&gt;     lea    rdi, [rip + <span class="number">0x38a59c</span>] &lt;<span class="number">0x7f7c75dc95f8</span>&gt;</span><br><span class="line">   <span class="number">0x7f7c75a3f05c</span> &lt;on_exit+<span class="number">12</span>&gt;    mov    rbp, rsi</span><br><span class="line">──────────────────────────────────────────[ SOURCE (CODE) ]──────────────────────────────────────────</span><br><span class="line">In file: /usr/src/glibc/glibc<span class="number">-2.23</span>/stdlib/<span class="built_in">exit</span>.c</span><br><span class="line">    <span class="number">99</span> </span><br><span class="line">   <span class="number">100</span> </span><br><span class="line">   <span class="number">101</span> <span class="keyword">void</span></span><br><span class="line">   <span class="number">102</span> <span class="built_in">exit</span> (<span class="keyword">int</span> status)</span><br><span class="line">   <span class="number">103</span> &#123;</span><br><span class="line"> ► <span class="number">104</span>   __run_exit_handlers (status, &amp;__exit_funcs, <span class="literal">true</span>);</span><br><span class="line">   <span class="number">105</span> &#125;</span><br><span class="line">   <span class="number">106</span> libc_hidden_def (<span class="built_in">exit</span>)</span><br><span class="line">──────────────────────────────────────────────[ STACK ]──────────────────────────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp  <span class="number">0x7fffb8837a40</span> —▸ <span class="number">0x4008f0</span> (__libc_csu_init) ◂— push   r15</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│      <span class="number">0x7fffb8837a48</span> —▸ <span class="number">0x7f7c75a25837</span> (__libc_start_main+<span class="number">247</span>) ◂— xor    edx, edx</span><br><span class="line"><span class="number">02</span>:<span class="number">0010</span>│      <span class="number">0x7fffb8837a50</span> ◂— <span class="number">0x1</span></span><br><span class="line">03:0018│      0x7fffb8837a58 —▸ 0x7fffb8837b28 —▸ 0x7fffb88391e5 ◂— './easy_printf'</span><br><span class="line"><span class="number">04</span>:<span class="number">0020</span>│      <span class="number">0x7fffb8837a60</span> ◂— <span class="number">0x175ff4ca0</span></span><br><span class="line"><span class="number">05</span>:<span class="number">0028</span>│      <span class="number">0x7fffb8837a68</span> —▸ <span class="number">0x4008c4</span> (main) ◂— push   rbp</span><br><span class="line"><span class="number">06</span>:<span class="number">0030</span>│      <span class="number">0x7fffb8837a70</span> ◂— <span class="number">0x0</span></span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│      <span class="number">0x7fffb8837a78</span> ◂— <span class="number">0xf14646c49173d8d5</span></span><br><span class="line">────────────────────────────────────────────[ BACKTRACE ]────────────────────────────────────────────</span><br><span class="line"> ► f <span class="number">0</span>     <span class="number">7f</span>7c75a3f03b <span class="built_in">exit</span>+<span class="number">11</span></span><br><span class="line">   f <span class="number">1</span>     <span class="number">7f</span>7c75a25837 __libc_start_main+<span class="number">247</span></span><br></pre></td></tr></table></figure>
+
+<p>舒服死了</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/12/SUCTF2019-playfmt-printf╡─│╔┴┤╣Ñ╗≈/" rel="next" title="SUCTF2019-playfmt-printf的成链攻击">
+                  <i class="fa fa-chevron-left"></i> SUCTF2019-playfmt-printf的成链攻击
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/19/hacknote/" rel="prev" title="hacknote">
+                  hacknote <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#搜索libc"><span class="nav-number">1.</span> <span class="nav-text">搜索libc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#恢复linux下静态编译程序的符号表"><span class="nav-number">2.</span> <span class="nav-text">恢复linux下静态编译程序的符号表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码调试glibc"><span class="nav-number">3.</span> <span class="nav-text">源码调试glibc</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

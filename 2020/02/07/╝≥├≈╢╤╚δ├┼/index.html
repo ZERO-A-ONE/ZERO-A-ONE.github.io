@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="malloc1void *ptr = malloc(0x10)   系统会调用一些函数在内存中开辟一大片空间作为堆的分配使用空间 malloc函数再从这一片堆的分配使用空间中分配0x10大小的空间，将指向该空间的地址返回给ptr(系统分配未使用余下的空间称为topchunk)  malloc_chunk我们称运行过程中被malloc分配的内存为一个chunk，这块内存在ptmalloc中用mall">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简明堆入门">
+<meta property="og:url" content="http://yoursite.com/2020/02/07/╝≥├≈╢╤╚δ├┼/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="malloc1void *ptr = malloc(0x10)   系统会调用一些函数在内存中开辟一大片空间作为堆的分配使用空间 malloc函数再从这一片堆的分配使用空间中分配0x10大小的空间，将指向该空间的地址返回给ptr(系统分配未使用余下的空间称为topchunk)  malloc_chunk我们称运行过程中被malloc分配的内存为一个chunk，这块内存在ptmalloc中用mall">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/CTF%E2%80%94%E2%80%94WriteUP/how2heap/15548795-49ecc4bc156e439a.png">
+<meta property="og:updated_time" content="2020-02-08T23:57:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简明堆入门">
+<meta name="twitter:description" content="malloc1void *ptr = malloc(0x10)   系统会调用一些函数在内存中开辟一大片空间作为堆的分配使用空间 malloc函数再从这一片堆的分配使用空间中分配0x10大小的空间，将指向该空间的地址返回给ptr(系统分配未使用余下的空间称为topchunk)  malloc_chunk我们称运行过程中被malloc分配的内存为一个chunk，这块内存在ptmalloc中用mall">
+<meta name="twitter:image" content="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/CTF%E2%80%94%E2%80%94WriteUP/how2heap/15548795-49ecc4bc156e439a.png">
+  <link rel="canonical" href="http://yoursite.com/2020/02/07/╝≥├≈╢╤╚δ├┼/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>简明堆入门 | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/07/╝≥├≈╢╤╚δ├┼/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">简明堆入门
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2020-02-07 23:56:29" itemprop="dateCreated datePublished" datetime="2020-02-07T23:56:29-08:00">2020-02-07</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2020-02-08 15:57:08" itemprop="dateModified" datetime="2020-02-08T15:57:08-08:00">2020-02-08</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="malloc"><a href="#malloc" class="headerlink" title="malloc"></a>malloc</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *ptr = <span class="built_in">malloc</span>(<span class="number">0x10</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>系统会调用一些函数在内存中开辟一大片空间作为堆的分配使用空间</li>
+<li>malloc函数再从这一片堆的分配使用空间中分配0x10大小的空间，将指向该空间的地址返回给ptr(系统分配未使用余下的空间称为<strong>topchunk</strong>)</li>
+</ul>
+<h2 id="malloc-chunk"><a href="#malloc-chunk" class="headerlink" title="malloc_chunk"></a>malloc_chunk</h2><p>我们称运行过程中被malloc分配的内存为一个chunk，这块内存在ptmalloc中用malloc_chunk结构体表示，当程序申请的chunk被free时，会被加入相应的空闲管理列表中</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span> &#123;</span></span><br><span class="line"></span><br><span class="line">  INTERNAL_SIZE_T      prev_size;  <span class="comment">/* Size of previous chunk (if free).  */</span></span><br><span class="line">  INTERNAL_SIZE_T      size;       <span class="comment">/* Size in bytes, including overhead. */</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	fd = Forward pointer to next chunk</span></span><br><span class="line"><span class="comment">	bk = Back pointer to previous chunk</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">fd</span>;</span>         <span class="comment">/* double links -- used only if free. */</span> </span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">bk</span>;</span></span><br><span class="line">  <span class="comment">/* Only used for large blocks: pointer to next larger size.  */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">fd_nextsize</span>;</span> <span class="comment">/* double links -- used only if free. */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">bk_nextsize</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>prev_size：如果前一个chunk是空闲的，该域表示前一个chunk的大小，如果前一个chunk不空闲，该域无意义，被前一个chunk占用复用</li>
+<li>size：当前chunk的大小，并且记录了当前chunk和前一个chunk的一些属性，二进制后三位是标志位</li>
+<li>FD：记录了下一个被free的chunk（used only if free）</li>
+<li>BK：记录了上一个被free的chunk（used only if free）</li>
+<li>fd_nextsize和bk_nextsize，只在largebin使用，记录了上/下一个被free chunk的size</li>
+</ul>
+<p>chunk是有他的神奇之处的，chunk虽然由一个统一的结构体声明，但是在被使用时和空闲时却又有两种不同的状态</p>
+<p>使用中的chunk</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">chunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of previous chunk, <span class="keyword">if</span> allocated            | |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of chunk, in bytes                       |M|P|</span><br><span class="line">      mem-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             User data starts here...                          .</span><br><span class="line">            .                                                               .</span><br><span class="line">            .             (malloc_usable_size() bytes)                      .</span><br><span class="line">            .                                                               |</span><br><span class="line">nextchunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of chunk                                     |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br></pre></td></tr></table></figure>
+
+<p>空闲中的chunk（被free后）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">chunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of previous chunk                            |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">    `head:' |             Size of chunk, in bytes                         |P|</span><br><span class="line">      mem-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Forward pointer to next chunk in <span class="built_in">list</span>             |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Back pointer to previous chunk in <span class="built_in">list</span>            |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Unused space (may be 0 bytes long)                .</span><br><span class="line">            .                                                               .</span><br><span class="line">            .                                                               |</span><br><span class="line">nextchunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">    `foot:' |             Size of chunk, in bytes                           |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br></pre></td></tr></table></figure>
+
+<h2 id="chunk的复用技术"><a href="#chunk的复用技术" class="headerlink" title="chunk的复用技术"></a>chunk的复用技术</h2><p>chunk中的字段prev_size是可以复用的：</p>
+<ul>
+<li>如果前一个邻接的chunk块空闲，那么当前chunk块结构体内的prev_size字段记录的是前一个邻接chunk块的大小。这就是由当前chunk指针获得前一个空闲chunk地址的依据。宏<code>prev_chunk(p)</code>就是依赖这个假设实现的<ul>
+<li>获得前一个chunk的地址：当前chunk的地址 - prev_size</li>
+</ul>
+</li>
+<li>如果前一个邻接chunk在使用中，则当前chunk的prev_size的空间被前一个chunk借用中，其中的值是前一个chunk的内存内容，对当前chunk没有任何意义</li>
+</ul>
+<h2 id="使用中的chunk"><a href="#使用中的chunk" class="headerlink" title="使用中的chunk"></a>使用中的chunk</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">chunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of previous chunk, <span class="keyword">if</span> allocated            | |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of chunk, in bytes                       |M|P|</span><br><span class="line">      mem-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             User data starts here...                          .</span><br><span class="line">            .                                                               .</span><br><span class="line">            .             (malloc_usable_size() bytes)                      .</span><br><span class="line">            .                                                               |</span><br><span class="line">nextchunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">            |             Size of chunk                                     |</span><br><span class="line">            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br></pre></td></tr></table></figure>
+
+<p>在size字段中最后三位有AMP三个标志位，但是在结构体中却没有定义，我们当前只需要记住P标志位</p>
+<ul>
+<li>PREV_INUSE：记录前一个chunk块是否被分配</li>
+</ul>
+<p>ptmalloc使用chunk实现内存管理，对chunk的管理基于独特的边界标记法。最重要的是地址的对齐。在不同的平台下，每个chunk的最小大小，地址对齐方式是不同的（地址对齐：即需要满足某个字节大小的整数倍，提高效率），ptmalloc依赖平台定义的<strong>size_t</strong>长度，对于32位平台，<strong>size_t</strong>长度为<strong>4</strong>字节，对于64位平台，size_t长度可能为<strong>4</strong>字节，也可能为<strong>8</strong>字节，在Linux X86_64上为<strong>8</strong>字节（做题常用环境）</p>
+<p>在64位平台下，一个使用中的chunk的大小的计算公式应该是：</p>
+<ul>
+<li>in_use_size =（用户请求大小+16byte-8byte）align to 8byte</li>
+</ul>
+<p>这里的16字节是因为需要存储<strong>prev_size</strong>和<strong>size</strong>域，但又因为向下一个chunk“借”了8字节（也就是<strong>prev_size</strong>域的复用），所以实际空间大小要减去8字节，每分配一个chunk的<strong>overhead</strong>为8字节，即SIZE_SZ的大小</p>
+<p>ptmalloc的堆块大小在glibc中会加上前两个成员的大小（0x10大小），所以当你分配一个堆内存时，堆内存的最小大小一定为<strong>0x20</strong>（0x10+0x10 or 4*8），即使malloc没有指定大小，也要分配fd和bk成员，所以加起来就是malloc_chunk结构体的前4个成员的大小总和，这样换用二进制就是100000，size字段的低三位就永远不会被使用，低三位就被用来当作flag位</p>
+<h2 id="堆的释放"><a href="#堆的释放" class="headerlink" title="堆的释放"></a>堆的释放</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">free</span>(ptr);</span><br></pre></td></tr></table></figure>
+
+<p>堆的释放一般都是用free函数实现。堆释放后，会被添加到相应的bins中进行管理，这里涉及到的结构体就是<strong>malloc_state</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> &#123;</span></span><br><span class="line">  <span class="comment">/* Serialize access.  */</span></span><br><span class="line">  <span class="keyword">mutex_t</span> mutex;</span><br><span class="line">  <span class="comment">/* Flags (formerly in max_fast).  */</span></span><br><span class="line">  <span class="keyword">int</span> flags;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> THREAD_STATS</span></span><br><span class="line">  <span class="comment">/* Statistics for locking.  Only used if THREAD_STATS is defined.  */</span></span><br><span class="line">  <span class="keyword">long</span> stat_lock_direct, stat_lock_loop, stat_lock_wait;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">  <span class="comment">/* Fastbins */</span></span><br><span class="line">  mfastbinptr      fastbins[NFASTBINS];</span><br><span class="line">  <span class="comment">/* Base of the topmost chunk -- not otherwise kept in a bin */</span></span><br><span class="line">  mchunkptr        top;</span><br><span class="line">  <span class="comment">/* The remainder from the most recent split of a small request */</span></span><br><span class="line">  mchunkptr        last_remainder;</span><br><span class="line">  <span class="comment">/* Normal bins packed as described above */</span></span><br><span class="line">  mchunkptr        bins[NBINS * <span class="number">2</span> - <span class="number">2</span>];</span><br><span class="line">  <span class="comment">/* Bitmap of bins */</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span>     binmap[BINMAPSIZE];</span><br><span class="line">  <span class="comment">/* Linked list */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> *<span class="title">next</span>;</span></span><br><span class="line">  <span class="comment">/* Memory allocated from the system in this arena.  */</span></span><br><span class="line">  INTERNAL_SIZE_T system_mem;</span><br><span class="line">  INTERNAL_SIZE_T max_system_mem;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>对于空闲的chunk，ptmalloc采用分箱式内存管理方式，根据空闲的chunk的大小和处于的状态将其放在四个不同的bin中，这四个空闲的chunk的容器包括：fast bins，unsort bin、small bins和large bins</p>
+<h2 id="Bins"><a href="#Bins" class="headerlink" title="Bins"></a>Bins</h2><p>首先，glibc malloc分配了若干个bins，为了方便查找了，glibc提供了两个数组：fastbinY和binsBins，英文解释是垃圾桶，在这里就存放被free的chunk</p>
+<p><img src="https://github-1251836300.cos.ap-guangzhou.myqcloud.com/CTF%E2%80%94%E2%80%94WriteUP/how2heap/15548795-49ecc4bc156e439a.png" alt="img"></p>
+<p>fastbinsY是拥有10（NFASTBINS）个元素的数组，用于存放每个fast chunk链表头指针，所以fast bins最多包含10个fast chunk的<strong>单向</strong>链表</p>
+<p>bins用于存储unstored bin，small bins和large bins的chunk链表头，small bins一共62个，large bins一共63个，加起来一共125个bin，是<strong>双向</strong>链表管理</p>
+<h2 id="fastbins"><a href="#fastbins" class="headerlink" title="fastbins"></a>fastbins</h2><p>首先编写下面程序：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *ptr1,*ptr2,*ptr3,*ptr4;</span><br><span class="line">    ptr1 = <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    ptr2 = <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    ptr3 = <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    ptr4 = <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr2);</span><br><span class="line">    <span class="built_in">free</span>(ptr3);</span><br><span class="line">    <span class="built_in">free</span>(ptr4);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>GDB调试可得：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x555555756250</span> FASTBIN &#123;</span><br><span class="line">  mchunk_prev_size = <span class="number">0</span>, </span><br><span class="line">  mchunk_size = <span class="number">33</span>, </span><br><span class="line">  fd = <span class="number">0x0</span>, </span><br><span class="line">  bk = <span class="number">0x0</span>, </span><br><span class="line">  fd_nextsize = <span class="number">0x0</span>, </span><br><span class="line">  bk_nextsize = <span class="number">0x21</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="number">0x555555756270</span> FASTBIN &#123;</span><br><span class="line">  mchunk_prev_size = <span class="number">0</span>, </span><br><span class="line">  mchunk_size = <span class="number">33</span>, </span><br><span class="line">  fd = <span class="number">0x555555756260</span>, </span><br><span class="line">  bk = <span class="number">0x0</span>, </span><br><span class="line">  fd_nextsize = <span class="number">0x0</span>, </span><br><span class="line">  bk_nextsize = <span class="number">0x21</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="number">0x555555756290</span> FASTBIN &#123;</span><br><span class="line">  mchunk_prev_size = <span class="number">0</span>, </span><br><span class="line">  mchunk_size = <span class="number">33</span>, </span><br><span class="line">  fd = <span class="number">0x555555756280</span>, </span><br><span class="line">  bk = <span class="number">0x0</span>, </span><br><span class="line">  fd_nextsize = <span class="number">0x0</span>, </span><br><span class="line">  bk_nextsize = <span class="number">0x21</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="number">0x5555557562b0</span> FASTBIN &#123;</span><br><span class="line">  mchunk_prev_size = <span class="number">0</span>, </span><br><span class="line">  mchunk_size = <span class="number">33</span>, </span><br><span class="line">  fd = <span class="number">0x5555557562a0</span>, </span><br><span class="line">  bk = <span class="number">0x0</span>, </span><br><span class="line">  fd_nextsize = <span class="number">0x0</span>, </span><br><span class="line">  bk_nextsize = <span class="number">0x20d31</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; bins</span><br><span class="line">tcachebins</span><br><span class="line"><span class="number">0x20</span> [  <span class="number">4</span>]: <span class="number">0x5555557562c0</span> —▸ <span class="number">0x5555557562a0</span> —▸ <span class="number">0x555555756280</span> —▸ <span class="number">0x555555756260</span> ◂— <span class="number">0x0</span></span><br></pre></td></tr></table></figure>
+
+<p>还可以直接查看内存中chunk的情况（64位系统用gx，32位用wx）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">4</span>gx <span class="number">0x555555756250</span></span><br><span class="line">    				(prev_size)          (size)</span><br><span class="line"><span class="number">0x555555756250</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span></span><br><span class="line">                             (User data)</span><br><span class="line"><span class="number">0x555555756260</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>fastbins主要是用于提高小内存的分配效率，默认情况下：</p>
+<ul>
+<li>对于SIZE_SZ为4Bytes的平台，小于64Bytes的chunk分配请求</li>
+<li>对于SIZE_SZ为8Bytes的平台，小于128Bytes的chunk分配请求</li>
+</ul>
+<p>首先会查找fastbins中是否有所需要大小的chunk存在（精确匹配大小），如果存在，就直接返回</p>
+<p>fastbins可以看作是samll bins的一小部分cache，默认情况下，fastbins只cache了small bins的前7个大小的空闲chunk（虽然有10个chunk的空间），也就是说：</p>
+<ul>
+<li>对于对于SIZE_SZ为4Bytes的平台，fastbins的7个chunk空闲链表（bin），每个bin的chunk大小依次为：16Bytes，24Bytes，32Bytes，40Bytes，56Bytes，64Bytes</li>
+<li>对于对于SIZE_SZ为8Bytes的平台，fastbins的7个chunk空闲链表（bin），每个bin的chunk大小依次为：32Bytes，48Bytes，64Bytes，80Bytes，96Bytes，128Bytes</li>
+</ul>
+<h2 id="Unsorted-bin"><a href="#Unsorted-bin" class="headerlink" title="Unsorted bin"></a>Unsorted bin</h2><p>可以看作是small bins和large bins的cache，只有<strong>1</strong>个unsort bin，以双向链表管理空闲chunk，空闲chunk不排序，所有的chunk在回收时都要先放到unsorted bin中，分配时，如果在unsorted bin中没有合适的chunk，就会把unsorted bin中的所有的chunk分别加入到所属的bin中，然后再在bin中分配合适的chunk。Bins数组中的元素bin[1]用于存储unsorted bin的chunk链表头</p>
+<h2 id="small-bins"><a href="#small-bins" class="headerlink" title="small bins"></a>small bins</h2><p>small bins管理空闲小chunk，每个small bin中的chunk大小与bin的index有如下关系：</p>
+<ul>
+<li>chunk_size = 2*SIZE_SZ * index</li>
+</ul>
+<p>因此在SIZE_SZ为4B的平台上，small_bins中的chunk大小是以8B为公差的等差数列，最大的chunk大小为504B，最小的chunk大小为16B，所在实际上共62个bin</p>
+<p>在SIZE_SZ为8B的平台上，small_bins中的chunk大小是以16B为公差的等差数列，最大的chunk大小为1008B，最小的chunk大小为32B，所在实际上共62个bin</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/07/8086╗π▒α▒╩╝╟04/" rel="next" title="8086汇编笔记04">
+                  <i class="fa fa-chevron-left"></i> 8086汇编笔记04
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/10/8086╗π▒α▒╩╝╟05/" rel="prev" title="8086汇编笔记05">
+                  8086汇编笔记05 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#malloc"><span class="nav-number">1.</span> <span class="nav-text">malloc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#malloc-chunk"><span class="nav-number">2.</span> <span class="nav-text">malloc_chunk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#chunk的复用技术"><span class="nav-number">3.</span> <span class="nav-text">chunk的复用技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用中的chunk"><span class="nav-number">4.</span> <span class="nav-text">使用中的chunk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆的释放"><span class="nav-number">5.</span> <span class="nav-text">堆的释放</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bins"><span class="nav-number">6.</span> <span class="nav-text">Bins</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastbins"><span class="nav-number">7.</span> <span class="nav-text">fastbins</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unsorted-bin"><span class="nav-number">8.</span> <span class="nav-text">Unsorted bin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#small-bins"><span class="nav-number">9.</span> <span class="nav-text">small bins</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

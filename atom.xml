@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ZERO-A-ONE</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2020-06-30T01:03:42.000Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>ZERO-A-ONE</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Angr入门笔记（一）</title>
+    <link href="http://yoursite.com/2020/06/29/Angr%E2%95%9A%CE%B4%E2%94%9C%E2%94%BC%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F%C3%BA%C2%BF%E2%95%A5%E2%95%97%C3%BA%E2%8C%90/"/>
+    <id>http://yoursite.com/2020/06/29/Angr╚δ├┼▒╩╝╟ú¿╥╗ú⌐/</id>
+    <published>2020-06-29T10:03:42.000Z</published>
+    <updated>2020-06-30T01:03:42.000Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>长亭PWN笔记03</title>
+    <link href="http://yoursite.com/2020/05/04/%E2%94%82%C3%B1%E2%95%90%C3%B1PWN%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F03/"/>
+    <id>http://yoursite.com/2020/05/04/│ñ═ñPWN▒╩╝╟03/</id>
+    <published>2020-05-04T16:16:23.000Z</published>
+    <updated>2020-05-05T07:16:40.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;ul&gt;
+&lt;li&gt;什么是堆&lt;/li&gt;
+&lt;li&gt;glibc的堆管理实现&lt;ul&gt;
+&lt;li&gt;arena&lt;/li&gt;
+&lt;li&gt;bins&lt;/li&gt;
+&lt;li&gt;chunk&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;malloc和free的工作流程&lt;/li&gt;
+&lt;li&gt;fastbin attack
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>长亭PWN笔记02</title>
+    <link href="http://yoursite.com/2020/04/26/%E2%94%82%C3%B1%E2%95%90%C3%B1PWN%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F02/"/>
+    <id>http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟02/</id>
+    <published>2020-04-26T08:55:21.000Z</published>
+    <updated>2020-04-27T02:56:40.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;ul&gt;
+&lt;li&gt;ROP实战技巧之一：连接多个libc函数调用&lt;/li&gt;
+&lt;li&gt;ROPP实战技巧之二：栈迁移(Stack
+        
+      
+    
+    </summary>
+    
+      <category term="长亭PWN笔记" scheme="http://yoursite.com/categories/%E9%95%BF%E4%BA%ADPWN%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>长亭PWN笔记01</title>
+    <link href="http://yoursite.com/2020/04/26/%E2%94%82%C3%B1%E2%95%90%C3%B1PWN%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F01/"/>
+    <id>http://yoursite.com/2020/04/26/│ñ═ñPWN▒╩╝╟01/</id>
+    <published>2020-04-26T08:54:26.000Z</published>
+    <updated>2020-04-27T02:56:48.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;PWN工具集合&quot;&gt;&lt;a href=&quot;#PWN工具集合&quot; class=&quot;headerlink&quot; title=&quot;PWN工具集合&quot;&gt;&lt;/a&gt;PWN工具集合&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;zio - 框架&lt;ul&gt;
+&lt;li&gt;接口简单易用&lt;/li&gt;
+&lt;li&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="长亭PWN笔记" scheme="http://yoursite.com/categories/%E9%95%BF%E4%BA%ADPWN%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Linux让终端走代理的几种方法</title>
+    <link href="http://yoursite.com/2020/04/21/Linux%E2%95%9A%E2%94%9C%E2%95%93%E2%95%92%E2%95%A2%E2%95%A6%E2%95%AB%E2%96%80%E2%94%A4%C2%B7%E2%94%94%CF%86%E2%95%A1%E2%94%80%E2%95%9D%E2%95%95%E2%95%93%E2%95%93%E2%95%96%E2%95%9C%E2%95%96%C2%BF/"/>
+    <id>http://yoursite.com/2020/04/21/Linux╚├╓╒╢╦╫▀┤·└φ╡─╝╕╓╓╖╜╖¿/</id>
+    <published>2020-04-21T15:40:57.000Z</published>
+    <updated>2020-04-27T02:56:58.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;最近使用终端git的时候觉得速度有点慢，考虑一下是不是可以通过让终端走代理的方式来加快速度，尝试了一下以后确实是可以的。如果只是为了设置git的话可以直接在文章最后找到git的设置代理的方法。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;前期准备:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;认识代
+        
+      
+    
+    </summary>
+    
+      <category term="Linux杂记" scheme="http://yoursite.com/categories/Linux%E6%9D%82%E8%AE%B0/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>PWNTOOLS个人手册</title>
+    <link href="http://yoursite.com/2020/04/18/PWNTOOLS%E2%95%95%C3%B7%E2%95%9A%E2%95%A6%E2%95%A9%E2%95%93%E2%96%93%C3%9F/"/>
+    <id>http://yoursite.com/2020/04/18/PWNTOOLS╕÷╚╦╩╓▓ß/</id>
+    <published>2020-04-18T08:48:38.000Z</published>
+    <updated>2020-04-18T23:48:56.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;项目主页：&lt;a href=&quot;http://pwntools.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://pwntools.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;项目地址：&lt;a
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>从理解ELF到手写Readelf解析器（一）</title>
+    <link href="http://yoursite.com/2020/04/12/%E2%94%A4%E2%95%99%E2%94%94%CF%86%E2%95%9C%CE%93ELF%E2%95%A1%E2%95%9C%E2%95%A9%E2%95%93%E2%95%A8%E2%94%A4Readelf%E2%95%9C%CE%93%E2%95%AC%C3%B7%E2%95%9E%E2%89%88%C3%BA%C2%BF%E2%95%A5%E2%95%97%C3%BA%E2%8C%90/"/>
+    <id>http://yoursite.com/2020/04/12/┤╙└φ╜ΓELF╡╜╩╓╨┤Readelf╜Γ╬÷╞≈ú¿╥╗ú⌐/</id>
+    <published>2020-04-12T11:36:31.000Z</published>
+    <updated>2020-04-13T02:38:18.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;（本文所有代码均基于Go语言，ELF文件为32位）&lt;/p&gt;
+&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>IDA、GDB、DBG常用操作</title>
+    <link href="http://yoursite.com/2020/03/17/IDA%C3%AD%C3%B3GDB%C3%AD%C3%B3DBG%E2%94%82%C3%BA%E2%95%99%E2%94%9C%E2%96%93%E2%94%98%E2%95%AB%E2%89%88/"/>
+    <id>http://yoursite.com/2020/03/17/IDAíóGDBíóDBG│ú╙├▓┘╫≈/</id>
+    <published>2020-03-17T15:21:18.000Z</published>
+    <updated>2020-03-18T06:22:02.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;IDA-Pro&quot;&gt;&lt;a href=&quot;#IDA-Pro&quot; class=&quot;headerlink&quot; title=&quot;IDA Pro&quot;&gt;&lt;/a&gt;IDA
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>80x86汇编笔记04</title>
+    <link href="http://yoursite.com/2020/03/03/80x86%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F04/"/>
+    <id>http://yoursite.com/2020/03/03/80x86╗π▒α▒╩╝╟04/</id>
+    <published>2020-03-04T01:58:29.000Z</published>
+    <updated>2020-03-04T17:58:46.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;子程序&quot;&gt;&lt;a href=&quot;#子程序&quot; class=&quot;headerlink&quot; title=&quot;子程序&quot;&gt;&lt;/a&gt;子程序&lt;/h2&gt;&lt;h3 id=&quot;子程序的定义&quot;&gt;&lt;a href=&quot;#子程序的定义&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>80x86汇编笔记03</title>
+    <link href="http://yoursite.com/2020/02/27/80x86%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F03/"/>
+    <id>http://yoursite.com/2020/02/27/80x86╗π▒α▒╩╝╟03/</id>
+    <published>2020-02-28T03:32:11.000Z</published>
+    <updated>2020-02-28T19:32:36.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;标号、变量和数据结构&quot;&gt;&lt;a href=&quot;#标号、变量和数据结构&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>汇编跳转指令汇总</title>
+    <link href="http://yoursite.com/2020/02/27/%E2%95%97%CF%80%E2%96%92%CE%B1%E2%95%A0%C2%B0%E2%95%AB%C2%AC%E2%95%93%E2%95%95%E2%94%B4%CE%B5%E2%95%97%CF%80%E2%95%AB%E2%96%84/"/>
+    <id>http://yoursite.com/2020/02/27/╗π▒α╠°╫¬╓╕┴ε╗π╫▄/</id>
+    <published>2020-02-27T08:53:10.000Z</published>
+    <updated>2020-02-28T00:53:40.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;无条件跳转&quot;&gt;&lt;a href=&quot;#无条件跳转&quot; class=&quot;headerlink&quot; title=&quot;无条件跳转&quot;&gt;&lt;/a&gt;无条件跳转&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;名称&lt;/th&gt;
+&lt;th
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>80x86汇编笔记02</title>
+    <link href="http://yoursite.com/2020/02/27/80x86%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F02/"/>
+    <id>http://yoursite.com/2020/02/27/80x86╗π▒α▒╩╝╟02/</id>
+    <published>2020-02-27T08:41:04.000Z</published>
+    <updated>2020-02-28T00:41:20.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;模式定义&quot;&gt;&lt;a href=&quot;#模式定义&quot; class=&quot;headerlink&quot; title=&quot;模式定义&quot;&gt;&lt;/a&gt;模式定义&lt;/h2&gt;&lt;h3 id=&quot;指定使用的指令集&quot;&gt;&lt;a href=&quot;#指定使用的指令集&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>80x86汇编笔记01</title>
+    <link href="http://yoursite.com/2020/02/25/80x86%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F01/"/>
+    <id>http://yoursite.com/2020/02/25/80x86╗π▒α▒╩╝╟01/</id>
+    <published>2020-02-26T00:58:14.000Z</published>
+    <updated>2020-02-26T16:58:38.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;80x86处理器的工作模式&quot;&gt;&lt;a href=&quot;#80x86处理器的工作模式&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>pwn入门（Basic-ROP）</title>
+    <link href="http://yoursite.com/2020/02/16/pwn%E2%95%9A%CE%B4%E2%94%9C%E2%94%BC%C3%BA%C2%BFBasic-ROP%C3%BA%E2%8C%90/"/>
+    <id>http://yoursite.com/2020/02/16/pwn╚δ├┼ú¿Basic-ROPú⌐/</id>
+    <published>2020-02-16T15:41:26.000Z</published>
+    <updated>2020-02-17T07:42:50.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;转载自：&lt;a href=&quot;https://www.yuque.com/hxfqg9/hs80y0/ug9gx5#ueOeL&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>PWN-Tips-1</title>
+    <link href="http://yoursite.com/2020/02/14/PWN-Tips-1/"/>
+    <id>http://yoursite.com/2020/02/14/PWN-Tips-1/</id>
+    <published>2020-02-14T16:32:06.000Z</published>
+    <updated>2020-02-15T08:33:50.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;题目源码编译&quot;&gt;&lt;a href=&quot;#题目源码编译&quot; class=&quot;headerlink&quot; title=&quot;题目源码编译&quot;&gt;&lt;/a&gt;题目源码编译&lt;/h2&gt;&lt;p&gt;如果希望什么保护都没有的编译命令一般是：&lt;/p&gt;
+&lt;figure class=&quot;highlight
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Win10-64bit下80x86汇编环境速成</title>
+    <link href="http://yoursite.com/2020/02/12/Win10-64bit%E2%95%A7%E2%94%AC80x86%E2%95%97%CF%80%E2%96%92%CE%B1%E2%95%97%E2%95%96%E2%95%9B%E2%94%82%E2%95%A6%E2%94%98%E2%94%82%E2%95%94/"/>
+    <id>http://yoursite.com/2020/02/12/Win10-64bit╧┬80x86╗π▒α╗╖╛│╦┘│╔/</id>
+    <published>2020-02-12T08:57:29.000Z</published>
+    <updated>2020-02-13T00:58:14.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;众所周知Windows只有较为古老的32位系统才提供对16位系统的兼容，现在普遍安装的64位操作系统需要一个开源的模拟环境DOSBOX来进行16位DOS环境的汇编学习操作&lt;/p&gt;
+&lt;h2 id=&quot;工具包准备&quot;&gt;&lt;a href=&quot;#工具包准备&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>8086汇编笔记06</title>
+    <link href="http://yoursite.com/2020/02/10/8086%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F06/"/>
+    <id>http://yoursite.com/2020/02/10/8086╗π▒α▒╩╝╟06/</id>
+    <published>2020-02-11T06:26:35.000Z</published>
+    <updated>2020-02-11T22:26:50.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;int指令&quot;&gt;&lt;a href=&quot;#int指令&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>8086汇编笔记05</title>
+    <link href="http://yoursite.com/2020/02/10/8086%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F05/"/>
+    <id>http://yoursite.com/2020/02/10/8086╗π▒α▒╩╝╟05/</id>
+    <published>2020-02-10T10:15:12.000Z</published>
+    <updated>2020-02-11T02:15:30.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;中断&quot;&gt;&lt;a href=&quot;#中断&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>简明堆入门</title>
+    <link href="http://yoursite.com/2020/02/07/%E2%95%9D%E2%89%A5%E2%94%9C%E2%89%88%E2%95%A2%E2%95%A4%E2%95%9A%CE%B4%E2%94%9C%E2%94%BC/"/>
+    <id>http://yoursite.com/2020/02/07/╝≥├≈╢╤╚δ├┼/</id>
+    <published>2020-02-08T07:56:29.000Z</published>
+    <updated>2020-02-08T23:57:08.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;malloc&quot;&gt;&lt;a href=&quot;#malloc&quot; class=&quot;headerlink&quot; title=&quot;malloc&quot;&gt;&lt;/a&gt;malloc&lt;/h2&gt;&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>8086汇编笔记04</title>
+    <link href="http://yoursite.com/2020/02/07/8086%E2%95%97%CF%80%E2%96%92%CE%B1%E2%96%92%E2%95%A9%E2%95%9D%E2%95%9F04/"/>
+    <id>http://yoursite.com/2020/02/07/8086╗π▒α▒╩╝╟04/</id>
+    <published>2020-02-07T08:33:23.000Z</published>
+    <updated>2020-02-08T00:33:38.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;标志寄存器&quot;&gt;&lt;a href=&quot;#标志寄存器&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
